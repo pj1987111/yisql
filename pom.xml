@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.zhy</groupId>
+    <artifactId>yisql_2.11</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>yisql-core</module>
+        <module>yisql-commons</module>
+        <module>yisql-dsl</module>
+        <module>yisql-test</module>
+        <module>yisql-provider</module>
+    </modules>
+
+    <properties>
+        <project.version>1.0.0</project.version>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <compiler.version>1.8</compiler.version>
+        <java_source_version>1.8</java_source_version>
+        <java_target_version>1.8</java_target_version>
+        <file_encoding>UTF-8</file_encoding>
+
+        <spark.version>2.4.0</spark.version>
+        <druid-version>1.0.31</druid-version>
+        <slf4j-api-version>1.7.25</slf4j-api-version>
+        <logback-version>1.2.2</logback-version>
+        <log4j-version>1.2.17</log4j-version>
+        <log4j-over-slf4j-version>1.7.25</log4j-over-slf4j-version>
+        <commons-logging-version>1.1.3</commons-logging-version>
+        <jcl-over-slf4j-version>1.7.25</jcl-over-slf4j-version>
+        <jul-to-slf4j-version>1.7.25</jul-to-slf4j-version>
+        <guava-version>23.0</guava-version>
+        <fastjson-version>1.2.67</fastjson-version>
+        <mysql-version>5.1.43</mysql-version>
+        <mybatis-version>3.4.5</mybatis-version>
+        <mybatis-spring-version>1.3.1</mybatis-spring-version>
+        <mybatis-springboot-version>1.3.1</mybatis-springboot-version>
+        <mapper-version>3.4.6</mapper-version>
+        <mapper-springboot-version>1.1.7</mapper-springboot-version>
+        <pagehelper-version>4.1.1</pagehelper-version>
+        <velocity-version>1.7</velocity-version>
+
+        <!--executeSql-->
+        <scala.version>2.11.12</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
+        <scalatest.version>3.0.0</scalatest.version>
+        <jobapi.version>1.0.4</jobapi.version>
+        <scala.maven.veriosn>3.2.2</scala.maven.veriosn>
+        <typesafe-config.version>1.4.0</typesafe-config.version>
+        <guice.version>3.0</guice.version>
+        <!--kraken-operation-->
+        <os-lib.version>0.2.9</os-lib.version>
+
+        <jolbox.version>0.8.0.RELEASE</jolbox.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--commons-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.9.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
+            </dependency>
+
+            <!--guava-->
+            <!--<dependency>-->
+            <!--<groupId>com.google.guava</groupId>-->
+            <!--<artifactId>guava</artifactId>-->
+            <!--<version>${guava-version}</version>-->
+            <!--</dependency>-->
+
+            <!-- fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson-version}</version>
+            </dependency>
+
+            <!-- druid -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid-version}</version>
+            </dependency>
+
+            <!-- mysql -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-version}</version>
+            </dependency>
+
+
+            <!-- 日志相关 -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback-version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${log4j-over-slf4j-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${jcl-over-slf4j-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${jul-to-slf4j-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+
+
+            <!--executeSql-->
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.binary.version}</artifactId>
+                <version>${scalatest.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-hive_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.typesafe/config -->
+            <dependency>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>${typesafe-config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
