@@ -15,6 +15,7 @@
         <module>yisql-dsl</module>
         <module>yisql-test</module>
         <module>yisql-provider</module>
+        <module>yisql-cmd</module>
     </modules>
 
     <properties>
@@ -56,10 +57,10 @@
         <scala.maven.veriosn>3.2.2</scala.maven.veriosn>
         <typesafe-config.version>1.4.0</typesafe-config.version>
         <guice.version>3.0</guice.version>
-        <!--kraken-operation-->
         <os-lib.version>0.2.9</os-lib.version>
-
+        <lift-json.version>3.4.1</lift-json.version>
         <jolbox.version>0.8.0.RELEASE</jolbox.version>
+        <fastjson-version>1.2.67</fastjson-version>
     </properties>
 
     <dependencyManagement>
@@ -126,7 +127,11 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api-version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${log4j-over-slf4j-version}</version>
+            </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
@@ -196,6 +201,22 @@
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.liftweb</groupId>
+                <artifactId>lift-json_${scala.binary.version}</artifactId>
+                <version>${lift-json.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.scala-lang</groupId>
+                        <artifactId>scala-compiler</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson-version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

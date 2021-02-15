@@ -1,13 +1,5 @@
 package com.zhy.yisql.core.dsl;
 
-/**
- *  \* Created with IntelliJ IDEA.
- *  \* User: hongyi.zhou
- *  \* Date: 2021-01-31
- *  \* Time: 22:15
- *  \* Description: 
- *  \
- */
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.misc.Interval;
@@ -25,8 +17,9 @@ public class CaseChangingCharStream implements CharStream {
     /**
      * Constructs a new CaseChangingCharStream wrapping the given {@link CharStream} forcing
      * all characters to upper case or lower case.
+     *
      * @param stream The stream to wrap.
-     * @param upper If true force each symbol to upper case, otherwise force to lower.
+     * @param upper  If true force each symbol to upper case, otherwise force to lower.
      */
     public CaseChangingCharStream(CharStream stream, boolean upper) {
         this.stream = stream;
@@ -44,6 +37,7 @@ public class CaseChangingCharStream implements CharStream {
         this.stream = stream;
         this.upper = false;
     }
+
     @Override
     public String getText(Interval interval) {
         return stream.getText(interval);

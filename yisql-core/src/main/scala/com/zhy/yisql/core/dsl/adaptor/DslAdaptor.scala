@@ -1,9 +1,10 @@
 package com.zhy.yisql.core.dsl.adaptor
 
-import com.zhy.yisql.core.dsl.ScriptSQLExecListener
+import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.core.dsl.template.TemplateMerge
 import com.zhy.yisql.dsl.parser.DSLSQLLexer
 import com.zhy.yisql.dsl.parser.DSLSQLParser.{ExpressionContext, SqlContext}
+import com.zhy.yisql.runner.ScriptSQLExecListener
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.spark.sql.SparkSession
 
@@ -14,7 +15,7 @@ import org.apache.spark.sql.SparkSession
   *  \* Time: 21:31
   *  \* Description: 
   *  \*/
-trait DslAdaptor extends DslTool {
+trait DslAdaptor extends DslTool with Logging {
     def parse(ctx: SqlContext): Unit
 }
 
@@ -55,7 +56,9 @@ trait DslTool {
 
 
     def cleanBlockStr(str: String) = {
-        if (str.startsWith("'''") && str.endsWith("'''"))
+        if(str.startsWith("'''\n") && str.endsWith("\n'''"))
+            str.substring(4, str.length - 4)
+        else if (str.startsWith("'''") && str.endsWith("'''"))
             str.substring(3, str.length - 3)
         else str
     }

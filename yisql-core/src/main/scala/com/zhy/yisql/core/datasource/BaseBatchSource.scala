@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource
 
 import com.zhy.yisql.core.dsl.adaptor.DslTool
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, SaveMode}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.

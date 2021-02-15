@@ -297,10 +297,10 @@ class BatchTest {
               |''';
               |load jsonStr.`jstr` as json_out;
               |
-              |save append json_out delta.`/tmp/delta/table10`
+              |save append json_out delta.`/tmp/delta/table11`
               |options idCols="id";
               |
-              |load delta.`/tmp/delta/table10` as output;
+              |load delta.`/tmp/delta/table11` as output;
               |
               |--select count(*) from output;
             """.stripMargin)
@@ -333,12 +333,14 @@ class BatchTest {
               |load delta.`/tmp/delta/table10` where
               |startingVersion="0"
               |and endingVersion="4"
-              |as table1;
+              |as table1
+              |;
               |
               |--select * from table1 as table2;
               |
               |select __delta_version__, collect_list(id) from table1 group by __delta_version__,id
-              |as table2;
+              |as table2
+              |;
             """.stripMargin)
         val res = executor.simpleExecute()
         println(res)

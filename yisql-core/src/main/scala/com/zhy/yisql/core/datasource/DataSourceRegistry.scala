@@ -1,7 +1,8 @@
 package com.zhy.yisql.core.datasource
 
 import com.google.common.reflect.ClassPath
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import com.zhy.yisql.common.utils.log.Logging
+import org.apache.spark.sql.DataFrame
 
 import scala.collection.JavaConverters._
 
@@ -10,9 +11,9 @@ import scala.collection.JavaConverters._
   *  \* User: hongyi.zhou
   *  \* Date: 2021-02-04
   *  \* Time: 19:27
-  *  \* Description: 
+  *  \* Description: 注册数据交换reader和writer
   *  \*/
-object DataSourceRegistry {
+object DataSourceRegistry extends Logging {
 
     private val registry = new java.util.concurrent.ConcurrentHashMap[String, DataSource]()
 
@@ -44,18 +45,16 @@ object DataSourceRegistry {
 
     private def registerFromPackage(name: String) = {
         ClassPath.from(getClass.getClassLoader).getTopLevelClasses(name).asScala.foreach { clzz =>
-            //            if (!clzz.getName.endsWith("MLSQLFileDataSource")) {
             val dataSource = Class.forName(clzz.getName).newInstance()
             if (dataSource.isInstanceOf[Registry]) {
                 dataSource.asInstanceOf[Registry].register()
             } else {
-                //                logWarning(
-                //                    s"""
-                //                       |${clzz.getName} does not implement MLSQLRegistry,
-                //                       |we cannot register it automatically.
-                //         """.stripMargin)
+                logWarning(
+                    s"""
+                       |${clzz.getName} does not implement YiSQLRegistry,
+                       |we cannot register it automatically.
+                         """.stripMargin)
             }
-            //            }
         }
     }
 

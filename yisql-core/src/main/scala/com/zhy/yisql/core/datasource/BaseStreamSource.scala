@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.zhy.yisql.core.dsl.adaptor.DslTool
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, Trigger}
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -55,5 +55,20 @@ trait BaseStreamSource extends StreamSource with StreamSink with Registry with D
     override def unRegister(): Unit = {
         DataSourceRegistry.unRegister(fullFormat)
         DataSourceRegistry.unRegister(shortFormat)
+    }
+}
+
+object ForeachBatchRunner {
+    def run(dataStreamWriter: DataStreamWriter[Row], outputName: String, callback: (Long, SparkSession) => Unit): Unit = {
+        dataStreamWriter.foreachBatch { (dataBatch, batchId) =>
+            dataBatch.createOrReplaceTempView(outputName)
+            callback(batchId, dataBatch.sparkSession)
+        }
+    }
+
+    def run(dataStreamWriter: DataStreamWriter[Row], callback: (Dataset[Row], Long) => Unit): Unit = {
+        dataStreamWriter.foreachBatch { (dataBatch, batchId) =>
+            callback(dataBatch, batchId)
+        }
     }
 }

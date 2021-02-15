@@ -1,7 +1,6 @@
 package com.zhy.yisql.runner
 
-import com.zhy.yisql.core.dsl.{ExecuteContext, PathPrefix, ScriptSQLExec, ScriptSQLExecListener}
-import com.zhy.yisql.core.util.JsonUtils
+import com.zhy.yisql.common.utils.json.JsonUtils
 import org.apache.spark.sql.SparkSession
 
 import scala.collection.mutable
@@ -32,8 +31,15 @@ class RunScriptExecutor(_params: Map[String, String]) {
         var outputResult: String = if (includeSchema) "{}" else "[]"
 
         try {
+//            val jobInfo = JobManager.getJobInfo(
+//                param("owner"), param("jobType", MLSQLJobType.SCRIPT), param("jobName"), param("sql"),
+//                paramAsLong("timeout", -1L)
+//            )
+
             val listener = createScriptSQLExecListener(sparkSession)
-            ScriptSQLExec.parse(param("sql"), listener)
+            JobManager.run(() => {
+                ScriptSQLExec.parse(param("sql"), listener)
+            })
             if (!silence)
                 outputResult = getScriptResult(listener, sparkSession)
         } finally {
