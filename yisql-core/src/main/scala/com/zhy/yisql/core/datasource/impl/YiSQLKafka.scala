@@ -1,10 +1,9 @@
 package com.zhy.yisql.core.datasource.impl
 
+import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
-import org.apache.spark.sql.{Column, DataFrame, DataFrameReader, DataFrameWriter, Row, functions => F}
-import tech.mlsql.schema.parser.SparkSimpleSchemaParser
+import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -19,23 +18,12 @@ class YiSQLKafka extends BaseStreamSource with BaseBatchSource {
     override def sLoad(streamReader: DataStreamReader, config: DataSourceConfig): DataFrame = {
         val option = config.config
         val format = option.getOrElse("implClass", fullFormat)
-        var loadTable = streamReader.options(rewriteKafkaConfig(option, getSubscribe, getLoadUrl, config.path)).format(format).
-                load()
+        var loadTable = streamReader.options(rewriteKafkaConfig(option, getSubscribe, getLoadUrl, config.path)).format(format).load()
         if (option.contains("valueSchema")) {
-            val sourceSchema = SparkSimpleSchemaParser.parse(option("valueSchema"))
-            val kafkaFields = List("key", "partition", "offset", "timestamp", "timestampType", "topic")
-            //step1 列重排
-            loadTable = loadTable.withColumn("kafkaValue", F.struct(
-                kafkaFields.map(F.col): _*
-            ))
-            //step2 value单独拿出,kafkaValue存储做后续使用
-            .selectExpr("CAST(value AS STRING) as tmpValue", "kafkaValue")
-            //step3 value解析出单独列
-            .select(new Column(JsonToStructs(sourceSchema, Map(), F.col("tmpValue").expr, None)).as("data"), F.col("kafkaValue"))
-            if(option.getOrElse("containRaw", "true").toBoolean)
-                loadTable = loadTable.select("data.*", "kafkaValue")
-            else
-                loadTable = loadTable.select("data.*")
+            loadTable = SparkSchemaJsonParser.parseDataFrame(
+                loadTable.selectExpr("CAST(value AS STRING) as value"),
+                option("valueSchema"),
+                option.getOrElse("containRaw", "true").toBoolean)
         }
         loadTable
     }
@@ -45,8 +33,16 @@ class YiSQLKafka extends BaseStreamSource with BaseBatchSource {
     }
 
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
+        val option = config.config
         val format = config.config.getOrElse("implClass", fullFormat)
-        reader.options(rewriteKafkaConfig(config.config, getSubscribe, getLoadUrl, config.path)).format(format).load()
+        var loadTable = reader.options(rewriteKafkaConfig(config.config, getSubscribe, getLoadUrl, config.path)).format(format).load()
+        if (option.contains("valueSchema")) {
+            loadTable = SparkSchemaJsonParser.parseDataFrame(
+                loadTable.selectExpr("CAST(value AS STRING) as value"),
+                option("valueSchema"),
+                option.getOrElse("containRaw", "true").toBoolean)
+        }
+        loadTable
     }
 
     override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {

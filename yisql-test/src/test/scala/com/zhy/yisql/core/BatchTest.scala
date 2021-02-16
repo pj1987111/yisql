@@ -156,6 +156,25 @@ class BatchTest {
     }
 
     @Test
+    def kafkaRead(): Unit = {
+        val executor = new RunScriptExecutor(Map())
+        executor.sql(
+            """
+              |load kafka.`zhy` where
+              |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+              |and multiplyFactor="2"
+              |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
+              |as table1;
+              |
+              |save append table1
+              |as console.``;
+              |
+            """.stripMargin)
+        val res = executor.simpleExecute()
+        println(res)
+    }
+
+    @Test
     def kafkaAdhoc(): Unit = {
         val executor = new RunScriptExecutor(Map())
         executor.sql(
@@ -163,6 +182,7 @@ class BatchTest {
               |load adHocKafka.`zhy` where
               |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
               |and multiplyFactor="2"
+              |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
               |as table1;
               |
               |load adHocKafka.`zhy` where
@@ -171,17 +191,21 @@ class BatchTest {
               |and timeFormat="yyyyMMdd"
               |and startingTime="20210212"
               |and endingTime="20210213"
+              |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
               |as table2;
               |
-              |select cast(value as string) as textValue, * from table1 as output;
-              |select count(*) from table1 as output;
-              |select count(*) from table2 as output;
-              |select cast(value as string) as value from table2 as output;
+              |--select cast(value as string) as textValue, * from table1 as output;
+              |--select count(*) from table1 as output;
+              |--select count(*) from table2 as output;
+              |--select cast(value as string) as value from table2 as output;
+              |
+              |save append table2
+              |as console.``;
               |
               |--kafka数据重新插入，指定时间范围
-              |save append output
-              |as kafka.`zhy1`
-              |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092";
+              |--save append output
+              |--as kafka.`zhy1`
+              |--`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092";
               |
             """.stripMargin)
         val res = executor.simpleExecute()

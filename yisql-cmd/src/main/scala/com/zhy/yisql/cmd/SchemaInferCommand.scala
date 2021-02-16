@@ -1,11 +1,13 @@
 package com.zhy.yisql.cmd
 
 import com.alibaba.fastjson.JSON
+import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.cmds.SQLCmd
 import org.apache.spark.sql.execution.datasources.json.JsonInferSchema
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String
 import tech.mlsql.common.utils.serder.json.JSONTool
+
 import scala.collection.JavaConversions._
 
 /**
@@ -26,10 +28,10 @@ class SchemaInferCommand extends SQLCmd {
                 val schemaStr = SchemaInferCommand.inferSchema(str.split("\n").map(f => UTF8String.fromString(f)), spark)
                 logInfo(s"Infer schema: ${schemaStr}")
                 Seq(Seq(schemaStr)).toDF("value")
-//            case Seq("jsonv2", str, _*) =>
-//                val schemaStr = SchemaInferCommand.inferSchemaV2(str, spark)
-//                logInfo(s"Infer schema: ${schemaStr}")
-//                Seq(Seq(schemaStr)).toDF("value")
+            case Seq("jsonv2", str, _*) =>
+                val schemaStr = SchemaInferCommand.inferSchemaV2(str.split("\n").map(f => UTF8String.fromString(f)), spark)
+                logInfo(s"Infer schema: ${schemaStr}")
+                Seq(Seq(schemaStr)).toDF("value")
             case _ => throw new RuntimeException(
                 """
                   |please use `!schemainfer help;` to get the usage.
@@ -45,7 +47,13 @@ object SchemaInferCommand {
         schemaStr
     }
 
-    def inferSchemaV2(dataMsg: String, spark: SparkSession) = {
+    def inferSchemaV2(data: Seq[UTF8String], spark: SparkSession) = {
+        val schema = JsonInferSchema.inferJson(data, spark)
+        val schemaStr = SparkSchemaJsonParser.serializeSchema(schema)
+        schemaStr
+    }
+
+    def inferSchemaOld(dataMsg: String, spark: SparkSession) = {
         var uSeq: Seq[UTF8String] = Seq.empty[UTF8String]
 
         for (data <- dataMsg.split("\n")) {

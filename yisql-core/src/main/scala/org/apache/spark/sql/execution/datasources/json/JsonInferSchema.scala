@@ -16,9 +16,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.Utils
 
-/**
-  * Created by allwefantasy on 6/8/2018.
-  */
 object JsonInferSchema {
 
     def inferJson(json: Seq[UTF8String], sparkSession: SparkSession) = {
