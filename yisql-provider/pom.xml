@@ -15,12 +15,12 @@
         <module>spark-adhoc-kafka_2.11</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.zhy</groupId>
-            <artifactId>yisql-core_${scala.binary.version}</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>com.zhy</groupId>-->
+<!--            <artifactId>yisql-core_${scala.binary.version}</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 </project>

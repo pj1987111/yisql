@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
   * 类json表达式转SPARK StructedField
   *
   * 默认支持最外层为数组
-  * 
+  *
   * 非嵌套
   * st(field(id,string),field(name,string))
   *

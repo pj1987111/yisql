@@ -1,7 +1,10 @@
 package com.zhy.yisql.runner
 
 import com.zhy.yisql.common.utils.json.JsonUtils
+import com.zhy.yisql.platform.PlatformManager
+import com.zhy.yisql.platform.runtime.SparkRuntime
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.session.SQLSparkSession
 
 import scala.collection.mutable
 
@@ -31,13 +34,13 @@ class RunScriptExecutor(_params: Map[String, String]) {
         var outputResult: String = if (includeSchema) "{}" else "[]"
 
         try {
-//            val jobInfo = JobManager.getJobInfo(
-//                param("owner"), param("jobType", MLSQLJobType.SCRIPT), param("jobName"), param("sql"),
-//                paramAsLong("timeout", -1L)
-//            )
+            val jobInfo = JobManager.getJobInfo(
+                param("owner"), param("jobType", SQLJobType.SCRIPT), param("jobName"), param("sql"),
+                paramAsLong("timeout", -1L)
+            )
 
-            val listener = createScriptSQLExecListener(sparkSession)
-            JobManager.run(() => {
+            val listener = createScriptSQLExecListener(sparkSession, jobInfo.groupId)
+            JobManager.run(sparkSession, jobInfo, () => {
                 ScriptSQLExec.parse(param("sql"), listener)
             })
             if (!silence)
@@ -78,7 +81,7 @@ class RunScriptExecutor(_params: Map[String, String]) {
         result.toString
     }
 
-    private def createScriptSQLExecListener(sparkSession: SparkSession) = {
+    private def createScriptSQLExecListener(sparkSession: SparkSession, groupId: String) = {
         val allPathPrefix = JsonUtils.fromJson[Map[String, String]](param("allPathPrefix", "{}"))
         val defaultPathPrefix = param("defaultPathPrefix", "")
         val pathPrefix = new PathPrefix(defaultPathPrefix, allPathPrefix)
@@ -87,7 +90,7 @@ class RunScriptExecutor(_params: Map[String, String]) {
         val ownerOption = if (params.contains("owner")) Some(param("owner")) else None
         val userDefineParams = params.filter(f => f._1.startsWith("context.")).map(f => (f._1.substring("context.".length), f._2))
 
-        ScriptSQLExec.setContext(ExecuteContext(context, param("owner"),
+        ScriptSQLExec.setContext(ExecuteContext(context, param("owner"), groupId,
             userDefineParams ++ Map("__PARAMS__" -> JsonUtils.toJson(params()))
         ))
         context.addEnv("HOME", pathPrefix.pathPrefix(None))
@@ -123,20 +126,22 @@ class RunScriptExecutor(_params: Map[String, String]) {
         _params ++ extraParams
     }
 
-    //    def getSession = {
-    //
-    //        val session = if (paramAsBoolean("sessionPerUser", false)) {
-    //            PlatformManager.getRuntime.asInstanceOf[SparkRuntime].getSession(param("owner", "admin"))
-    //        } else {
-    //            PlatformManager.getRuntime.asInstanceOf[SparkRuntime].sparkSession
-    //        }
-    //
-    //        if (paramAsBoolean("sessionPerRequest", false)) {
-    //            session.cloneSession
-    //        } else {
-    //            session
-    //        }
-    //    }
+    def runtime = PlatformManager.getRuntime
+
+    def getSession = {
+
+        val session = if (paramAsBoolean("sessionPerUser", false)) {
+            runtime.asInstanceOf[SparkRuntime].getSession(param("owner", "admin"))
+        } else {
+            runtime.asInstanceOf[SparkRuntime].sparkSession
+        }
+
+        if (paramAsBoolean("sessionPerRequest", false)) {
+            SQLSparkSession.cloneSession(session)
+        } else {
+            session
+        }
+    }
 
     def getSimpleSession = {
         SparkSession

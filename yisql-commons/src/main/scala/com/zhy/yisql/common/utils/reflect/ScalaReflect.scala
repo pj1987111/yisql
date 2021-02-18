@@ -15,6 +15,12 @@ import scala.reflect.runtime.{universe => ru}
 class ScalaReflect {}
 
 object ScalaReflect {
+    def findObjectMethod(clzzName: String) = {
+        val clzz = Class.forName(clzzName + "$")
+        val instance = clzz.getField("MODULE$").get(null)
+        (instance.getClass, instance)
+    }
+
     private def mirror = {
         ru.runtimeMirror(getClass.getClassLoader)
     }
@@ -69,7 +75,6 @@ object ScalaReflect {
         })
         tempMap.toMap
     }
-
 
 }
 

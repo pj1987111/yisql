@@ -33,7 +33,7 @@ object ScriptSQLExec {
         if (_context() == null) {
             //            logError("If this is not unit test, then it may be  something wrong. context should not be null")
             val exec = new ScriptSQLExecListener(null, new PathPrefix("/tmp/zhy", Map()))
-            setContext(ExecuteContext(exec, "zhy", Map()))
+            setContext(ExecuteContext(exec, "zhy", "", Map()))
         }
         _context()
     }
@@ -96,6 +96,9 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
     private val _branchContext = BranchContextHolder(new mutable.Stack[BranchContext](), new ArrayBuffer[String]())
     //全局环境变量
     private val _env = new scala.collection.mutable.HashMap[String, String]
+
+    private[this] val _jobProgressListeners = ArrayBuffer[SQLJobProgressListener]()
+
     private val lastSelectTable = new AtomicReference[String]()
     private val _declaredTables = new ArrayBuffer[String]()
 
@@ -106,6 +109,11 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
     }
 
     def declaredTables = _declaredTables
+
+    def addJobProgressListener(l: SQLJobProgressListener) = {
+        _jobProgressListeners += l
+        this
+    }
 
     def setLastSelectTable(table: String) = {
         if (table != null) {
@@ -149,13 +157,13 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
         }
 
         def before(clzz: String) = {
-            println(clzz, getText)
+            _jobProgressListeners.foreach(_.before(clzz, getText))
         }
-        //
-        //        def after(clzz: String) = {
-        //            _jobListeners.foreach(_.after(clzz, getText))
-        //        }
-        //
+
+        def after(clzz: String) = {
+            _jobProgressListeners.foreach(_.after(clzz, getText))
+        }
+
         //        def traceBC = {
         //            ScriptSQLExec.context().execListener.env().getOrElse("__debug__","false").toBoolean
         //        }
@@ -272,9 +280,10 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
   * @param userDefinedParam 用户定义变量
   */
 case class ExecuteContext(@transient execListener: ScriptSQLExecListener,
-                          owner: String,
-                          userDefinedParam: Map[String, String] = Map()
-                         )
+                               owner: String,
+                               groupId: String,
+                               userDefinedParam: Map[String, String] = Map()
+                              )
 
 class PathPrefix(val _defaultPathPrefix: String, val _allPathPrefix: Map[String, String]) {
     def pathPrefix(owner: Option[String]): String = {
