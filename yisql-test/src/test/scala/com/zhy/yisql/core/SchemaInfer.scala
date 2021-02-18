@@ -1,7 +1,7 @@
 package com.zhy.yisql.core
 
 import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
-import com.zhy.yisql.runner.RunScriptExecutor
+import com.zhy.yisql.core.job.runner.LocalSQLExecutor
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.types.{ArrayType, DataType, IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession, functions => F}
@@ -16,7 +16,7 @@ import org.junit.Test
   *  \*/
 class SchemaInfer {
     System.setProperty("HADOOP_USER_NAME", "admin")
-    val executor = new RunScriptExecutor(Map("defaultPathPrefix" -> "/user/datacompute/export"))
+    val executor = new LocalSQLExecutor(Map("defaultPathPrefix" -> "/user/datacompute/export"))
 
     def getSimpleSession = {
         SparkSession

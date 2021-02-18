@@ -1,19 +1,17 @@
-package com.zhy.yisql.platform
+package com.zhy.yisql.core.platform
 
-import java.lang.reflect.Method
 import java.util
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
 import java.util.{Map => JMap}
 
-import com.zhy.yisql.StreamApp
 import com.zhy.yisql.common.utils.base.TryTool
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.param.ParamsUtil
-import com.zhy.yisql.platform.lifecycle.PlatformLifecycle
-import com.zhy.yisql.platform.runtime.{PlatformManagerListener, StreamingRuntime}
+import com.zhy.yisql.core.platform.lifecycle.PlatformLifecycle
+import com.zhy.yisql.core.platform.runtime.{PlatformManagerListener, StreamingRuntime}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -155,7 +153,7 @@ class PlatformManager extends Logging {
             runtime.startRuntime
         }
         PlatformManager.RUNTIME_IS_READY.compareAndSet(false, true)
-        if (params.getBooleanParam("streaming.spark.service", true)) {
+        if (params.getBooleanParam("streaming.unitest.awaitTermination", true)) {
             runtime.awaitTermination
         }
     }
@@ -214,7 +212,7 @@ object PlatformManager {
         val tempParams: JMap[Any, Any] = new util.HashMap[Any, Any]()
         params.asScala.map(f => tempParams.put(f._1.asInstanceOf[Any], f._2.asInstanceOf[Any]))
 
-        val platformName = params.get("streaming.platform")
+        val platformName = params.getOrDefault("streaming.platform", SPARK)
         val runtime = createRuntimeByPlatform(platformNameMapping(platformName), tempParams)
 
         runtime
@@ -230,7 +228,7 @@ object PlatformManager {
 
     def FLINK_STREAMING = "flink_streaming"
 
-    val RUNTIME_PREFIX = "com.zhy.yisql.platform.runtime."
+    val RUNTIME_PREFIX = "com.zhy.yisql.core.platform.runtime."
 
     def platformNameMapping = Map[String, String](
         SPAKR_S_S -> s"${RUNTIME_PREFIX}SparkStructuredStreamingRuntime",

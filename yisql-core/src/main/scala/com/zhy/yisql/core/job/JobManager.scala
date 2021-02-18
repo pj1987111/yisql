@@ -1,10 +1,11 @@
-package com.zhy.yisql.runner
+package com.zhy.yisql.core.job
 
 import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
 
 import com.zhy.yisql.common.utils.log.Logging
-import com.zhy.yisql.runner.JobListener.{JobFinishedEvent, JobStartedEvent}
+import com.zhy.yisql.core.job.listener.JobListener
+import com.zhy.yisql.core.job.listener.JobListener.{JobFinishedEvent, JobStartedEvent}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.session.{SessionIdentifier, SparkSessionCacheManager}
 
@@ -53,7 +54,7 @@ object JobManager extends Logging {
 
     def run(session: SparkSession, job: SQLJobInfo, f: () => Unit): Unit = {
 
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         //添加任务进度listener
         context.execListener.addJobProgressListener(new DefaultSQLJobProgressListener())
 
@@ -79,10 +80,10 @@ object JobManager extends Logging {
 //    }
 def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
     // TODO: (fchen) 改成callback
-    val context = ScriptSQLExec.getContext()
+    val context = SQLExecContext.getContext()
     _executor.execute(new Runnable {
         override def run(): Unit = {
-            ScriptSQLExec.setContext(context)
+            SQLExecContext.setContext(context)
             try {
                 JobManager.run(session, job, f)
                 context.execListener.addEnv("__MarkAsyncRunFinish__","true")
@@ -92,7 +93,7 @@ def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
             } finally {
 //                RequestCleanerManager.call()
                 context.execListener.env.remove("__MarkAsyncRunFinish__")
-                ScriptSQLExec.unset
+                SQLExecContext.unset
                 SparkSession.clearActiveSession()
             }
 
@@ -221,7 +222,7 @@ class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging 
 
     override def before(name: String, sql: String): Unit = {
         counter += 1
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val job = JobManager.getJobInfo.filter(f => f._1 == context.groupId).head._2
         // only save/insert will trigger execution
 

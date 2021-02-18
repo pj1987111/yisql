@@ -1,9 +1,9 @@
 package com.zhy.yisql.core.dsl.adaptor
 
 import com.zhy.yisql.core.datasource.{DataSourceConfig, DataSourceRegistry}
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
-import com.zhy.yisql.runner.ScriptSQLExecListener
 import org.apache.spark.sql.streaming.DataStreamReader
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 

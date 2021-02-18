@@ -4,7 +4,7 @@ import com.zhy.yisql.common.utils.hdfs.HDFSOperatorV2
 import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.common.utils.path.PathFun
 import com.zhy.yisql.core.cmds.SQLCmd
-import com.zhy.yisql.runner.ScriptSQLExec
+import com.zhy.yisql.core.job.SQLExecContext
 import org.apache.spark.sql.kafka010.KafkaOffsetInfo
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String
@@ -86,7 +86,7 @@ class KafkaCommand extends SQLCmd {
             case "registerSchema" =>
                 val schemaStr = SchemaInferCommand.inferSchema(res.collect().map(f => UTF8String.fromString(f._2)).toSeq, spark)
                 logInfo(s"Infer schema: ${schemaStr}")
-                ScriptSQLExec.getContext().execListener.addEnv("context_kafka_schema", schemaStr)
+                SQLExecContext.getContext().execListener.addEnv("context_kafka_schema", schemaStr)
                 Seq(Seq(schemaStr)).toDF("value")
         }
     }

@@ -18,10 +18,10 @@
 
 package com.zhy.yisql.core.dsl.adaptor
 
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.dsl.template.TemplateMerge
 import com.zhy.yisql.dsl.parser.DSLSQLLexer
 import com.zhy.yisql.dsl.parser.DSLSQLParser.SqlContext
-import com.zhy.yisql.runner.ScriptSQLExecListener
 import org.antlr.v4.runtime.misc.Interval
 
 /**

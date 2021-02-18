@@ -1,6 +1,6 @@
 package com.zhy.yisql.core
 
-import com.zhy.yisql.runner.RunScriptExecutor
+import com.zhy.yisql.core.job.runner.LocalSQLExecutor
 import org.junit.Test
 
 /**
@@ -14,7 +14,7 @@ class CommandTest {
     @Test
     def deltaSelect(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new RunScriptExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
         //        val executor = new RunScriptExecutor(Map())
         //todo 路径合并
         executor.sql(
@@ -37,7 +37,7 @@ class CommandTest {
     @Test
     def kafkaCommand(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new RunScriptExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
         //        val executor = new RunScriptExecutor(Map())
         executor.sql(
             """

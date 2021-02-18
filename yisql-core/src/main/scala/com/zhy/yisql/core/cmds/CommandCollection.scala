@@ -1,6 +1,7 @@
 package com.zhy.yisql.core.cmds
 
-import com.zhy.yisql.runner.{PathPrefix, ScriptSQLExec, ScriptSQLExecListener}
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
+import com.zhy.yisql.core.job.{PathPrefix, SQLExecContext}
 import org.apache.spark.sql.SparkSession
 
 import scala.collection.JavaConverters._
@@ -94,7 +95,7 @@ object CommandCollection {
 
   def evaluateMLSQL(spark: SparkSession, mlsql: String) = {
     val context = new ScriptSQLExecListener(spark, new PathPrefix(null, null))
-    ScriptSQLExec.parse(mlsql, context)
+    SQLExecContext.parse(mlsql, context)
     spark.table(context.getLastSelectTable().get)
   }
 }

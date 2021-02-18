@@ -3,7 +3,6 @@ package com.zhy.yisql.core.dsl.processor
 import com.zhy.yisql.core.dsl.adaptor.{CommandAdaptor, SetAdaptor, SingleStatement, StatementAdaptor}
 import com.zhy.yisql.dsl.parser.DSLSQLBaseListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser.SqlContext
-import com.zhy.yisql.runner.ScriptSQLExecListener
 
 import scala.collection.mutable.ArrayBuffer
 

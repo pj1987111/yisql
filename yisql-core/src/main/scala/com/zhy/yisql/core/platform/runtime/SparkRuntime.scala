@@ -1,4 +1,4 @@
-package com.zhy.yisql.platform.runtime
+package com.zhy.yisql.core.platform.runtime
 
 import java.lang.reflect.Modifier
 import java.util.concurrent.atomic.AtomicReference
@@ -6,14 +6,15 @@ import java.util.{Map => JMap}
 
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.reflect.{ClassLoaderTool, ScalaReflect}
-import com.zhy.yisql.platform.PlatformManager
-import org.apache.log4j.LogManager
-import org.apache.spark.SparkConf
+import com.zhy.yisql.core.datasource.datalake.DataLake
+import com.zhy.yisql.core.job.JobManager
+import com.zhy.yisql.core.platform.PlatformManager
 import org.apache.spark.sql.session.{SessionIdentifier, SessionManager}
 import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.{SQLConf, SparkConf}
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -24,6 +25,8 @@ import scala.collection.mutable
   *  \*/
 class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with PlatformManagerListener with Logging {
 
+    val configReader = SQLConf.createConfigReader(params.map(f => (f._1.toString, f._2.toString)))
+
     def name = "SPARK"
 
     var sparkSession: SparkSession = createRuntime
@@ -33,9 +36,8 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
 
     override def params: JMap[Any, Any] = _params
 
-    private val streamingParams = mutable.HashMap[String, String]()
-
     initUDF()
+
     SparkRuntime.setLastInstantiatedContext(this)
 
     def getSession(owner: String) = {
@@ -56,20 +58,48 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
         ).foreach { f =>
             conf.set(f._1.toString, f._2.toString)
         }
+        if (SQLConf.SQL_MASTER.readFrom(configReader).isDefined) {
+            conf.setMaster(SQLConf.SQL_MASTER.readFrom(configReader).get)
+        }
+
+        conf.setAppName(SQLConf.SQL_NAME.readFrom(configReader))
+
+        if (params.containsKey(DataLake.STREAMING_DL_PATH)) {
+            conf.set(DataLake.SPARK_DL_PATH, params.get(DataLake.STREAMING_DL_PATH).toString)
+        }
+
+//        registerLifeCyleCallback("tech.mlsql.runtime.MetaStoreService")
+//        lifeCyleCallback.foreach { callback =>
+//            callback.beforeRuntimeStarted(params.map(f => (f._1.toString, f._2.toString)).toMap, conf)
+//        }
 
         val sparkSession = SparkSession.builder().config(conf)
 
+        def setHiveConnectionURL = {
+            val url = SQLConf.SQL_HIVE_CONNECTION.readFrom(configReader)
+            if (!url.isEmpty) {
+                logInfo("set hive javax.jdo.option.ConnectionURL=" + url)
+                sparkSession.config("javax.jdo.option.ConnectionURL", url)
+            }
+        }
 
-        params.filter(f =>
-            f._1.toString.startsWith("streaming.")
-        ).foreach(f =>
-            streamingParams.put(f._1.toString, f._2.toString)
-        )
-
-        if (streamingParams.getOrDefault("streaming.enableHiveSupport", "false").equals("true")) {
+        if (SQLConf.SQL_ENABLE_HIVE_SUPPORT.readFrom(configReader)) {
+            setHiveConnectionURL
             sparkSession.enableHiveSupport()
         }
+
         val ss = sparkSession.getOrCreate()
+        ss
+
+//        lifeCyleCallback.foreach { callback =>
+//            callback.afterRuntimeStarted(params.map(f => (f._1.toString, f._2.toString)).toMap, conf, ss)
+//        }
+
+        if (SQLConf.SQL_SPARK_SERVICE.readFrom(configReader)) {
+            JobManager.init(ss)
+        }
+
+        show(params.asScala.map(kv => (kv._1.toString, kv._2.toString)).toMap)
         ss
     }
 
@@ -120,7 +150,9 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     override def configureStreamingRuntimeInfo(streamingRuntimeInfo: StreamingRuntimeInfo): Unit = {}
 
     override def awaitTermination: Unit = {
-        Thread.currentThread().join()
+        if (SQLConf.SQL_SPARK_SERVICE.readFrom(configReader)) {
+            Thread.currentThread().join()
+        }
     }
 
     override def startThriftServer: Unit = {
@@ -136,6 +168,23 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     }
 
     override def processEvent(event: Event): Unit = {}
+
+    private def show(conf: Map[String, String]) {
+        val keyLength = conf.keys.map(_.size).max
+        val valueLength = conf.values.map(_.size).max
+        val header = "-" * (keyLength + valueLength + 3)
+        logInfo("mlsql server start with configuration!")
+        logInfo(header)
+        conf.map {
+            case (key, value) =>
+                val keyStr = key + (" " * (keyLength - key.size))
+                val valueStr = value + (" " * (valueLength - value.size))
+                s"|${keyStr}|${valueStr}|"
+        }.foreach(line => {
+            logInfo(line)
+        })
+        logInfo(header)
+    }
 }
 
 object SparkRuntime {

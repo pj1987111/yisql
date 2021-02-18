@@ -3,9 +3,10 @@ package com.zhy.yisql.core.dsl.adaptor
 import java.util.UUID
 
 import com.zhy.yisql.core.datasource.{DataSinkConfig, DataSourceRegistry}
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
-import com.zhy.yisql.runner.{ScriptSQLExec, ScriptSQLExecListener}
+import com.zhy.yisql.core.job.SQLExecContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.streaming.{DataStreamWriter, OutputMode, StreamingQuery}
 
@@ -66,7 +67,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
     override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
         val SaveStatement(_, tableName, format, path, option, mode, partitionByCol) = analyze(ctx)
         val spark:SparkSession = scriptSQLExecListener.sparkSession
-        val context = ScriptSQLExec.getContext
+        val context = SQLExecContext.getContext
         //添加sql配置，可以过滤，etl等操作
         var df: DataFrame = option.get("etl.sql").map{sql=>
             spark.sql(sql)

@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.{BaseBatchSource, DataSinkConfig, DataSourceConfig}
-import com.zhy.yisql.runner.ScriptSQLExec
+import com.zhy.yisql.core.job.SQLExecContext
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 
 /**
@@ -14,7 +14,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 class YiSQLJsonStr extends BaseBatchSource {
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
         val option = config.config
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val items = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
         val spark = config.df.get.sparkSession
         import spark.implicits._
@@ -37,7 +37,7 @@ class YiSQLJsonStr extends BaseBatchSource {
 class YiSQLCsvStr extends BaseBatchSource {
 
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val items = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
         val spark = config.df.get.sparkSession
         import spark.implicits._

@@ -2,7 +2,7 @@ package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.datalake.DataLake
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import com.zhy.yisql.runner.ScriptSQLExec
+import com.zhy.yisql.core.job.SQLExecContext
 import org.apache.spark.sql.delta.sources.DeltaDataSource
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, functions => F}
@@ -16,7 +16,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, f
   *  \*/
 class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val format = config.config.getOrElse("implClass", fullFormat)
         val owner = config.config.get("owner").getOrElse(context.owner)
 
@@ -56,7 +56,7 @@ class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
     }
 
     override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val format = config.config.getOrElse("implClass", fullFormat)
         val partitionByCol = config.config.getOrElse("partitionByCol", "").split(",").filterNot(_.isEmpty)
         if (partitionByCol.length > 0) {
@@ -74,7 +74,7 @@ class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
 
     override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
         val format = config.config.getOrElse("implClass", fullFormat)
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val owner = config.config.get("owner").getOrElse(context.owner)
 
         val dataLake = new DataLake(config.df.get.sparkSession)
@@ -88,13 +88,13 @@ class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
     }
 
     def resolvePath(path: String, owner: String): String = {
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         resourceRealPath(context.execListener, Option(owner), path)
     }
 
     override def sSave(streamWriter: DataStreamWriter[Row], config: DataSinkConfig): Any = {
         val dataLake = new DataLake(config.df.get.sparkSession)
-        val context = ScriptSQLExec.getContext()
+        val context = SQLExecContext.getContext()
         val finalPath = if (dataLake.isEnable) {
             dataLake.identifyToPath(config.path)
         } else {

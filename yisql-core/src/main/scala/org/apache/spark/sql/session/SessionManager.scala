@@ -3,7 +3,7 @@ package org.apache.spark.sql.session
 import java.util.concurrent.ConcurrentHashMap
 
 import com.zhy.yisql.common.utils.log.Logging
-import com.zhy.yisql.runner.JobManager
+import com.zhy.yisql.core.job.JobManager
 import org.apache.spark.sql.SparkSession
 
 /**

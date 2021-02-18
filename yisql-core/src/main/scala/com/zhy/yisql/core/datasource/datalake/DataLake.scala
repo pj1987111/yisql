@@ -16,12 +16,12 @@ class DataLake(sparkSession: SparkSession) {
 
     def buildInDBs = Set("__mlsql__", "__tmp__")
 
-    def isEnable = sparkSession.sessionState.conf.contains(DataLake.RUNTIME_KEY)
+    def isEnable = sparkSession.sessionState.conf.contains(DataLake.SPARK_DL_PATH)
 
     def overwriteHive = sparkSession.sessionState.conf.getConfString(DataLake.DELTA_LAKE_OVERWRITE_HIVE, "false").toBoolean
 
     def value = {
-        sparkSession.sessionState.conf.getConfString(DataLake.RUNTIME_KEY)
+        sparkSession.sessionState.conf.getConfString(DataLake.SPARK_DL_PATH)
     }
 
     def dbAndtableToPath(db: String, table: String) = {
@@ -58,8 +58,8 @@ class DataLake(sparkSession: SparkSession) {
 }
 
 object DataLake {
-    val RUNTIME_KEY = "spark.datalake.path"
-    val USER_KEY = "streaming.datalake.path"
+    val SPARK_DL_PATH = "spark.datalake.path"
+    val STREAMING_DL_PATH = "streaming.datalake.path"
     val DELTA_LAKE_OVERWRITE_HIVE = "spark.yisql.datalake.overwrite.hive"
 }
 

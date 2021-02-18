@@ -35,7 +35,18 @@
                     <groupId>com.fasterxml.jackson</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
-
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -156,6 +167,7 @@
 
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
+        <scriptSourceDirectory>src/main/resources</scriptSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>

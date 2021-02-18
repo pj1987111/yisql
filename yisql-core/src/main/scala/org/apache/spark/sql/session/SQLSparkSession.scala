@@ -20,8 +20,8 @@ package org.apache.spark.sql.session
 
 import java.lang.reflect.UndeclaredThrowableException
 
-import com.zhy.yisql.platform.PlatformManager
-import com.zhy.yisql.platform.runtime.SparkRuntime
+import com.zhy.yisql.core.platform.PlatformManager
+import com.zhy.yisql.core.platform.runtime.SparkRuntime
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import tech.mlsql.common.utils.log.Logging

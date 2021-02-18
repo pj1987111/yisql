@@ -1,8 +1,10 @@
-package com.zhy.yisql.runner
+package com.zhy.yisql.core.job.runner
 
-import com.zhy.yisql.common.utils.json.JsonUtils
-import com.zhy.yisql.platform.PlatformManager
-import com.zhy.yisql.platform.runtime.SparkRuntime
+import com.zhy.yisql.common.utils.json.{JSONTool, JsonUtils}
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
+import com.zhy.yisql.core.job._
+import com.zhy.yisql.core.platform.PlatformManager
+import com.zhy.yisql.core.platform.runtime.SparkRuntime
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.session.SQLSparkSession
 
@@ -15,7 +17,7 @@ import scala.collection.mutable
   *  \* Time: 21:38
   *  \* Description: 
   *  \*/
-class RunScriptExecutor(_params: Map[String, String]) {
+class LocalSQLExecutor(_params: Map[String, String]) {
     private val extraParams = mutable.HashMap[String, String]()
     private var _autoClean = false
 
@@ -25,7 +27,8 @@ class RunScriptExecutor(_params: Map[String, String]) {
     }
 
     def simpleExecute(): (Int, String) = {
-        simpleExecute(getSimpleSession)
+        val spark = PlatformManager.getRuntime.asInstanceOf[SparkRuntime].sparkSession
+        simpleExecute(spark)
     }
 
     def simpleExecute(sparkSession: SparkSession): (Int, String) = {
@@ -41,7 +44,7 @@ class RunScriptExecutor(_params: Map[String, String]) {
 
             val listener = createScriptSQLExecListener(sparkSession, jobInfo.groupId)
             JobManager.run(sparkSession, jobInfo, () => {
-                ScriptSQLExec.parse(param("sql"), listener)
+                SQLExecContext.parse(param("sql"), listener)
             })
             if (!silence)
                 outputResult = getScriptResult(listener, sparkSession)
@@ -82,7 +85,8 @@ class RunScriptExecutor(_params: Map[String, String]) {
     }
 
     private def createScriptSQLExecListener(sparkSession: SparkSession, groupId: String) = {
-        val allPathPrefix = JsonUtils.fromJson[Map[String, String]](param("allPathPrefix", "{}"))
+        val allPathPrefix = JSONTool.parseJson[Map[String, String]](param("allPathPrefix", "{}"))
+//        val allPathPrefix = JsonUtils.fromJson[Map[String, String]](param("allPathPrefix", "{}"))
         val defaultPathPrefix = param("defaultPathPrefix", "")
         val pathPrefix = new PathPrefix(defaultPathPrefix, allPathPrefix)
 
@@ -90,7 +94,7 @@ class RunScriptExecutor(_params: Map[String, String]) {
         val ownerOption = if (params.contains("owner")) Some(param("owner")) else None
         val userDefineParams = params.filter(f => f._1.startsWith("context.")).map(f => (f._1.substring("context.".length), f._2))
 
-        ScriptSQLExec.setContext(ExecuteContext(context, param("owner"), groupId,
+        SQLExecContext.setContext(ExecuteContext(context, param("owner"), groupId,
             userDefineParams ++ Map("__PARAMS__" -> JsonUtils.toJson(params()))
         ))
         context.addEnv("HOME", pathPrefix.pathPrefix(None))

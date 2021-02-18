@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.dsl.adaptor
 
 import com.zhy.yisql.common.utils.shell.ShellCommand
+import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
-import com.zhy.yisql.runner.ScriptSQLExecListener
 
 /**
   *  \* Created with IntelliJ IDEA.

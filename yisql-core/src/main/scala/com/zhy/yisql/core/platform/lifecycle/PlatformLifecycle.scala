@@ -1,6 +1,6 @@
-package com.zhy.yisql.platform.lifecycle
+package com.zhy.yisql.core.platform.lifecycle
 
-import com.zhy.yisql.platform.runtime.StreamingRuntime
+import com.zhy.yisql.core.platform.runtime.StreamingRuntime
 
 /**
   *  \* Created with IntelliJ IDEA.
