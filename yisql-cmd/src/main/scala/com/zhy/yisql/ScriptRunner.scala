@@ -2,7 +2,8 @@ package com.zhy.yisql
 
 import java.util.concurrent.{Callable, Executors}
 
-import com.zhy.yisql.core.job.{ExecuteContext, JobManager, SQLJobInfo, SQLJobType, SQLExecContext}
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
+import com.zhy.yisql.core.job.{JobManager, SQLJobInfo, SQLJobType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
@@ -16,7 +17,7 @@ object ScriptRunner {
     private val executors = Executors.newFixedThreadPool(10)
 
     def runSubJobAsync(code: String, fetchResult: (DataFrame) => Unit, spark: Option[SparkSession], reuseContext: Boolean, reuseExecListenerEnv: Boolean) = {
-        val context = SQLExecContext.getContext()
+        val context = SQLExecuteContext.getContext()
         val finalSpark = spark.getOrElse(context.execListener.sparkSession)
         val jobInfo = JobManager.getJobInfo(context.owner, SQLJobType.SCRIPT, context.groupId, code, -1l)
         jobInfo.copy(jobName = jobInfo.jobName + ":" + jobInfo.groupId)
@@ -45,7 +46,7 @@ object ScriptRunner {
             val newContext = if (!reuseContext) {
                 val ssel = context.execListener.clone(spark)
                 val newContext = ExecuteContext(ssel, context.owner, jobInfo.groupId, context.userDefinedParam)
-                SQLExecContext.setContext(newContext)
+                SQLExecuteContext.setContext(newContext)
                 if (!reuseExecListenerEnv) {
                     newContext.execListener.env().clear()
                 }
@@ -56,7 +57,7 @@ object ScriptRunner {
             } else context
             val skipAuth = newContext.execListener.env().getOrElse("SKIP_AUTH", "false").toBoolean
             val skipPhysical = newContext.execListener.env().getOrElse("SKIP_PHYSICAL", "false").toBoolean
-            SQLExecContext.parse(code, newContext.execListener)
+            SQLExecuteContext.parse(code, newContext.execListener)
             context.execListener.getLastSelectTable() match {
                 case Some(tableName) =>
                     if (spark.catalog.tableExists(tableName)) {
@@ -71,7 +72,7 @@ object ScriptRunner {
     }
 
     def rubSubJob(code: String, fetchResult: (DataFrame) => Unit, spark: Option[SparkSession], reuseContext: Boolean, reuseExecListenerEnv: Boolean) = {
-        val context = SQLExecContext.getContext()
+        val context = SQLExecuteContext.getContext()
         val finalSpark = spark.getOrElse(context.execListener.sparkSession)
 
         val jobInfo = JobManager.getJobInfo(context.owner, SQLJobType.SCRIPT, context.groupId, code, -1l)
@@ -106,7 +107,7 @@ object ScriptRunner {
       *
       */
     def runJob(code: String, jobInfo: SQLJobInfo, fetchResult: (DataFrame) => Unit) = {
-        val context = SQLExecContext.getContext()
+        val context = SQLExecuteContext.getContext()
         _run(code, context, jobInfo, context.execListener.sparkSession, fetchResult, true, true)
 
     }

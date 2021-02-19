@@ -4,6 +4,7 @@ import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
 
 import com.zhy.yisql.common.utils.log.Logging
+import com.zhy.yisql.core.execute.SQLExecuteContext
 import com.zhy.yisql.core.job.listener.JobListener
 import com.zhy.yisql.core.job.listener.JobListener.{JobFinishedEvent, JobStartedEvent}
 import org.apache.spark.sql.SparkSession
@@ -12,6 +13,7 @@ import org.apache.spark.sql.session.{SessionIdentifier, SparkSessionCacheManager
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
+
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou
@@ -45,8 +47,8 @@ object JobManager extends Logging {
             if (_jobManager == null) {
                 logInfo(s"JobManager started with initialDelay=${initialDelay} checkTimeInterval=${checkTimeInterval}")
                 _jobManager = new JobManager(spark, initialDelay, checkTimeInterval)
-//                _jobListeners += new CleanCacheListener
-//                _jobListeners += new EngineMDCLogListener
+                //                _jobListeners += new CleanCacheListener
+                //                _jobListeners += new EngineMDCLogListener
                 _jobManager.run
             }
         }
@@ -54,7 +56,7 @@ object JobManager extends Logging {
 
     def run(session: SparkSession, job: SQLJobInfo, f: () => Unit): Unit = {
 
-        val context = SQLExecContext.getContext()
+        val context = SQLExecuteContext.getContext()
         //添加任务进度listener
         context.execListener.addJobProgressListener(new DefaultSQLJobProgressListener())
 
@@ -75,31 +77,31 @@ object JobManager extends Logging {
         }
     }
 
-//    def run(f: () => Unit): Unit = {
-//        f()
-//    }
-def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
-    // TODO: (fchen) 改成callback
-    val context = SQLExecContext.getContext()
-    _executor.execute(new Runnable {
-        override def run(): Unit = {
-            SQLExecContext.setContext(context)
-            try {
-                JobManager.run(session, job, f)
-                context.execListener.addEnv("__MarkAsyncRunFinish__","true")
-            } catch {
-                case e: Exception =>
-                    logInfo("Async Job Exception", e)
-            } finally {
-//                RequestCleanerManager.call()
-                context.execListener.env.remove("__MarkAsyncRunFinish__")
-                SQLExecContext.unset
-                SparkSession.clearActiveSession()
-            }
+    //    def run(f: () => Unit): Unit = {
+    //        f()
+    //    }
+    def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
+        // TODO: (fchen) 改成callback
+        val context = SQLExecuteContext.getContext()
+        _executor.execute(new Runnable {
+            override def run(): Unit = {
+                SQLExecuteContext.setContext(context)
+                try {
+                    JobManager.run(session, job, f)
+                    context.execListener.addEnv("__MarkAsyncRunFinish__", "true")
+                } catch {
+                    case e: Exception =>
+                        logInfo("Async Job Exception", e)
+                } finally {
+                    //                RequestCleanerManager.call()
+                    context.execListener.env.remove("__MarkAsyncRunFinish__")
+                    SQLExecuteContext.unset
+                    SparkSession.clearActiveSession()
+                }
 
-        }
-    })
-}
+            }
+        })
+    }
 
     def getJobInfo(owner: String,
                    jobType: String,
@@ -222,7 +224,7 @@ class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging 
 
     override def before(name: String, sql: String): Unit = {
         counter += 1
-        val context = SQLExecContext.getContext()
+        val context = SQLExecuteContext.getContext()
         val job = JobManager.getJobInfo.filter(f => f._1 == context.groupId).head._2
         // only save/insert will trigger execution
 
@@ -268,15 +270,15 @@ class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging 
 
 
 case class SQLJobInfo(
-                               owner: String,
-                               jobType: String,
-                               jobName: String,
-                               jobContent: String,
-                               groupId: String,
-                               progress: MLSQLJobProgress,
-                               startTime: Long,
-                               timeout: Long
-                       )
+                             owner: String,
+                             jobType: String,
+                             jobName: String,
+                             jobContent: String,
+                             groupId: String,
+                             progress: MLSQLJobProgress,
+                             startTime: Long,
+                             timeout: Long
+                     )
 
 case class MLSQLJobProgress(var totalJob: Long = 0, var currentJobIndex: Long = 0, var script: String = "") {
     def increment = currentJobIndex += 1

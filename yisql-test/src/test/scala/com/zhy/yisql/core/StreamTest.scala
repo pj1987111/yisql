@@ -1,6 +1,6 @@
 package com.zhy.yisql.core
 
-import com.zhy.yisql.core.job.runner.LocalSQLExecutor
+import com.zhy.yisql.core.execute.SQLExecute
 import org.junit.Test
 
 /**
@@ -15,7 +15,7 @@ class StreamTest {
     @Test
     def kafka2console(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set streamName="zhy1";
@@ -42,7 +42,7 @@ class StreamTest {
     @Test
     def kafka2kafka(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set streamName="zhy1";
@@ -69,7 +69,7 @@ class StreamTest {
     @Test
     def kafka2Jdbc(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set streamName="zhy1";
@@ -102,7 +102,7 @@ class StreamTest {
     @Test
     def kafka2Elastic(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set streamName="zhy1";
@@ -133,7 +133,7 @@ class StreamTest {
     @Test
     def kafka2Hive(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set streamName="zhy1";
@@ -163,7 +163,7 @@ class StreamTest {
     @Test
     def kafka2Delta(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         executor.sql(
             """
               |set streamName="zhy1";
@@ -195,7 +195,7 @@ class StreamTest {
     @Test
     def delta2Console(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         executor.sql(
             """
               |set streamName="zhy1";

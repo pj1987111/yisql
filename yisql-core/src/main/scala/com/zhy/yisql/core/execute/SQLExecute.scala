@@ -1,4 +1,4 @@
-package com.zhy.yisql.core.job.runner
+package com.zhy.yisql.core.execute
 
 import com.zhy.yisql.common.utils.json.{JSONTool, JsonUtils}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
@@ -17,7 +17,7 @@ import scala.collection.mutable
   *  \* Time: 21:38
   *  \* Description: 
   *  \*/
-class LocalSQLExecutor(_params: Map[String, String]) {
+class SQLExecute(_params: Map[String, String]) {
     private val extraParams = mutable.HashMap[String, String]()
     private var _autoClean = false
 
@@ -26,12 +26,33 @@ class LocalSQLExecutor(_params: Map[String, String]) {
         this
     }
 
-    def simpleExecute(): (Int, String) = {
-        val spark = PlatformManager.getRuntime.asInstanceOf[SparkRuntime].sparkSession
-        simpleExecute(spark)
+    def owner(owner: String) = {
+        extraParams += ("owner" -> owner)
+        this
     }
 
-    def simpleExecute(sparkSession: SparkSession): (Int, String) = {
+    def async(async: Boolean) = {
+        extraParams += ("async" -> async.toString)
+        this
+    }
+
+    def timeout(timeout: Long) = {
+        extraParams += ("timeout" -> timeout.toString)
+        this
+    }
+
+    def executeMode(executeMode: String) = {
+        extraParams += ("executeMode" -> executeMode)
+        this
+    }
+
+    def autoClean(autoClean: Boolean) = {
+        this._autoClean = autoClean
+        this
+    }
+
+    def simpleExecute(): (Int, String) = {
+        val sparkSession = getSession
         val silence = paramAsBoolean("silence", false)
         val includeSchema = param("includeSchema", "false").toBoolean
         var outputResult: String = if (includeSchema) "{}" else "[]"
@@ -44,7 +65,7 @@ class LocalSQLExecutor(_params: Map[String, String]) {
 
             val listener = createScriptSQLExecListener(sparkSession, jobInfo.groupId)
             JobManager.run(sparkSession, jobInfo, () => {
-                SQLExecContext.parse(param("sql"), listener)
+                SQLExecuteContext.parse(param("sql"), listener)
             })
             if (!silence)
                 outputResult = getScriptResult(listener, sparkSession)
@@ -94,7 +115,7 @@ class LocalSQLExecutor(_params: Map[String, String]) {
         val ownerOption = if (params.contains("owner")) Some(param("owner")) else None
         val userDefineParams = params.filter(f => f._1.startsWith("context.")).map(f => (f._1.substring("context.".length), f._2))
 
-        SQLExecContext.setContext(ExecuteContext(context, param("owner"), groupId,
+        SQLExecuteContext.setContext(ExecuteContext(context, param("owner"), groupId,
             userDefineParams ++ Map("__PARAMS__" -> JsonUtils.toJson(params()))
         ))
         context.addEnv("HOME", pathPrefix.pathPrefix(None))
@@ -147,12 +168,16 @@ class LocalSQLExecutor(_params: Map[String, String]) {
         }
     }
 
-    def getSimpleSession = {
-        SparkSession
-                .builder()
-                .master("local[*]")
-                .appName("RunScriptExecutor")
-                .enableHiveSupport()
-                .getOrCreate()
+    def getSessionByOwner(owner: String) = {
+        if (paramAsBoolean("sessionPerUser", false)) {
+            runtime.asInstanceOf[SparkRuntime].getSession(owner)
+        } else {
+            runtime.asInstanceOf[SparkRuntime].sparkSession
+        }
+    }
+
+    def cleanActiveSessionInSpark = {
+        SQLExecuteContext.unset
+        SparkSession.clearActiveSession()
     }
 }

@@ -1,4 +1,4 @@
-package com.zhy.yisql.core.job
+package com.zhy.yisql.core.execute
 
 import com.zhy.yisql.core.cmds.CommandCollection
 import com.zhy.yisql.core.dsl.CaseChangingCharStream
@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
   *  \* Description: 
   * sql运行上下文
   *  \*/
-object SQLExecContext {
+object SQLExecuteContext {
 
     private[this] val yisqlExecuteContext: ThreadLocal[ExecuteContext] = new ThreadLocal[ExecuteContext]
 
@@ -36,7 +36,7 @@ object SQLExecContext {
     def setContext(ec: ExecuteContext): Unit = yisqlExecuteContext.set(ec)
 
     def setContextIfNotPresent(ec: ExecuteContext): Unit = {
-        if (SQLExecContext._context() == null) {
+        if (SQLExecuteContext._context() == null) {
             yisqlExecuteContext.set(ec)
         }
     }

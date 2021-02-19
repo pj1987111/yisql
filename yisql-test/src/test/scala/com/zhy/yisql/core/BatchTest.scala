@@ -1,6 +1,6 @@
 package com.zhy.yisql.core
 
-import com.zhy.yisql.core.job.runner.LocalSQLExecutor
+import com.zhy.yisql.core.execute.SQLExecute
 import org.junit.Test
 
 /**
@@ -15,7 +15,7 @@ class BatchTest extends BaseTest {
     @Test
     def readJsonParOrc(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         executor.sql(
             """
               |set jstr='''
@@ -63,7 +63,7 @@ class BatchTest extends BaseTest {
     @Test
     def readCsv(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         executor.sql(
             """
               |set csvStr='''
@@ -91,7 +91,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def json2Es(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set jstr='''
@@ -126,7 +126,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def json2Kafka(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set jstr='''
@@ -158,8 +158,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def kafkaRead(): Unit = {
-        val p = System.getProperties
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |load kafka.`zhy` where
@@ -178,7 +177,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def kafkaAdhoc(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |load adHocKafka.`zhy` where
@@ -216,7 +215,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def es2mysql(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set user="root";
@@ -245,7 +244,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def hiverw(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |set savePath="/tmp/zhy/jsontest1";
@@ -267,7 +266,7 @@ class BatchTest extends BaseTest {
 
     @Test
     def hiveFormat(): Unit = {
-        val executor = new LocalSQLExecutor(Map())
+        val executor = new SQLExecute(Map())
         executor.sql(
             """
               |load hive.`hhy.trajectory_min_section`  as table1;
@@ -306,7 +305,7 @@ class BatchTest extends BaseTest {
     @Test
     def deltaBatchAppend(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         executor.sql(
             """
               |set jstr='''
@@ -337,7 +336,7 @@ class BatchTest extends BaseTest {
     @Test
     def deltaSelect(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         //        val executor = new RunScriptExecutor(Map())
         executor.sql(
             """
@@ -352,7 +351,7 @@ class BatchTest extends BaseTest {
     @Test
     def deltaSelectVersions(): Unit = {
         System.setProperty("HADOOP_USER_NAME", "admin")
-        val executor = new LocalSQLExecutor(Map("defaultPathPrefix"->"/user/datacompute/export"))
+        val executor = new SQLExecute(Map("defaultPathPrefix"->"/user/datacompute/export"))
         //        val executor = new RunScriptExecutor(Map())
         executor.sql(
             """

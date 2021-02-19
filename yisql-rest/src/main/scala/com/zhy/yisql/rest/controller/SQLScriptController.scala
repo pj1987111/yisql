@@ -1,5 +1,14 @@
 package com.zhy.yisql.rest.controller
 
+import com.zhy.yisql.common.utils.bean.BeanUtils
+import com.zhy.yisql.common.utils.json.JSONTool
+import com.zhy.yisql.common.utils.log.Logging
+import com.zhy.yisql.core.execute.SQLExecute
+import com.zhy.yisql.core.job.JobManager
+import com.zhy.yisql.rest.entity.{KillJobEntity, SQLRunEntity}
+import com.zhy.yisql.rest.service.SQLScriptService
+import org.apache.spark.SparkInstance
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.{RequestMapping, RestController}
 
 /**
@@ -10,94 +19,56 @@ import org.springframework.web.bind.annotation.{RequestMapping, RestController}
   *  \* Description: 
   *  \*/
 @RestController
-@RequestMapping(value = Array("/sql"))
-class SQLScriptController {
-    @RequestMapping(value = Array("/test")) def test = "sql test ok"
+class SQLScriptController extends Logging {
+    @Autowired
+    var service: SQLScriptService = _
 
-    @RequestMapping(value = Array("/run")) def run(): Unit = {
-//        var outputResult: String = if (includeSchema) "{}" else "[]"
-//        try {
-//            val jobInfo = JobManager.getJobInfo(
-//                param("owner"), param("jobType", SQLJobType.SCRIPT), param("jobName"), param("sql"),
-//                paramAsLong("timeout", -1L)
-//            )
-//            val context = createScriptSQLExecListener(sparkSession, jobInfo.groupId)
-//
-//            def query = {
-//                if (paramAsBoolean("async", false)) {
-//                    JobManager.asyncRun(sparkSession, jobInfo, () => {
-//                        try {
-//                            ScriptSQLExec.parse(param("sql"), context,
-//                                skipInclude = paramAsBoolean("skipInclude", false),
-//                                skipAuth = paramAsBoolean("skipAuth", true),
-//                                skipPhysicalJob = paramAsBoolean("skipPhysicalJob", false),
-//                                skipGrammarValidate = paramAsBoolean("skipGrammarValidate", true))
-//
-//                            outputResult = getScriptResult(context, sparkSession)
-//                            htp.post(new Url(param("callback")),
-//                                Map("stat" -> s"""succeeded""",
-//                                    "res" -> outputResult,
-//                                    "jobInfo" -> JSONTool.toJsonStr(jobInfo)))
-//                        } catch {
-//                            case e: Exception =>
-//                                e.printStackTrace()
-//                                val msgBuffer = ArrayBuffer[String]()
-//                                if (paramAsBoolean("show_stack", false)) {
-//                                    format_full_exception(msgBuffer, e)
-//                                }
-//                                htp.post(new Url(param("callback")),
-//                                    Map("stat" -> s"""failed""",
-//                                        "msg" -> (e.getMessage + "\n" + msgBuffer.mkString("\n")),
-//                                        "jobInfo" -> JSONTool.toJsonStr(jobInfo)
-//                                    ))
-//                        }
-//                    })
-//                } else {
-//                    JobManager.run(sparkSession, jobInfo, () => {
-//                        ScriptSQLExec.parse(param("sql"), context,
-//                            skipInclude = paramAsBoolean("skipInclude", false),
-//                            skipAuth = paramAsBoolean("skipAuth", true),
-//                            skipPhysicalJob = paramAsBoolean("skipPhysicalJob", false),
-//                            skipGrammarValidate = paramAsBoolean("skipGrammarValidate", true)
-//                        )
-//                        if (!silence) {
-//                            outputResult = getScriptResult(context, sparkSession)
-//                        }
-//                    })
-//                }
-//            }
-//
-//            def analyze = {
-//                ScriptSQLExec.parse(param("sql"), context,
-//                    skipInclude = false,
-//                    skipAuth = true,
-//                    skipPhysicalJob = true,
-//                    skipGrammarValidate = true)
-//                context.preProcessListener.map(f => JSONTool.toJsonStr(f.analyzedStatements.map(_.unwrap))) match {
-//                    case Some(i) => outputResult = i
-//                    case None =>
-//                }
-//            }
-//
-//            params.getOrDefault("executeMode", "query") match {
-//                case "query" => query
-//                case "analyze" => analyze
-//                case executeMode: String =>
-//                    AppRuntimeStore.store.getController(executeMode) match {
-//                        case Some(item) =>
-//                            outputResult = Class.forName(item.customClassItem.className).
-//                                    newInstance().asInstanceOf[CustomController].run(params().toMap + ("__jobinfo__" -> JSONTool.toJsonStr(jobInfo)))
-//                        case None => throw new RuntimeException(s"no executeMode named ${executeMode}")
-//                    }
-//            }
-//
-//        } catch {
-//            case e: Exception =>
-//                val msg = ExceptionRenderManager.call(e)
-//                render(500, msg.str.get)
-//        } finally {
-//            RequestCleanerManager.call()
-//            cleanActiveSessionInSpark
-//        }
+    @RequestMapping(value = Array("/test"))
+    def test = "sql test ok"
+
+    @RequestMapping(value = Array("/sql/run"))
+    def run(sqlRunEntity: SQLRunEntity): String = {
+        val params: Map[String, String] = BeanUtils.getCCParams(sqlRunEntity)
+        logInfo(s"/sql/run method params is: $params")
+        val executor = new SQLExecute(params)
+        val res = executor.simpleExecute()
+        res._2
+    }
+
+    //todo list测试，为什么过一会就没了
+    @RequestMapping(value = Array("/job/list"))
+    def listJobs(): String = {
+        val infoMap = JobManager.getJobInfo
+        JSONTool.toJsonStr(infoMap)
+    }
+
+    @RequestMapping(value = Array("/job/kill"))
+    def killJob(killJobEntity: KillJobEntity): String = {
+        val groupId = killJobEntity.getGroupId
+        val executor = new SQLExecute(Map())
+        if(groupId==null) {
+            val jobName = killJobEntity.getJobName
+            val groupIds = JobManager.getJobInfo.filter(f => f._2.jobName == jobName)
+            groupIds.headOption match {
+                case Some(item) => JobManager.killJob(executor.getSessionByOwner(item._2.owner), item._2.groupId)
+                case None =>
+            }
+        }else {
+            JobManager.getJobInfo.find(f => f._2.groupId == groupId) match {
+                case Some(item) => JobManager.killJob(executor.getSessionByOwner(item._2.owner), item._2.groupId)
+                case None =>
+            }
+        }
+        executor.cleanActiveSessionInSpark
+        "job killing..."
+    }
+
+    @RequestMapping(value = Array("/instance/resource"))
+    def instanceResource = {
+        val executor = new SQLExecute(Map())
+        val session = executor.getSession
+        val resource = new SparkInstance(session).resources
+        executor.cleanActiveSessionInSpark
+        JSONTool.toJsonStr(resource)
     }
 }

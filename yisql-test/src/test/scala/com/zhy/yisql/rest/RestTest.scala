@@ -1,4 +1,4 @@
-package com.zhy.yisql.core
+package com.zhy.yisql.rest
 
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import org.junit.Test
@@ -24,7 +24,7 @@ class RestTest {
     def testStartServer(): Unit = {
         val restClass = Class.forName("com.zhy.yisql.rest.Application")
         val method = restClass.getMethod("main", classOf[Array[String]])
-        method.invoke(null, Array(""))
+        method.invoke(null, Array("--server.port=9090"))
         Thread.currentThread().join()
     }
 

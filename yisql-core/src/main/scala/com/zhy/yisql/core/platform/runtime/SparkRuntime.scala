@@ -164,7 +164,8 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     override def startHttpServer: Unit = {
         val restClass = Class.forName("com.zhy.yisql.rest.Application")
         val method = restClass.getMethod("main", classOf[Array[String]])
-        method.invoke(null, Array(""))
+        val httpServerPort = SQLConf.SQL_DRIVER_PORT.readFrom(configReader)
+        method.invoke(null, Array(s"--server.port=$httpServerPort"))
     }
 
     override def processEvent(event: Event): Unit = {}
@@ -173,7 +174,7 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
         val keyLength = conf.keys.map(_.size).max
         val valueLength = conf.values.map(_.size).max
         val header = "-" * (keyLength + valueLength + 3)
-        logInfo("mlsql server start with configuration!")
+        logInfo("yisql server start with configuration!")
         logInfo(header)
         conf.map {
             case (key, value) =>

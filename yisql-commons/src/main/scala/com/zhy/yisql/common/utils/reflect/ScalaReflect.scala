@@ -1,5 +1,7 @@
 package com.zhy.yisql.common.utils.reflect
 
+import java.lang.reflect.Field
+
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
@@ -15,6 +17,30 @@ import scala.reflect.runtime.{universe => ru}
 class ScalaReflect {}
 
 object ScalaReflect {
+
+    def findField(clzz: Class[_], fieldName: String): Field = {
+        var field:Field = null
+        try
+            field = clzz.getDeclaredField(fieldName)
+        catch {
+            case e: Exception =>
+                if (clzz.getSuperclass != null) field = findField(clzz.getSuperclass, fieldName)
+        }
+        field
+    }
+
+    def field[T: ClassTag](obj: T, fieldName: String, value: Object): Unit = {
+        val field = findField(obj.getClass, fieldName)
+        field.setAccessible(true)
+        field.set(obj, value)
+    }
+
+    def field[T: ClassTag](obj: T, fieldName: String): Object = {
+        val field = findField(obj.getClass, fieldName)
+        field.setAccessible(true)
+        field.get(obj)
+    }
+
     def findObjectMethod(clzzName: String) = {
         val clzz = Class.forName(clzzName + "$")
         val instance = clzz.getField("MODULE$").get(null)

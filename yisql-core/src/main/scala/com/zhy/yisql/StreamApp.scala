@@ -17,13 +17,13 @@ object StreamApp {
         val params = new ParamsUtil(args)
         require(params.hasParam("streaming.name"), "Application name should be set")
         val platform = PlatformManager.getOrCreate
-        TryTool.tryOrExit {
-            List("tech.mlsql.runtime.LogFileHook", "tech.mlsql.runtime.PluginHook").foreach { className =>
-                platform.registerPlatformLifecycle(
-                    Class.forName(className).
-                            newInstance().asInstanceOf[PlatformLifecycle])
-            }
-        }
+//        TryTool.tryOrExit {
+//            List("tech.mlsql.runtime.LogFileHook", "tech.mlsql.runtime.PluginHook").foreach { className =>
+//                platform.registerPlatformLifecycle(
+//                    Class.forName(className).
+//                            newInstance().asInstanceOf[PlatformLifecycle])
+//            }
+//        }
 
         platform.run(params)
     }
