@@ -77,9 +77,6 @@ object JobManager extends Logging {
         }
     }
 
-    //    def run(f: () => Unit): Unit = {
-    //        f()
-    //    }
     def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
         // TODO: (fchen) 改成callback
         val context = SQLExecuteContext.getContext()
@@ -110,7 +107,7 @@ object JobManager extends Logging {
                    timeout: Long): SQLJobInfo = {
         val startTime = System.currentTimeMillis()
         val groupId = _jobManager.nextGroupId
-        SQLJobInfo(owner, jobType, jobName, jobContent, groupId, MLSQLJobProgress(), startTime, timeout)
+        SQLJobInfo(owner, jobType, jobName, jobContent, groupId, SQLJobProgress(), startTime, timeout)
     }
 
     def getJobInfo: Map[String, SQLJobInfo] =
@@ -275,12 +272,12 @@ case class SQLJobInfo(
                              jobName: String,
                              jobContent: String,
                              groupId: String,
-                             progress: MLSQLJobProgress,
+                             progress: SQLJobProgress,
                              startTime: Long,
                              timeout: Long
                      )
 
-case class MLSQLJobProgress(var totalJob: Long = 0, var currentJobIndex: Long = 0, var script: String = "") {
+case class SQLJobProgress(var totalJob: Long = 0, var currentJobIndex: Long = 0, var script: String = "") {
     def increment = currentJobIndex += 1
 
     def setTotal(total: Long) = {

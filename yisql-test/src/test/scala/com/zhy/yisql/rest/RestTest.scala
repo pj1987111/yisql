@@ -22,7 +22,7 @@ class RestTest {
 
     @Test
     def testStartServer(): Unit = {
-        val restClass = Class.forName("com.zhy.yisql.rest.Application")
+        val restClass = Class.forName("com.zhy.yisql.core.rest.Application")
         val method = restClass.getMethod("main", classOf[Array[String]])
         method.invoke(null, Array("--server.port=9090"))
         Thread.currentThread().join()

@@ -3,8 +3,8 @@ package com.zhy.yisql.core
 import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.execute.SQLExecute
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
-import org.apache.spark.sql.types.{ArrayType, DataType, IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{Column, DataFrame, SparkSession, functions => F}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{Column, SparkSession, functions => F}
 import org.junit.Test
 
 /**
@@ -14,7 +14,7 @@ import org.junit.Test
   *  \* Time: 20:54
   *  \* Description: 
   *  \*/
-class SchemaInfer {
+class SchemaInfer extends BaseTest {
     System.setProperty("HADOOP_USER_NAME", "admin")
     val executor = new SQLExecute(Map("defaultPathPrefix" -> "/user/datacompute/export"))
 
@@ -27,52 +27,43 @@ class SchemaInfer {
                 .getOrCreate()
     }
 
+    val schemaInferTest1 =
+        """
+          |!schemainfer json
+          |'''
+          |[{"id":"1101","name":"小明1","age":20,"message":"testmsg1","date":"20210112","version":1},{"id":"1102","name":"小明2","age":21,"message":"testmsg2","date":"20210112","version":1},{"id":"1103","name":"小明3","age":22,"message":"testmsg3","date":"20210112","version":1}]
+          |{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}
+          |{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}
+          |'''
+          |;
+        """.stripMargin
+
+    val schemaInferTest2 =
+        """
+          |!schemainfer json
+          |'''
+          |{"table":"test1","data":{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}}
+          |'''
+          |;
+        """.stripMargin
+
+    val schemaInfer2Test =
+        s"""
+          |!schemainfer jsonv2
+          |'''
+          |$jsonVals2
+          |'''
+          |;
+        """.stripMargin
     @Test
     def schemaInfer(): Unit = {
-        //        executor.sql(
-        //            """
-        //              |
-        //              |
-        //              |!schemainfer json
-        //              |'''
-        //              |[{"id":"1101","name":"小明1","age":20,"message":"testmsg1","date":"20210112","version":1},{"id":"1102","name":"小明2","age":21,"message":"testmsg2","date":"20210112","version":1},{"id":"1103","name":"小明3","age":22,"message":"testmsg3","date":"20210112","version":1}]
-        //              |{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}
-        //              |{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}
-        //              |'''
-        //              |;
-        //              |
-        //            """.stripMargin)
-
-        executor.sql(
-            """
-              |
-              |
-              |!schemainfer json
-              |'''
-              |{"table":"test1","data":{"id":"1101","name":"小明1","age":"20","message":"testmsg1","date":"20210112","version":1}}
-              |'''
-              |;
-              |
-            """.stripMargin)
-        val res = executor.simpleExecute()
-        println(res)
+        sqlParseInner(schemaInferTest1)
+        sqlParseInner(schemaInferTest2)
     }
 
     @Test
     def schemaInfer2(): Unit = {
-        executor.sql(
-            s"""
-              |
-              |
-              |!schemainfer jsonv2
-              |'''
-              |$jsonVals2
-              |'''
-              |;
-              |
-            """.stripMargin)
-        val res = executor.simpleExecute()
-        println(res)
+        sqlParseInner(schemaInfer2Test)
     }
 
     //普通json

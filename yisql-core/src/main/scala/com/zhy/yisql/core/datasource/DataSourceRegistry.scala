@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.datasource
 
-import com.google.common.reflect.ClassPath
 import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.DataFrame
+import tech.mlsql.common.utils.reflect.ClassPath
 
 import scala.collection.JavaConverters._
 

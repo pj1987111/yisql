@@ -1,7 +1,4 @@
-package com.zhy.yisql.rest
-
-import com.zhy.yisql.StreamApp
-import org.junit.Test
+package com.zhy.yisql
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -10,11 +7,13 @@ import org.junit.Test
   *  \* Time: 13:00
   *  \* Description: 
   *  \*/
-class ServerMain {
-    @Test
-    def run(): Unit = {
+object ServerMain {
+    def main(args: Array[String]): Unit = {
         val args = Array(
             "-streaming.master local[*]",
+            //            "-spark.yarn.jars /Volumes/workspace/install/spark/spark-2.4.6-bin-hadoop2.6/jars/*.jar",
+            //            "-spark.yarn.jars /user/yarn_jars/yisql/*.jar",
+            //            "-streaming.master yarn",
             "-streaming.name test",
             "-streaming.enableHiveSupport true",
             "-streaming.spark.service true",

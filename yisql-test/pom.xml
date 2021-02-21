@@ -30,11 +30,18 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>tech.mlsql</groupId>
             <artifactId>pyjava-2.4_2.11</artifactId>
             <version>0.2.8.4_fixbugs</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.mlsql</groupId>
+            <artifactId>mysql-binlog_${scala.binary.version}</artifactId>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 

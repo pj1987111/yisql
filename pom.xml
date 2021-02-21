@@ -16,7 +16,7 @@
         <module>yisql-test</module>
         <module>yisql-provider</module>
         <module>yisql-cmd</module>
-        <module>yisql-rest</module>
+<!--        <module>yisql-rest</module>-->
     </modules>
 
     <properties>
@@ -32,13 +32,8 @@
 
         <spark.version>2.4.0</spark.version>
         <druid-version>1.0.31</druid-version>
-        <slf4j-api-version>1.7.25</slf4j-api-version>
-        <logback-version>1.2.2</logback-version>
-        <log4j-version>1.2.17</log4j-version>
-        <log4j-over-slf4j-version>1.7.25</log4j-over-slf4j-version>
-        <commons-logging-version>1.1.3</commons-logging-version>
-        <jcl-over-slf4j-version>1.7.25</jcl-over-slf4j-version>
-        <jul-to-slf4j-version>1.7.25</jul-to-slf4j-version>
+        <slf4j.version>1.7.5</slf4j.version>
+        <logback.version>1.1.8</logback.version>
         <guava-version>23.0</guava-version>
         <fastjson-version>1.2.67</fastjson-version>
         <mysql-version>5.1.43</mysql-version>
@@ -62,9 +57,12 @@
         <lift-json.version>3.4.1</lift-json.version>
         <jolbox.version>0.8.0.RELEASE</jolbox.version>
         <fastjson-version>1.2.67</fastjson-version>
+
+        <springboot.version>2.1.9.RELEASE</springboot.version>
+<!--        <scope>provided</scope>-->
+        <scope>compile</scope>
     </properties>
 
-    <dependencyManagement>
         <dependencies>
             <!--commons-->
             <dependency>
@@ -100,6 +98,12 @@
             <!--<version>${guava-version}</version>-->
             <!--</dependency>-->
 
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.8.5</version>
+            </dependency>
+
             <!-- fastjson -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -126,40 +130,32 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>log4j-over-slf4j</artifactId>
-                <version>${log4j-over-slf4j-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>${logback-version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
 
-
-<!--            <dependency>-->
-<!--                <groupId>org.slf4j</groupId>-->
-<!--                <artifactId>log4j-over-slf4j</artifactId>-->
-<!--                <version>${log4j-over-slf4j-version}</version>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${jcl-over-slf4j-version}</version>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
+            <!-- sparksql中需要-->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
-                <version>${jul-to-slf4j-version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
+            <!-- 去除，防止springboot依赖报错 -->
+<!--            <dependency>-->
+<!--                <groupId>ch.qos.logback</groupId>-->
+<!--                <artifactId>logback-classic</artifactId>-->
+<!--                <version>${logback.version}</version>-->
+<!--            </dependency>-->
+
+<!--            <dependency>-->
+<!--                <groupId>ch.qos.logback</groupId>-->
+<!--                <artifactId>logback-core</artifactId>-->
+<!--                <version>${logback.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -173,23 +169,6 @@
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest_${scala.binary.version}</artifactId>
                 <version>${scalatest.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_${scala.binary.version}</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_${scala.binary.version}</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-                <scope>test</scope>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.typesafe/config -->
@@ -220,6 +199,5 @@
                 <version>${fastjson-version}</version>
             </dependency>
         </dependencies>
-    </dependencyManagement>
 
 </project>
