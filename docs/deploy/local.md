@@ -1,0 +1,1 @@
+./yisql_start.sh -streaming.name yisql -streaming.platform spark -streaming.rest true -streaming.driver.port 9003 -streaming.spark.service true -streaming.thrift false -streaming.enableHiveSupport true -streaming.master local[*]

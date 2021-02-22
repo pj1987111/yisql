@@ -9,7 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yisql-provider</artifactId>
+    <artifactId>yisql-provider_2.11</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>spark-adhoc-kafka_2.11</module>

@@ -18,7 +18,8 @@ class BaseTest {
 
     //rest测试或直接执行
     val restMode = true
-    val restUrl = "http://127.0.0.1:9003/sql/run"
+//    val restUrl = "http://127.0.0.1:9003/sql/run"
+    val restUrl = "http://cdh217:9003/sql/run"
 
     val exeMap = Map(
         "defaultPathPrefix" -> "/user/datacompute/export",

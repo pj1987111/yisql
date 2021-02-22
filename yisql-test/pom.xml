@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yisql-test_${scala.binary.version}</artifactId>
+    <artifactId>yisql-test_2.11</artifactId>
 
     <dependencies>
         <dependency>
