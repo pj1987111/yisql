@@ -165,7 +165,6 @@
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-web</artifactId>-->
-<!--            <version>${springboot.version}</version>-->
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.springframework.boot</groupId>-->
@@ -173,20 +172,6 @@
 <!--                </exclusion>-->
 <!--            </exclusions>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate.validator</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <repositories>
@@ -216,10 +201,14 @@
                         </goals>
                         <configuration>
                             <relocations>
-                            <relocation>
-                                <pattern>com.google.gson</pattern>
-                                <shadedPattern>yisql.com.google.gson</shadedPattern>
-                            </relocation>
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>yisql.com.google.gson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.hibernate.validator</pattern>
+                                    <shadedPattern>yisql.org.hibernate.validator</shadedPattern>
+                                </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
@@ -302,7 +291,7 @@
                             <tasks>
                                 <copy todir="${basedir}/../plugins">
                                     <fileset dir="target/">
-                                        <include name="${project.name}-${project.version}.jar" />
+                                        <include name="${project.name}-${project.version}.jar"/>
                                     </fileset>
                                 </copy>
                             </tasks>

@@ -58,8 +58,8 @@
         <fastjson-version>1.2.67</fastjson-version>
 
         <springboot.version>2.1.9.RELEASE</springboot.version>
-        <scope>provided</scope>
-<!--                <scope>compile</scope>-->
+        <!--        <scope>provided</scope>-->
+        <scope>compile</scope>
     </properties>
 
     <parent>
@@ -67,6 +67,53 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.4.RELEASE</version>
     </parent>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <scope>compile</scope>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jar</id>
+            <properties>
+                <scope>provided</scope>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <!-- 单独打jar包要去除下面的，直接跑的话不能去除下面的-->
+                        <exclusion>
+                            <groupId>org.hibernate.validator</groupId>
+                            <artifactId>hibernate-validator</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
         <!--commons-->
@@ -198,11 +245,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba</groupId>-->
-<!--            <artifactId>fastjson</artifactId>-->
-<!--            <version>${fastjson-version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>javax.validation</groupId>-->
+        <!--            <artifactId>validation-api</artifactId>-->
+        <!--            <version>1.1.0.Final</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba</groupId>-->
+        <!--            <artifactId>fastjson</artifactId>-->
+        <!--            <version>${fastjson-version}</version>-->
+        <!--        </dependency>-->
     </dependencies>
 
 </project>

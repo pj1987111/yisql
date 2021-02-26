@@ -97,7 +97,8 @@ class StreamTest extends BaseTest {
         """
           |set streamName="zhy1";
           |set sourceSchema="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer),field(age,integer))";
-          |set targetSql="select * from kafka_post_kafka where age>=25";
+          |--val targetSql: Nothing = "select * from kafka_post_kafka where age>=25";
+          |set targetSql="select * from kafka_post_kafka";
           |
           |load kafka.`zhy` options
           |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
@@ -109,8 +110,10 @@ class StreamTest extends BaseTest {
           |as kafka_post_kafka;
           |
           |save append kafka_post_kafka hive.`hhy.json_test_tab`
-          |options partitionByCol="date,version"
-          |and `etl.sql`="${targetSql}"
+          |options
+          |--partitionByCol="date,version"
+          |--and
+          |`etl.sql`="${targetSql}"
           |and duration="10";
         """.stripMargin
 

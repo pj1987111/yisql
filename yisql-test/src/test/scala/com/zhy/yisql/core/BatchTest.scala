@@ -1,5 +1,7 @@
 package com.zhy.yisql.core
 
+import java.net.InetAddress
+
 import org.junit.Test
 
 /**
@@ -321,6 +323,18 @@ class BatchTest extends BaseTest {
           |;
         """.stripMargin
 
+    val hive2hiveTest =
+        """
+          |--load hive.`hhy.json_test_tab`  as table1;
+          |
+          |--select count(*) from hhy.json_test_tab as table2;
+          |
+          |--insert into table hhy.json_test_tab select * from hhy.json_test_tab;
+          |
+          |select count(*) from hhy.json_test_tab as table2;
+          |--select id,direction,tr_section from hhy.trajectory_min_section_zhy as table3;
+        """.stripMargin
+
     @Test
     def readJsonParOrc(): Unit = {
         sqlParseInner(readJsonParOrcTest)
@@ -379,5 +393,11 @@ class BatchTest extends BaseTest {
     @Test
     def deltaSelectVersions(): Unit = {
         sqlParseInner(deltaSelectVersionsTest)
+    }
+
+    @Test
+    def hive2hive(): Unit = {
+//        for(a <- 1 to 20)
+            sqlParseInner(hive2hiveTest)
     }
 }
