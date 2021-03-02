@@ -90,7 +90,7 @@ class SQLExecute(_params: Map[String, String]) {
                     result.append(s""" "schema":${df.schema.json},"data": """)
                 }
 
-                val outputSize = paramAsInt("outputSize", 5000)
+                val outputSize = paramAsInt("outputSize", 1000)
                 val jsonDF = sparkSession.sql(s"select * from $table limit " + outputSize).toJSON
                 val scriptJsonStringResult = fetchType match {
                     case "collect" => jsonDF.collect().mkString(",")

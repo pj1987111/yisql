@@ -19,7 +19,8 @@ import scala.collection.mutable.ArrayBuffer
   *  \* User: hongyi.zhou
   *  \* Date: 2021-02-14
   *  \* Time: 17:23
-  *  \* Description: 
+  *  \* Description:
+  * 任务执行 
   *  \*/
 object JobManager extends Logging {
     private[this] var _jobManager: JobManager = _

@@ -16,6 +16,7 @@
         <module>yisql-test</module>
         <module>yisql-provider</module>
         <module>yisql-cmd</module>
+        <module>yisql-jdbc</module>
     </modules>
 
     <properties>

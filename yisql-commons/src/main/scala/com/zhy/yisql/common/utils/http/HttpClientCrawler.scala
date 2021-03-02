@@ -4,6 +4,7 @@ import java.nio.charset.Charset
 import java.security.cert.X509Certificate
 import java.util
 
+import com.zhy.yisql.common.utils.json.JSONTool
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
@@ -82,6 +83,11 @@ object HttpClientCrawler {
             }
 
         }
+    }
+
+    def requestByMethodJson(url: String, method: String = "GET", paramsJson: String, useProxy: Boolean = false): String = {
+        val params = JSONTool.parseJson[Map[String, String]](paramsJson)
+        requestByMethod(url, method, params, useProxy)
     }
 
     def requestByMethod(url: String, method: String = "GET", params: Map[String, String], useProxy: Boolean = false): String = {
