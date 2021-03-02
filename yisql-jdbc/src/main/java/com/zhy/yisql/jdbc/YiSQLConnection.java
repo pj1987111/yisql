@@ -1,8 +1,5 @@
 package com.zhy.yisql.jdbc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -17,8 +14,6 @@ import java.util.concurrent.Executor;
  *  \
  */
 public class YiSQLConnection implements Connection {
-
-  private static final Logger logger = LoggerFactory.getLogger(YiSQLConnection.class);
 
   private YiSQLConnectionParam param;
 

@@ -3,7 +3,6 @@ package com.zhy.yisql.jdbc;
 import java.sql.*;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import static com.zhy.yisql.jdbc.Config.YiSQL_URL_PREFIX;
 
@@ -16,13 +15,12 @@ import static com.zhy.yisql.jdbc.Config.YiSQL_URL_PREFIX;
  *  \
  */
 public class YiSQLDriver implements Driver {
-  private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(YiSQLDriver.class);
 
   static {
     try {
       DriverManager.registerDriver(new YiSQLDriver());
     } catch (SQLException e) {
-      logger.error("Error occurs when registering YiSQL driver", e);
+      System.err.println("Error occurs when registering YiSQL driver");
     }
   }
 

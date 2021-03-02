@@ -12,7 +12,7 @@ import java.sql.SQLException;
  */
 public class YiSQLException extends SQLException {
 
-  private static final long serialVersionUID = -5071922897222027267L;
+  private static final long serialVersionUID = -5071922123822027267L;
 
   public YiSQLException(String reason) {
     super(reason);

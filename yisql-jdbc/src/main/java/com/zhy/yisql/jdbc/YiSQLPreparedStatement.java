@@ -1,8 +1,6 @@
 package com.zhy.yisql.jdbc;
 
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.Reader;

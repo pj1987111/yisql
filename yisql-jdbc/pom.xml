@@ -12,10 +12,31 @@
     <artifactId>yisql-jdbc</artifactId>
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>com.zhy</groupId>-->
+<!--            <artifactId>yisql-commons_${scala.binary.version}</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>com.zhy</groupId>
-            <artifactId>yisql-commons_${scala.binary.version}</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
         </dependency>
     </dependencies>
 
