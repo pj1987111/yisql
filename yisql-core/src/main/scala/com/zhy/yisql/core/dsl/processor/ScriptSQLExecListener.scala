@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 import com.zhy.yisql.core.dsl.adaptor._
 import com.zhy.yisql.core.execute.{BranchContext, BranchContextHolder, PathPrefix}
-import com.zhy.yisql.core.job.SQLJobProgressListener
+import com.zhy.yisql.core.job.JobProgressListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser.SqlContext
 import com.zhy.yisql.dsl.parser.{DSLSQLBaseListener, DSLSQLLexer}
 import org.antlr.v4.runtime.misc.Interval
@@ -31,7 +31,7 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
     //全局环境变量
     private val _env = new scala.collection.mutable.HashMap[String, String]
 
-    private[this] val _jobProgressListeners = ArrayBuffer[SQLJobProgressListener]()
+    private[this] val _jobProgressListeners = ArrayBuffer[JobProgressListener]()
 
     private val lastSelectTable = new AtomicReference[String]()
     private val _declaredTables = new ArrayBuffer[String]()
@@ -44,7 +44,7 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
 
     def declaredTables = _declaredTables
 
-    def addJobProgressListener(l: SQLJobProgressListener) = {
+    def addJobProgressListener(l: JobProgressListener) = {
         _jobProgressListeners += l
         this
     }

@@ -72,7 +72,7 @@ class SparkSessionCacheManager extends Logging {
     }
 
     def users = {
-        userToSparkSession.asScala.map(_._1).toList
+        userToSparkSession.asScala.keys.toList
     }
 
     /**
@@ -114,7 +114,7 @@ object SparkSessionCacheManager {
 
     def getSessionManager: SessionManager = sessionManager
 
-    def getSessionManagerOption: Option[SessionManager] = if (sessionManager == null) None else Some(sessionManager)
+    def getSessionManagerOption: Option[SessionManager] = Option(sessionManager)
 
 
     def setExpireTimeout(expire: Long): String = {

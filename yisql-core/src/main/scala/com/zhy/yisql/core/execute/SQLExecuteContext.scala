@@ -85,13 +85,14 @@ case class ForContext() extends BranchContext
   *
   * @param execListener     sql执行上下文
   * @param owner            所属用户
+  * @param groupId          所属组
   * @param userDefinedParam 用户定义变量
   */
 case class ExecuteContext(@transient execListener: ScriptSQLExecListener,
-                               owner: String,
-                               groupId: String,
-                               userDefinedParam: Map[String, String] = Map()
-                              )
+                          owner: String,
+                          groupId: String,
+                          userDefinedParam: Map[String, String] = Map()
+                         )
 
 class PathPrefix(val _defaultPathPrefix: String, val _allPathPrefix: Map[String, String]) {
     def pathPrefix(owner: Option[String]): String = {

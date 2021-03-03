@@ -31,7 +31,7 @@ trait BaseStreamSource extends StreamSource with StreamSink with Registry with D
 
         if(!skipFormat)
             writer.format(format)
-
+        writer.queryName(config.jobName.get)
         writer.outputMode(config.mode).options(option)
 
         foreachBatchCallback(writer, config)

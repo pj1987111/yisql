@@ -67,7 +67,7 @@ object JobManager extends Logging {
                 f()
             } else {
                 session.sparkContext.setJobGroup(job.groupId, job.jobName, true)
-                _jobManager.groupIdJobInfo.put(job.groupId, job)
+                addJobManually(job)
                 f()
             }
 
@@ -189,11 +189,11 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
             groupIdJobInfo.remove(groupId)
         }
 
-        if (job != null && !ignoreStreamJob && job.jobType == SQLJobType.STREAM) {
+        if (job != null && !ignoreStreamJob && job.jobType == JobType.STREAM) {
             killStreamJob
         }
 
-        if (job.jobType != SQLJobType.STREAM) {
+        if (job.jobType != JobType.STREAM) {
             killBatchJob
         }
     }
@@ -203,19 +203,19 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
     }
 }
 
-case object SQLJobType {
+case object JobType {
     val SCRIPT = "script"
     val SQL = "sql"
     val STREAM = "stream"
 }
 
-trait SQLJobProgressListener {
+trait JobProgressListener {
     def before(name: String, sql: String): Unit
 
     def after(name: String, sql: String): Unit
 }
 
-class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging {
+class DefaultSQLJobProgressListener extends JobProgressListener with Logging {
 
     val actionSet = Set("save", "insert", "train", "run", "predict")
     var counter = 0
@@ -254,7 +254,7 @@ class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging 
             job.progress.script = sql
             shouldLog = true
         }
-        if (shouldLog && !job.progress.script.startsWith("load _mlsql_.")) {
+        if (shouldLog && !job.progress.script.startsWith("load _yisql_.")) {
             logInfo(s"Total jobs: ${job.progress.totalJob} current job:${job.progress.currentJobIndex} job script:${job.progress.script} ")
         }
 
@@ -267,6 +267,17 @@ class DefaultSQLJobProgressListener extends SQLJobProgressListener with Logging 
 }
 
 
+/**
+  *
+  * @param owner      job所属用户
+  * @param jobType    job类型 script,sql,stream
+  * @param jobName    job名称
+  * @param jobContent job内容
+  * @param groupId    jobid
+  * @param progress
+  * @param startTime  任务开始时间
+  * @param timeout    任务允许超时时间 -1不超时
+  */
 case class SQLJobInfo(
                              owner: String,
                              jobType: String,

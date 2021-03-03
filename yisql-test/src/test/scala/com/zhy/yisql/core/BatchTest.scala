@@ -335,6 +335,14 @@ class BatchTest extends BaseTest {
           |--select id,direction,tr_section from hhy.trajectory_min_section_zhy as table3;
         """.stripMargin
 
+    val esReadTest =
+        """
+          |load es.`zhy/z1` where
+          |and es.nodes="cdh173"
+          |as data1;
+          |
+          |select count(*) from data1 as table2;
+        """.stripMargin
     @Test
     def readJsonParOrc(): Unit = {
         sqlParseInner(readJsonParOrcTest)
@@ -400,4 +408,10 @@ class BatchTest extends BaseTest {
 //        for(a <- 1 to 20)
             sqlParseInner(hive2hiveTest)
     }
+
+    @Test
+    def esRead(): Unit = {
+        sqlParseInner(esReadTest)
+    }
+
 }

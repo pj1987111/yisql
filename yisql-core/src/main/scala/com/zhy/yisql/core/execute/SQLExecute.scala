@@ -59,7 +59,7 @@ class SQLExecute(_params: Map[String, String]) {
 
         try {
             val jobInfo = JobManager.getJobInfo(
-                param("owner"), param("jobType", SQLJobType.SCRIPT), param("jobName"), param("sql"),
+                param("owner"), param("jobType", JobType.SCRIPT), param("jobName"), param("sql"),
                 paramAsLong("timeout", -1L)
             )
 

@@ -15,11 +15,13 @@ import org.junit.Before
   *  \* Description: 
   *  \*/
 class BaseTest {
-
+    //    val rootUrl = "cdh217:9003"
+    val rootUrl = "127.0.0.1:9003"
     //rest测试或直接执行
     val restMode = true
-//    val restUrl = "http://127.0.0.1:9003/sql/run"
-    val restUrl = "http://cdh217:9003/sql/run"
+    val restUrl = s"http://$rootUrl/sql/run"
+    val jobListUrl = s"http://$rootUrl/job/list"
+    val jobKillUrl = s"http://$rootUrl/job/kill"
 
     val exeMap = Map(
         "defaultPathPrefix" -> "/user/datacompute/export",
@@ -38,6 +40,25 @@ class BaseTest {
         println(res)
     }
 
+    def jobList(url: String) = {
+        val res = if (restMode) {
+            HttpClientCrawler.requestByMethod(url = url, method = "POST", Map[String, String]())
+        }
+        println(res)
+    }
+
+    def jobKill(url: String, gId: Option[String], jobName: Option[String]) = {
+        var killMap = Map[String, String]()
+        if(gId.isDefined)
+            killMap+=("groupId"->gId.get)
+        if(jobName.isDefined)
+            killMap+=("jobName"->jobName.get)
+        val res = if (restMode) {
+            HttpClientCrawler.requestByMethod(url = url, method = "POST", killMap)
+        }
+        println(res)
+    }
+
     @Before
     def startPlatform(): Unit = {
         //        val args = Array(
@@ -47,7 +68,7 @@ class BaseTest {
         //            "-streaming.spark.service true",
         //            "-streaming.rest true")
 
-        if(!restMode) {
+        if (!restMode) {
             val args = Array(
                 "-streaming.master local[*]",
                 "-streaming.name test",

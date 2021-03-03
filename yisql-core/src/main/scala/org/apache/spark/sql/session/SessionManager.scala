@@ -55,7 +55,7 @@ class SessionManager(rootSparkSession: SparkSession) extends Logging {
         synchronized {
             var session = identifierToSession.get(sessionIdentifier)
             if (session == null) {
-                openSession(sessionIdentifier.owner, "", "", Map(), true)
+                openSession(sessionIdentifier.owner, "", "", Map(), withImpersonation = true)
             }
             session = identifierToSession.get(sessionIdentifier)
             //to record last visit timestamp
@@ -67,13 +67,11 @@ class SessionManager(rootSparkSession: SparkSession) extends Logging {
 
     def getSessionOption(sessionIdentifier: SessionIdentifier): Option[SQLSession] = {
         val session = getSession(sessionIdentifier)
-        if (session == null) None else Some(session)
+        Option(session)
     }
 
     def closeSession(sessionIdentifier: SessionIdentifier) {
-        val runningJobCnt = JobManager.getJobInfo
-                .filter(_._2.owner == sessionIdentifier.owner)
-                .size
+        val runningJobCnt = JobManager.getJobInfo.count(_._2.owner == sessionIdentifier.owner)
 
         if (runningJobCnt == 0) {
             val session = identifierToSession.remove(sessionIdentifier)

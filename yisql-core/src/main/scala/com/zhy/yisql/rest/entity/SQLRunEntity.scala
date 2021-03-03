@@ -1,6 +1,6 @@
 package com.zhy.yisql.rest.entity
 
-import com.zhy.yisql.core.job.SQLJobType
+import com.zhy.yisql.core.job.JobType
 
 import scala.beans.BeanProperty
 
@@ -17,7 +17,7 @@ case class SQLRunEntity(
                                @BeanProperty
                                var owner: String = "",
                                @BeanProperty
-                               var jobType: String = SQLJobType.SCRIPT,
+                               var jobType: String = JobType.SCRIPT,
                                @BeanProperty
                                var executeMode: String = "query",
                                @BeanProperty
@@ -40,6 +40,12 @@ case class SQLRunEntity(
                                var fetchType: String = "collect"
                        )
 
+/**
+  *
+  * @param groupId 杀的任务id
+  * @param jobName 杀的任务名
+  *                两者选一都可
+  */
 case class KillJobEntity(
                                 @BeanProperty
                                 var groupId: String = "",

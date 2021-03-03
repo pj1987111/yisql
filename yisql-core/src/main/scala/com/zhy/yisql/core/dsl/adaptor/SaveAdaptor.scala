@@ -4,7 +4,8 @@ import java.util.UUID
 
 import com.zhy.yisql.core.datasource.{DataSinkConfig, DataSourceRegistry}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
-import com.zhy.yisql.core.execute.SQLExecuteContext
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
+import com.zhy.yisql.core.job.{JobManager, JobType, StreamManager}
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
 import org.apache.spark.sql._
@@ -66,16 +67,16 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
 
     override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
         val SaveStatement(_, tableName, format, path, option, mode, partitionByCol) = analyze(ctx)
-        val spark:SparkSession = scriptSQLExecListener.sparkSession
+        val spark: SparkSession = scriptSQLExecListener.sparkSession
         val context = SQLExecuteContext.getContext()
+        handleStreamJobManagerStart(context)
+
         //添加sql配置，可以过滤，etl等操作
-        var df: DataFrame = option.get("etl.sql").map{sql=>
+        var df: DataFrame = option.get("etl.sql").map { sql =>
             spark.sql(sql)
-        }.getOrElse{
+        }.getOrElse {
             spark.table(tableName)
         }
-        var streamQuery: StreamingQuery = null
-
         if (option.contains("fileNum")) {
             df = df.repartition(option.getOrElse("fileNum", "").toString.toInt)
         }
@@ -85,7 +86,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
                 val res = datasource.asInstanceOf[ {def sSave(writer: DataStreamWriter[Row], config: DataSinkConfig): Any}].sSave(
                     df.writeStream,
                     // here we should change final_path to path in future
-                    DataSinkConfig(path, option, mode, Option(df)))
+                    DataSinkConfig(path, option, mode, Option(df), Option(scriptSQLExecListener.env()("streamName"))))
                 res
             } else {
                 val newOption = if (partitionByCol.nonEmpty) {
@@ -95,7 +96,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
                 val res = datasource.asInstanceOf[ {def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any}].bSave(
                     df.write,
                     // here we should change final_path to path in future
-                    DataSinkConfig(path, newOption, mode, Option(df)))
+                    DataSinkConfig(path, newOption, mode, Option(df), None))
                 res
             }
         }.getOrElse {
@@ -115,15 +116,48 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
             }
         }
 
-        if (isStream) {
-            streamQuery = saveRes.asInstanceOf[StreamingQuery]
-        }
-        //next todo put in job manager...
-
         val tempTable = UUID.randomUUID().toString.replace("-", "")
         val outputTable = emptyDataFrame(spark)
         outputTable.createOrReplaceTempView(tempTable)
         scriptSQLExecListener.setLastSelectTable(tempTable)
+    }
+
+    /**
+      * 更改job信息，重置jobname,type等
+      * 流job信息使用streamQuery中
+      *
+      * @param context
+      */
+    def handleStreamJobManagerStart(context: ExecuteContext): Unit = {
+        var job = JobManager.getJobInfo(context.groupId)
+        if (isStream) {
+            job = job.copy(jobType = JobType.STREAM, jobName = scriptSQLExecListener.env()("streamName"))
+            JobManager.addJobManually(job)
+        }
+    }
+
+    /**
+      * 清理无用job，二次确认插入
+      *
+      * @param saveRes
+      * @param context
+      */
+    def handleStreamJobManagerEnd(saveRes: Any, context: ExecuteContext): Unit = {
+        if (isStream) {
+            val streamQuery = saveRes.asInstanceOf[StreamingQuery]
+            var job = JobManager.getJobInfo(context.groupId)
+            if (streamQuery != null) {
+                //清理无用的job，批处理才有用
+                JobManager.removeJobManually(job.groupId)
+                val realGroupId = streamQuery.id.toString
+                //double check
+                if (!JobManager.getJobInfo.contains(realGroupId)) {
+                    JobManager.addJobManually(job.copy(groupId = realGroupId))
+                }
+                job = JobManager.getJobInfo(realGroupId)
+                StreamManager.addStore(job)
+            }
+        }
     }
 }
 

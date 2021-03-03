@@ -70,8 +70,16 @@ trait Registry {
 
 case class DataSourceConfig(path: String, config: Map[String, String], df: Option[DataFrame] = None)
 
-case class DataSinkConfig(path: String, config: Map[String, String], mode: String, df: Option[DataFrame] = None) {
+/**
+  *
+  * @param path    存储路径
+  * @param config  写入参数
+  * @param mode    写入模式
+  * @param df
+  * @param jobName 任务名，用于流任务注册
+  */
+case class DataSinkConfig(path: String, config: Map[String, String], mode: String, df: Option[DataFrame] = None, jobName: Option[String]) {
     def cloneWithNewMode(newMode: String): DataSinkConfig = {
-        DataSinkConfig(path, config, newMode, df)
+        DataSinkConfig(path, config, newMode, df, jobName)
     }
 }

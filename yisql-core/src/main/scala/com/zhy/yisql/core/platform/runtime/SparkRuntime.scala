@@ -7,7 +7,7 @@ import java.util.{Map => JMap}
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.reflect.{ClassLoaderTool, ScalaReflect}
 import com.zhy.yisql.core.datasource.datalake.DataLake
-import com.zhy.yisql.core.job.JobManager
+import com.zhy.yisql.core.job.{JobManager, StreamManager}
 import com.zhy.yisql.core.platform.PlatformManager
 import com.zhy.yisql.rest.Application
 import org.apache.spark.sql.session.{SessionIdentifier, SessionManager}
@@ -38,6 +38,7 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     override def params: JMap[Any, Any] = _params
 
     initUDF()
+    StreamManager.start(sparkSession)
 
     SparkRuntime.setLastInstantiatedContext(this)
 
@@ -114,7 +115,6 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
         //                registerUDF(clzz)
         //            }
         //        }
-        //        MLSQLStreamManager.start(sparkSession)
         createTables
     }
 

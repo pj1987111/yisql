@@ -111,8 +111,8 @@ class StreamTest extends BaseTest {
           |
           |save append kafka_post_kafka hive.`hhy.json_test_tab`
           |options
-          |--partitionByCol="date,version"
-          |--and
+          |partitionByCol="date,version"
+          |and
           |`etl.sql`="${targetSql}"
           |and duration="10";
         """.stripMargin
@@ -156,42 +156,35 @@ class StreamTest extends BaseTest {
     @Test
     def kafka2console(): Unit = {
         sqlParseInner(kafka2consoleTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def kafka2kafka(): Unit = {
         sqlParseInner(kafka2kafkaTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def kafka2Jdbc(): Unit = {
         sqlParseInner(kafka2JdbcTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def kafka2Elastic(): Unit = {
         sqlParseInner(kafka2ElasticTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def kafka2Hive(): Unit = {
         sqlParseInner(kafka2HiveTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def kafka2Delta(): Unit = {
         sqlParseInner(kafka2DeltaTest)
-        Thread.currentThread().join()
     }
 
     @Test
     def delta2Console(): Unit = {
         sqlParseInner(delta2ConsoleTest)
-        Thread.currentThread().join()
     }
 }

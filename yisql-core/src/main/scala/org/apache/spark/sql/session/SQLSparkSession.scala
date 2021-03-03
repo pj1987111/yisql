@@ -20,6 +20,7 @@ package org.apache.spark.sql.session
 
 import java.lang.reflect.UndeclaredThrowableException
 
+import com.zhy.yisql.core.job.StreamManager
 import com.zhy.yisql.core.platform.PlatformManager
 import com.zhy.yisql.core.platform.runtime.SparkRuntime
 import org.apache.spark.SparkConf
@@ -59,7 +60,7 @@ class SQLSparkSession(userName: String, conf: Map[String, String]) extends Loggi
         notifyAll()
         create(sessionConf)
     }
-//    MLSQLStreamManager.start(_sparkSession)
+    StreamManager.start(_sparkSession)
   }
 
 

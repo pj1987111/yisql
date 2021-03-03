@@ -93,9 +93,9 @@ object CommandCollection {
         """.stripMargin)
   }
 
-  def evaluateMLSQL(spark: SparkSession, mlsql: String) = {
+  def evaluateYiSQL(spark: SparkSession, sql: String) = {
     val context = new ScriptSQLExecListener(spark, new PathPrefix(null, null))
-    SQLExecuteContext.parse(mlsql, context)
+    SQLExecuteContext.parse(sql, context)
     spark.table(context.getLastSelectTable().get)
   }
 }

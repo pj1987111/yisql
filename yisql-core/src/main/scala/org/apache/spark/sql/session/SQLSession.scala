@@ -61,10 +61,10 @@ class SQLSession(username: String,
 
   def sparkSession: SparkSession = this._sqlSparkSession.sparkSession
 
-  def mlsqlSparkSession: SQLSparkSession = this._sqlSparkSession
+  def yisqlSparkSession: SQLSparkSession = this._sqlSparkSession
 
   def open(sessionConf: Map[String, String]): Unit = {
-    mlsqlSparkSession.init(sessionConf)
+    yisqlSparkSession.init(sessionConf)
     lastAccessTime = System.currentTimeMillis
     lastIdleTime = lastAccessTime
   }

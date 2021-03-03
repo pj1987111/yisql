@@ -3,7 +3,7 @@ package com.zhy.yisql
 import java.util.concurrent.{Callable, Executors}
 
 import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
-import com.zhy.yisql.core.job.{JobManager, SQLJobInfo, SQLJobType}
+import com.zhy.yisql.core.job.{JobManager, SQLJobInfo, JobType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
@@ -19,7 +19,7 @@ object ScriptRunner {
     def runSubJobAsync(code: String, fetchResult: (DataFrame) => Unit, spark: Option[SparkSession], reuseContext: Boolean, reuseExecListenerEnv: Boolean) = {
         val context = SQLExecuteContext.getContext()
         val finalSpark = spark.getOrElse(context.execListener.sparkSession)
-        val jobInfo = JobManager.getJobInfo(context.owner, SQLJobType.SCRIPT, context.groupId, code, -1l)
+        val jobInfo = JobManager.getJobInfo(context.owner, JobType.SCRIPT, context.groupId, code, -1l)
         jobInfo.copy(jobName = jobInfo.jobName + ":" + jobInfo.groupId)
         val future = executors.submit(new Callable[Option[DataFrame]] {
             override def call(): Option[DataFrame] = {
@@ -75,7 +75,7 @@ object ScriptRunner {
         val context = SQLExecuteContext.getContext()
         val finalSpark = spark.getOrElse(context.execListener.sparkSession)
 
-        val jobInfo = JobManager.getJobInfo(context.owner, SQLJobType.SCRIPT, context.groupId, code, -1l)
+        val jobInfo = JobManager.getJobInfo(context.owner, JobType.SCRIPT, context.groupId, code, -1l)
         jobInfo.copy(jobName = jobInfo.jobName + ":" + jobInfo.groupId)
         _run(code, context, jobInfo, finalSpark, fetchResult, reuseContext, reuseExecListenerEnv)
         context.execListener.getLastSelectTable() match {
