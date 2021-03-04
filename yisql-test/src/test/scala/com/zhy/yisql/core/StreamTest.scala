@@ -11,6 +11,7 @@ import org.junit.Test
   *  \*/
 class StreamTest extends BaseTest {
 
+    import org.apache.log4j.Level
     val kafka2consoleTest =
         """
           |set streamName="zhy1";
@@ -18,9 +19,10 @@ class StreamTest extends BaseTest {
           |load kafka.`zhy` options
           |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
           |and `enable.auto.commit`="true"
-          |and `group.id`="zhy123"
+          |and `group.id`="zhy1234"
+          |and `failOnDataLoss`="false"
           |and `auto.offset.reset`="latest"
-          |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
+          |--and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
           |as kafka_post_console;
           |
           |save append kafka_post_console

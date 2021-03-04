@@ -17,7 +17,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -155,5 +158,37 @@ public class Utils {
       }
     }
     return res;
+  }
+
+  public static String fileLinesWrite(String filePath, String content, boolean flag) {
+    String filedo = "write";
+    FileWriter fw = null;
+    try {
+      File file = new File(filePath);
+      //如果文件夹不存在，则创建文件夹
+      if (!file.getParentFile().exists()) {
+        file.getParentFile().mkdirs();
+      }
+      if (!file.exists()) {//如果文件不存在，则创建文件,写入第一行内容
+        file.createNewFile();
+        fw = new FileWriter(file);
+        filedo = "create";
+      } else {//如果文件存在,则追加或替换内容
+        fw = new FileWriter(file, flag);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    PrintWriter pw = new PrintWriter(fw);
+    pw.println(content);
+    pw.flush();
+    try {
+      fw.flush();
+      pw.close();
+      fw.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return filedo;
   }
 }

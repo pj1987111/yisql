@@ -9,6 +9,8 @@ package com.zhy.yisql.jdbc;
  *  \
  */
 public class Config {
+  public static final String METHOD_NOT_SUPPORTED_STRING = "Method not supported";
+
   public final static String YiSQL_URL_PREFIX = "jdbc:yisql://";
   public static final String JDBC_DRIVER_NAME = "com.zhy.yisql.jdbc.YiSQLDriver";
   public static int MAX_SIZE = 1024;

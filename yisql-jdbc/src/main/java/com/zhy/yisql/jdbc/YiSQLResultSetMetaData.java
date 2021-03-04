@@ -48,7 +48,7 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
 
   @Override
   public int isNullable(int column) throws SQLException {
-    if (schema.getJSONObject(column).getBoolean("nullable")) {
+    if (schema.getJSONObject(column-1).getBoolean("nullable")) {
       return ResultSetMetaData.columnNullable;
     } else {
       return ResultSetMetaData.columnNoNulls;
@@ -67,12 +67,12 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
 
   @Override
   public String getColumnLabel(int column) throws SQLException {
-    return schema.getJSONObject(column).getString("name");
+    return schema.getJSONObject(column-1).getString("name");
   }
 
   @Override
   public String getColumnName(int column) throws SQLException {
-    return schema.getJSONObject(column).getString("name");
+    return schema.getJSONObject(column-1).getString("name");
   }
 
   @Override
@@ -102,7 +102,7 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
 
   @Override
   public int getColumnType(int column) throws SQLException {
-    String colType = schema.getJSONObject(column).getString("type");
+    String colType = schema.getJSONObject(column-1).getString("type");
     int res;
     switch (colType.toLowerCase()) {
       case "integer":
@@ -112,7 +112,8 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
         res = Types.DOUBLE;
         break;
       case "long":
-        res = Types.BIGINT;
+//        res = Types.BIGINT;
+        res = Types.INTEGER;
         break;
       case "float":
         res = Types.FLOAT;
@@ -149,7 +150,7 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
 
   @Override
   public String getColumnTypeName(int column) throws SQLException {
-    return schema.getJSONObject(column).getString("type");
+    return schema.getJSONObject(column-1).getString("type");
   }
 
   @Override
@@ -169,7 +170,7 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
 
   @Override
   public String getColumnClassName(int column) throws SQLException {
-    String colType = schema.getJSONObject(column).getString("type");
+    String colType = schema.getJSONObject(column-1).getString("type");
     String res;
     switch (colType.toLowerCase()) {
       case "integer":
@@ -179,7 +180,8 @@ public class YiSQLResultSetMetaData implements ResultSetMetaData {
         res = "java.lang.Double";
         break;
       case "long":
-        res = "java.lang.Long";
+//        res = "java.lang.Long";
+        res = "java.lang.Integer";
         break;
       case "float":
         res = "java.lang.Float";

@@ -72,12 +72,12 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).getString(fields.get(columnIndex));
+    return data.getJSONObject(pos).getString(fields.get(columnIndex-1));
   }
 
   @Override
   public boolean getBoolean(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).getBoolean(fields.get(columnIndex));
+    return data.getJSONObject(pos).getBoolean(fields.get(columnIndex-1));
   }
 
   @Override
@@ -87,44 +87,44 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public short getShort(int columnIndex) throws SQLException {
-    return (short) data.getJSONObject(pos).getInt(fields.get(columnIndex));
+    return (short) data.getJSONObject(pos).getInt(fields.get(columnIndex-1));
   }
 
   @Override
   public int getInt(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).getInt(fields.get(columnIndex));
+    return data.getJSONObject(pos).getInt(fields.get(columnIndex-1));
   }
 
   @Override
   public long getLong(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).getLong(fields.get(columnIndex));
+    return data.getJSONObject(pos).getLong(fields.get(columnIndex-1));
   }
 
   @Override
   public float getFloat(int columnIndex) throws SQLException {
-    return (float)data.getJSONObject(pos).getDouble(fields.get(columnIndex));
+    return (float)data.getJSONObject(pos).getDouble(fields.get(columnIndex-1));
   }
 
   @Override
   public double getDouble(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).getDouble(fields.get(columnIndex));
+    return data.getJSONObject(pos).getDouble(fields.get(columnIndex-1));
   }
 
   @Override
   public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-    return new java.math.BigDecimal(data.getJSONObject(pos).getDouble(fields.get(columnIndex))).setScale(scale);
+    return new java.math.BigDecimal(data.getJSONObject(pos).getDouble(fields.get(columnIndex-1))).setScale(scale);
   }
 
   @Override
   public byte[] getBytes(int columnIndex) throws SQLException {
-    return getString(columnIndex).getBytes();
+    return getString(columnIndex-1).getBytes();
   }
 
   @Override
   public java.sql.Date getDate(int columnIndex) throws SQLException {
     Date res = null;
     try {
-      res = new Date(dateFormat.parse(getString(columnIndex)).getTime());
+      res = new Date(dateFormat.parse(getString(columnIndex-1)).getTime());
     } catch (ParseException e) {
       e.printStackTrace();
     }
@@ -133,14 +133,14 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Time getTime(int columnIndex) throws SQLException {
-    return Time.valueOf(getString(columnIndex));
+    return Time.valueOf(getString(columnIndex-1));
   }
 
   @Override
   public Timestamp getTimestamp(int columnIndex) throws SQLException {
     Timestamp res = null;
     try {
-      res = new Timestamp(dateFormat.parse(getString(columnIndex)).getTime());
+      res = new Timestamp(dateFormat.parse(getString(columnIndex-1)).getTime());
     } catch (ParseException e) {
       e.printStackTrace();
     }
@@ -264,7 +264,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Object getObject(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).get(columnIndex);
+    return data.getJSONObject(pos).get(columnIndex-1);
   }
 
   @Override
@@ -289,7 +289,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-    return getBigDecimal(columnIndex, 0);
+    return getBigDecimal(columnIndex-1, 0);
   }
 
   @Override
@@ -719,7 +719,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-    return getDate(columnIndex);
+    return getDate(columnIndex-1);
   }
 
   @Override
@@ -729,7 +729,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-    return getTime(columnIndex);
+    return getTime(columnIndex-1);
   }
 
   @Override
@@ -739,7 +739,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-    return getTimestamp(columnIndex);
+    return getTimestamp(columnIndex-1);
   }
 
   @Override

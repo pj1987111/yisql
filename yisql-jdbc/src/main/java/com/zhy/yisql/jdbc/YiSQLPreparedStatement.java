@@ -43,7 +43,8 @@ public class YiSQLPreparedStatement implements PreparedStatement {
     JSONObject dataWithSchema = JSONObject.fromObject(respJsonStr);
     JSONObject schema = dataWithSchema.getJSONObject("schema");
     YiSQLResultSetMetaData meta = new YiSQLResultSetMetaData(schema.getJSONArray("fields"));
-    return new YiSQLResultSet(dataWithSchema, meta, conn);
+    resultSet = new YiSQLResultSet(dataWithSchema, meta, conn);
+    return resultSet;
   }
 
   @Override
@@ -393,7 +394,7 @@ public class YiSQLPreparedStatement implements PreparedStatement {
 
   @Override
   public ResultSet getResultSet() throws SQLException {
-    return null;
+    return resultSet;
   }
 
   @Override

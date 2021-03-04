@@ -331,8 +331,9 @@ class BatchTest extends BaseTest {
           |
           |--insert into table hhy.json_test_tab select * from hhy.json_test_tab;
           |
-          |select count(*) from hhy.json_test_tab as table2;
+          |--select count(*) from hhy.json_test_tab as table2;
           |--select id,direction,tr_section from hhy.trajectory_min_section_zhy as table3;
+          |select * from hhy.json_test_tab as table2;
         """.stripMargin
 
     val esReadTest =

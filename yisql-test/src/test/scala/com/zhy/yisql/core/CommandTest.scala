@@ -39,6 +39,21 @@ class CommandTest extends BaseTest {
           |--!kafka sampleData 20 "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092" zhy;
         """.stripMargin
 
+    val listJobsTest =
+        """
+          |!show jobs
+        """.stripMargin
+
+    val listJobTest =
+        """
+          |!show job zhy1
+        """.stripMargin
+
+    val killJobTest =
+        """
+          |!kill zhy1
+        """.stripMargin
+
     @Test
     def deltaSelect(): Unit = {
         sqlParseInner(deltaSelectTest)
@@ -47,6 +62,21 @@ class CommandTest extends BaseTest {
     @Test
     def kafkaCommand(): Unit = {
         sqlParseInner(kafkaCommandTest)
+    }
+
+    @Test
+    def listJobs(): Unit = {
+        sqlParseInner(listJobsTest)
+    }
+
+    @Test
+    def listJob(): Unit = {
+        sqlParseInner(listJobTest)
+    }
+
+    @Test
+    def killJob(): Unit = {
+        sqlParseInner(killJobTest)
     }
 
 }
