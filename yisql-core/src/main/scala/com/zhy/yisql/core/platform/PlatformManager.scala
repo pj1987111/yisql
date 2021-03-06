@@ -101,9 +101,9 @@ class PlatformManager extends Logging {
         //            case None =>
         //        }
 
-        if (params.getBooleanParam("streaming.rest", false) && !reRun) {
-            startRestServer(runtime)
-        }
+//        if (params.getBooleanParam("streaming.rest", false) && !reRun) {
+//            startRestServer(runtime)
+//        }
 
         if (params.getBooleanParam("streaming.thrift", false) && !reRun) {
             startThriftServer(runtime)

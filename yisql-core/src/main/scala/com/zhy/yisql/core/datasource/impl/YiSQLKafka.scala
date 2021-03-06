@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource.impl
 
-import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
+import com.zhy.yisql.core.util.SparkSchemaJsonParser
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 

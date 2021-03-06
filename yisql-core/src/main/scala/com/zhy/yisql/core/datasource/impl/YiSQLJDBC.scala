@@ -5,7 +5,7 @@ import java.util.Properties
 import com.zhy.yisql.common.utils.reflect.ScalaReflect
 import com.zhy.yisql.core.datasource._
 import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
-import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
+import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
 import org.apache.spark.sql._
 
 /**

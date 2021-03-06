@@ -3,20 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yisql_2.11</artifactId>
+        <artifactId>yisql_all</artifactId>
         <groupId>com.zhy</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yisql-commons_2.11</artifactId>
+    <artifactId>yisql-commons</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <scala.version>2.11.8</scala.version>
-        <scala.binary.version>2.11</scala.binary.version>
 
         <guava.version>16.0</guava.version>
         <httpclient.version>4.5.3</httpclient.version>
@@ -25,35 +22,11 @@
 
         <jackson.version>2.6.7.1</jackson.version>
 
-        <json4s.version>3.5.3</json4s.version>
-        <lift-json.version>3.3.0</lift-json.version>
         <scalatest.version>3.0.0</scalatest.version>
         <hadoop-version>2.6.0</hadoop-version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
-            <version>${json4s.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
-            <version>2.9.9</version>
-        </dependency>
-        <!-- springboot版本依赖 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.9</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-            <classifier>jdk15</classifier>
-        </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
@@ -64,18 +37,6 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop-version}</version>
-            <scope>${scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>${scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
             <scope>${scope}</scope>
         </dependency>
         <dependency>

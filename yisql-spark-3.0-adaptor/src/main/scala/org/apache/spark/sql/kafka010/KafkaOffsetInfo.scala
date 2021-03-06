@@ -5,17 +5,17 @@ import java.util.{Locale, UUID}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
 import org.apache.spark.util.UninterruptibleThread
 
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou
-  *  \* Date: 2021-02-15
-  *  \* Time: 13:16
+  *  \* Date: 2021-03-06
+  *  \* Time: 09:50
   *  \* Description: 
   *  \*/
 object KafkaOffsetInfo {
-
     def getKafkaInfo(spark: SparkSession, params: Map[String, String]) = {
         val parameters = params
         val caseInsensitiveParams = parameters.map { case (k, v) => (k.toLowerCase(Locale.ROOT), v) }
@@ -29,7 +29,7 @@ object KafkaOffsetInfo {
         val kafkaOffsetReader = new KafkaOffsetReader(
             strategy(caseInsensitiveParams),
             KafkaSourceProvider.kafkaParamsForDriver(specifiedKafkaParams),
-            parameters,
+            CaseInsensitiveMap(parameters),
             driverGroupIdPrefix = s"$uniqueGroupId-driver")
 
         var newUntilPartitionOffsets: KafkaSourceOffset = null
@@ -44,7 +44,7 @@ object KafkaOffsetInfo {
                 if (params.getOrElse("failOnDataLoss", "true").toBoolean) {
                     throw new IllegalStateException(message + s". $INSTRUCTION_FOR_FAIL_ON_DATA_LOSS_TRUE")
                 } else {
-//                    logWarning(message + s". $INSTRUCTION_FOR_FAIL_ON_DATA_LOSS_FALSE")
+                    //                    logWarning(message + s". $INSTRUCTION_FOR_FAIL_ON_DATA_LOSS_FALSE")
                 }
             }
 
@@ -76,7 +76,7 @@ object KafkaOffsetInfo {
                 "If startingOffsets contains specific offsets, you must specify all TopicPartitions.\n" +
                         "Use -1 for latest, -2 for earliest, if you don't care.\n" +
                         s"Specified: ${partitionOffsets.keySet} Assigned: ${partitions}")
-//            logDebug(s"Partitions assigned to consumer: $partitions. Seeking to $partitionOffsets")
+            //            logDebug(s"Partitions assigned to consumer: $partitions. Seeking to $partitionOffsets")
             partitionOffsets
         }
 

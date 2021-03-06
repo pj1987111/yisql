@@ -19,6 +19,7 @@ import scala.collection.JavaConverters._
   *  \* Description: 
   *  \*/
 class PyTest {
+    /*
     var sparkSession: SparkSession = _
 
     @Before
@@ -119,4 +120,5 @@ class PyTest {
         val wow = SparkUtils.internalCreateDataFrame(session, abc, StructType(Seq(StructField("AAA", LongType), StructField("BBB", LongType))), false)
         wow.show()
     }
+    */
 }

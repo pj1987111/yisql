@@ -14,7 +14,7 @@ import org.apache.spark.sql.SparkSession
   *  \* Time: 22:30
   *  \* Description: 
   *  \*/
-class SparkInstance(session: SparkSession) {
+class SparkInstanceService(session: SparkSession) {
 
     def resources = {
         var totalTasks = 0l

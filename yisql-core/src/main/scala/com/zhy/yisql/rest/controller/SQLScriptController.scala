@@ -7,7 +7,7 @@ import com.zhy.yisql.core.execute.SQLExecute
 import com.zhy.yisql.core.job.JobManager
 import com.zhy.yisql.rest.entity.{KillJobEntity, SQLRunEntity}
 import com.zhy.yisql.rest.service.SQLScriptService
-import org.apache.spark.SparkInstance
+import org.apache.spark.SparkInstanceService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.{RequestMapping, RestController}
 
@@ -66,7 +66,7 @@ class SQLScriptController extends Logging {
     def instanceResource = {
         val executor = new SQLExecute(Map())
         val session = executor.getSession
-        val resource = new SparkInstance(session).resources
+        val resource = new SparkInstanceService(session).resources
         executor.cleanActiveSessionInSpark
         JSONTool.toJsonStr(resource)
     }

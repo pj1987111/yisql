@@ -57,18 +57,3 @@ trait BaseStreamSource extends StreamSource with StreamSink with Registry with D
         DataSourceRegistry.unRegister(shortFormat)
     }
 }
-
-object ForeachBatchRunner {
-    def run(dataStreamWriter: DataStreamWriter[Row], outputName: String, callback: (Long, SparkSession) => Unit): Unit = {
-        dataStreamWriter.foreachBatch { (dataBatch, batchId) =>
-            dataBatch.createOrReplaceTempView(outputName)
-            callback(batchId, dataBatch.sparkSession)
-        }
-    }
-
-    def run(dataStreamWriter: DataStreamWriter[Row], callback: (Dataset[Row], Long) => Unit): Unit = {
-        dataStreamWriter.foreachBatch { (dataBatch, batchId) =>
-            callback(dataBatch, batchId)
-        }
-    }
-}

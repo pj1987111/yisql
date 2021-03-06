@@ -11,6 +11,7 @@ object ServerMain {
     def main(args: Array[String]): Unit = {
         System.setProperty("HADOOP_USER_NAME","admin")
         val args = Array(
+            "-spark.driver.bindAddress 127.0.0.1",
             "-streaming.master local[*]",
             //            "-spark.yarn.jars /Volumes/workspace/install/spark/spark-2.4.6-bin-hadoop2.6/jars/*.jar",
             //            "-spark.yarn.jars /user/yarn_jars/yisql/*.jar",

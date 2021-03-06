@@ -1,7 +1,7 @@
 package com.zhy.yisql.core
 
-import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.execute.SQLExecute
+import com.zhy.yisql.core.util.SparkSchemaJsonParser
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, SparkSession, functions => F}

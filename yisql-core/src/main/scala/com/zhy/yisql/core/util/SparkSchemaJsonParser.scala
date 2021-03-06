@@ -1,4 +1,4 @@
-package com.zhy.yisql.common.utils.json
+package com.zhy.yisql.core.util
 
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.types._

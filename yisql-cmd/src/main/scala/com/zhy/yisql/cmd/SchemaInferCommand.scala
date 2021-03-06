@@ -1,8 +1,8 @@
 package com.zhy.yisql.cmd
 
 import com.alibaba.fastjson.JSON
-import com.zhy.yisql.common.utils.json.SparkSchemaJsonParser
 import com.zhy.yisql.core.cmds.SQLCmd
+import com.zhy.yisql.core.util.SparkSchemaJsonParser
 import org.apache.spark.sql.execution.datasources.json.JsonInferSchema
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String

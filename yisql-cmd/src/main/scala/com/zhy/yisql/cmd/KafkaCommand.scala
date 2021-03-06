@@ -1,10 +1,10 @@
 package com.zhy.yisql.cmd
 
-import com.zhy.yisql.common.utils.hdfs.HDFSOperatorV2
 import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.common.utils.path.PathFun
 import com.zhy.yisql.core.cmds.SQLCmd
 import com.zhy.yisql.core.execute.SQLExecuteContext
+import com.zhy.yisql.core.util.HDFSOperatorV2
 import org.apache.spark.sql.kafka010.KafkaOffsetInfo
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String

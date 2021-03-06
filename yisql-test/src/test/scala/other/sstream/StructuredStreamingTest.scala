@@ -2,7 +2,7 @@ package other.sstream
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
-import org.apache.spark.sql.streaming.{OutputMode, ProcessingTime, StreamingQuery, Trigger}
+import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery, Trigger}
 import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession, functions => F}
 import org.junit.Test
 import tech.mlsql.schema.parser.SparkSimpleSchemaParser
@@ -29,40 +29,40 @@ class StructuredStreamingTest {
         spark
     }
 
-    @Test
-    def kafkaTest1() = {
-        val spark = initSpark()
-        import spark.implicits._
-
-        val df = spark
-                .readStream
-                .format("kafka")
-                .option("kafka.bootstrap.servers", "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092")
-                .option("subscribe", "sstream")
-                //默认是从lastest读，这里设置从头开始读
-                .option("startingOffsets", "earliest")
-                .load()
-        val kafkaDf: Dataset[(String, String)] = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-                .as[(String, String)]
-        //判断是否为流处理
-        println(kafkaDf.isStreaming)
-        kafkaDf.printSchema()
-        val words = kafkaDf.flatMap(_._2.split(" "))
-        val wordCounts = words.groupBy("value").count()
-        val query = wordCounts
-                .writeStream
-                .outputMode("complete")
-                .format("console")
-                .trigger(ProcessingTime(5.seconds))
-                .start()
-        query.awaitTermination()
-
-        //        val words = lines.as[String].flatMap(_.split(" "))
-        //        val wordCounts = words.groupBy("value").count()
-        ////        df1.printSchema()
-        //        val query = wordCounts.writeStream.outputMode("complete").format("console").start()
-        //        query.awaitTermination()
-    }
+//    @Test
+//    def kafkaTest1() = {
+//        val spark = initSpark()
+//        import spark.implicits._
+//
+//        val df = spark
+//                .readStream
+//                .format("kafka")
+//                .option("kafka.bootstrap.servers", "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092")
+//                .option("subscribe", "sstream")
+//                //默认是从lastest读，这里设置从头开始读
+//                .option("startingOffsets", "earliest")
+//                .load()
+//        val kafkaDf: Dataset[(String, String)] = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+//                .as[(String, String)]
+//        //判断是否为流处理
+//        println(kafkaDf.isStreaming)
+//        kafkaDf.printSchema()
+//        val words = kafkaDf.flatMap(_._2.split(" "))
+//        val wordCounts = words.groupBy("value").count()
+//        val query = wordCounts
+//                .writeStream
+//                .outputMode("complete")
+//                .format("console")
+//                .trigger(ProcessingTime(5.seconds))
+//                .start()
+//        query.awaitTermination()
+//
+//        //        val words = lines.as[String].flatMap(_.split(" "))
+//        //        val wordCounts = words.groupBy("value").count()
+//        ////        df1.printSchema()
+//        //        val query = wordCounts.writeStream.outputMode("complete").format("console").start()
+//        //        query.awaitTermination()
+//    }
 
     @Test
     def simpleTest2(): Unit = {

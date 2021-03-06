@@ -1,4 +1,4 @@
-package com.zhy.yisql.common.utils.hdfs
+package com.zhy.yisql.core.util
 
 import java.io.{BufferedReader, ByteArrayOutputStream, File, InputStream, InputStreamReader}
 
@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, Path}
 import org.apache.hadoop.io.IOUtils
+import org.apache.spark.SparkUtils
 import org.apache.spark.deploy.SparkHadoopUtil
 
 import scala.collection.mutable.ArrayBuffer
@@ -21,8 +22,8 @@ import scala.collection.mutable.ArrayBuffer
 object HDFSOperatorV2 {
 
     def hadoopConfiguration:Configuration = {
-        if(SparkHadoopUtil.get != null){
-            SparkHadoopUtil.get.conf
+        if(SparkUtils.sparkHadoopUtil != null){
+            SparkUtils.sparkHadoopUtil.conf
         } else new Configuration()
 
     }

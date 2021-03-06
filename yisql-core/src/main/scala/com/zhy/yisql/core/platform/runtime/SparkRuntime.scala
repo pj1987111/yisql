@@ -1,6 +1,7 @@
 package com.zhy.yisql.core.platform.runtime
 
 import java.lang.reflect.Modifier
+import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 import java.util.{Map => JMap}
 
@@ -36,6 +37,8 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     sessionManager.start()
 
     override def params: JMap[Any, Any] = _params
+
+    startHttpServer
 
     initUDF()
     StreamManager.start(sparkSession)
@@ -169,6 +172,12 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
 //        val method = restClass.getMethod("main", classOf[Array[String]])
 //        val httpServerPort = SQLConf.SQL_DRIVER_PORT.readFrom(configReader)
 //        method.invoke(null, Array(s"--server.port=$httpServerPort"))
+
+        import java.lang.reflect.Field
+        val factoryField = classOf[URL].getDeclaredField("factory")
+//        val factoryField = URL.class.getDeclaredField("factory")
+        factoryField.setAccessible(true)
+        factoryField.set(null, null)
     }
 
     override def processEvent(event: Event): Unit = {}
