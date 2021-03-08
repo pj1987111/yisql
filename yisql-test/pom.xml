@@ -19,6 +19,11 @@
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
+            <artifactId>yisql-rest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zhy</groupId>
             <artifactId>yisql-cmd</artifactId>
             <version>${project.version}</version>
         </dependency>

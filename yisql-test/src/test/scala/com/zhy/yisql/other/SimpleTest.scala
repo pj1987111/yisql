@@ -1,7 +1,7 @@
 package com.zhy.yisql.other
 
 import com.zhy.yisql.common.utils.bean.BeanUtils
-import com.zhy.yisql.rest.entity.SQLRunEntity
+//import com.zhy.yisql.rest.entity.SQLRunEntity
 import org.junit.Test
 
 /**
@@ -12,14 +12,14 @@ import org.junit.Test
   *  \* Description: 
   *  \*/
 class SimpleTest {
-    @Test
-    def beanTest(): Unit = {
-        val entity = new SQLRunEntity
-//        entity.setCallback()
-        println(entity)
-        val mapV = BeanUtils.getCCParams(entity)
-        println(mapV)
-    }
+//    @Test
+//    def beanTest(): Unit = {
+//        val entity = new SQLRunEntity
+////        entity.setCallback()
+//        println(entity)
+//        val mapV = BeanUtils.getCCParams(entity)
+//        println(mapV)
+//    }
 
     @Test
     def mapTest(): Unit = {

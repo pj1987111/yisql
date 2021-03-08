@@ -164,82 +164,82 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public String getString(String columnLabel) throws SQLException {
-    return getString(fields.indexOf(columnLabel));
+    return getString(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public boolean getBoolean(String columnLabel) throws SQLException {
-    return getBoolean(fields.indexOf(columnLabel));
+    return getBoolean(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public byte getByte(String columnLabel) throws SQLException {
-    return getByte(fields.indexOf(columnLabel));
+    return getByte(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public short getShort(String columnLabel) throws SQLException {
-    return getShort(fields.indexOf(columnLabel));
+    return getShort(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public int getInt(String columnLabel) throws SQLException {
-    return getInt(fields.indexOf(columnLabel));
+    return getInt(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public long getLong(String columnLabel) throws SQLException {
-    return getLong(fields.indexOf(columnLabel));
+    return getLong(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public float getFloat(String columnLabel) throws SQLException {
-    return getFloat(fields.indexOf(columnLabel));
+    return getFloat(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public double getDouble(String columnLabel) throws SQLException {
-    return getDouble(fields.indexOf(columnLabel));
+    return getDouble(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
-    return getBigDecimal(fields.indexOf(columnLabel));
+    return getBigDecimal(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public byte[] getBytes(String columnLabel) throws SQLException {
-    return getBytes(fields.indexOf(columnLabel));
+    return getBytes(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public Date getDate(String columnLabel) throws SQLException {
-    return getDate(fields.indexOf(columnLabel));
+    return getDate(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public Time getTime(String columnLabel) throws SQLException {
-    return getTime(fields.indexOf(columnLabel));
+    return getTime(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public Timestamp getTimestamp(String columnLabel) throws SQLException {
-    return getTimestamp(fields.indexOf(columnLabel));
+    return getTimestamp(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public InputStream getAsciiStream(String columnLabel) throws SQLException {
-    return getAsciiStream(fields.indexOf(columnLabel));
+    return getAsciiStream(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-    return getUnicodeStream(fields.indexOf(columnLabel));
+    return getUnicodeStream(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public InputStream getBinaryStream(String columnLabel) throws SQLException {
-    return getBinaryStream(fields.indexOf(columnLabel));
+    return getBinaryStream(fields.indexOf(columnLabel)+1);
   }
 
   @Override
@@ -269,12 +269,12 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Object getObject(String columnLabel) throws SQLException {
-    return getObject(fields.indexOf(columnLabel));
+    return getObject(fields.indexOf(columnLabel)+1);
   }
 
   @Override
   public int findColumn(String columnLabel) throws SQLException {
-    return fields.indexOf(columnLabel);
+    return fields.indexOf(columnLabel)+1;
   }
 
   @Override
@@ -294,7 +294,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-    return getBigDecimal(fields.indexOf(columnLabel));
+    return getBigDecimal(fields.indexOf(columnLabel)+1);
   }
 
   private void checkIfClosed() throws SQLException {
@@ -714,7 +714,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Array getArray(String columnLabel) throws SQLException {
-    return getArray(fields.indexOf(columnLabel));
+    return getArray(fields.indexOf(columnLabel)+1);
   }
 
   @Override
@@ -724,7 +724,7 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Date getDate(String columnLabel, Calendar cal) throws SQLException {
-    return getDate(fields.indexOf(columnLabel));
+    return getDate(fields.indexOf(columnLabel)+1);
   }
 
   @Override

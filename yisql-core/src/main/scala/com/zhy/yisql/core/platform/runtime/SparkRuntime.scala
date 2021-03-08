@@ -10,7 +10,6 @@ import com.zhy.yisql.common.utils.reflect.{ClassLoaderTool, ScalaReflect}
 import com.zhy.yisql.core.datasource.datalake.DataLake
 import com.zhy.yisql.core.job.{JobManager, StreamManager}
 import com.zhy.yisql.core.platform.PlatformManager
-import com.zhy.yisql.rest.Application
 import org.apache.spark.sql.session.{SessionIdentifier, SessionManager}
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import org.apache.spark.{SQLConf, SparkConf}
@@ -166,12 +165,12 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     }
 
     override def startHttpServer: Unit = {
-        val httpServerPort = SQLConf.SQL_DRIVER_PORT.readFrom(configReader)
-        Application.main(Array(s"--server.port=$httpServerPort"))
-//        val restClass = Class.forName("com.zhy.yisql.rest.Application")
-//        val method = restClass.getMethod("main", classOf[Array[String]])
 //        val httpServerPort = SQLConf.SQL_DRIVER_PORT.readFrom(configReader)
-//        method.invoke(null, Array(s"--server.port=$httpServerPort"))
+//        Application.main(Array(s"--server.port=$httpServerPort"))
+        val restClass = Class.forName("com.zhy.yisql.rest.Application")
+        val method = restClass.getMethod("main", classOf[Array[String]])
+        val httpServerPort = SQLConf.SQL_DRIVER_PORT.readFrom(configReader)
+        method.invoke(null, Array(s"--server.port=$httpServerPort"))
 
         import java.lang.reflect.Field
         val factoryField = classOf[URL].getDeclaredField("factory")

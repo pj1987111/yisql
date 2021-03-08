@@ -20,9 +20,6 @@
 
         <scope>provided</scope>
 
-        <jackson.version>2.6.7.1</jackson.version>
-
-        <scalatest.version>3.0.0</scalatest.version>
         <hadoop-version>2.6.0</hadoop-version>
     </properties>
 
