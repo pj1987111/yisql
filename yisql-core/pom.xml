@@ -10,24 +10,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yisql-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${spark.big.version}-${parent.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-commons</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-dsl</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-spark-${spark.big.version}-adaptor</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>
@@ -193,37 +193,6 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-spark-20_2.11</artifactId>
-            <version>5.6.8</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.spark</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.jpountz.lz4</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.46</version>
@@ -375,7 +344,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="${basedir}/../plugins">
+                                <copy todir="${basedir}/../plugins/${spark.big.version}">
                                     <fileset dir="target/">
                                         <include name="${project.name}-${project.version}.jar"/>
                                     </fileset>

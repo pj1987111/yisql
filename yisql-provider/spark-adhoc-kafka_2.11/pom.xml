@@ -27,13 +27,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.11.8</scala.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <scala.jline.version>2.11.0-M3</scala.jline.version>
-
-        <spark.version>2.4.0</spark.version>
-        <spark.bigversion>2.4</spark.bigversion>
-        <mlsql.version>1.2.0</mlsql.version>
+<!--        <scala.version>2.11.8</scala.version>-->
+<!--        <scala.binary.version>2.11</scala.binary.version>-->
+<!--        <spark.version>2.4.0</spark.version>-->
 
         <guava.version>16.0</guava.version>
         <httpclient.version>4.5.3</httpclient.version>
@@ -117,14 +113,6 @@
 
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>${kafka.version}</version>
-            <classifier>test</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_${scala.binary.version}</artifactId>
             <version>${kafka.version}</version>
             <classifier>test</classifier>
@@ -198,24 +186,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 

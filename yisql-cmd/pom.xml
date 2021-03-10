@@ -10,15 +10,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yisql-cmd</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${spark.big.version}-${parent.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-core</artifactId>
-            <version>${project.version}</version>
-<!--            <scope>provided</scope>-->
+            <version>${parent.version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -111,7 +111,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="${basedir}/../plugins">
+                                <copy todir="${basedir}/../plugins/${spark.big.version}">
                                     <fileset dir="target/">
                                         <include name="${project.name}-${project.version}.jar"/>
                                     </fileset>

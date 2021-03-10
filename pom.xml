@@ -9,19 +9,6 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <modules>
-        <module>yisql-core</module>
-        <module>yisql-commons</module>
-        <module>yisql-dsl</module>
-        <module>yisql-test</module>
-        <module>yisql-provider</module>
-        <module>yisql-cmd</module>
-        <module>yisql-jdbc</module>
-        <module>yisql-spark-2.4-adaptor</module>
-        <module>yisql-rest</module>
-        <!--        <module>yisql-spark-3.0-adaptor</module>-->
-    </modules>
-
     <properties>
         <project.version>1.0.0</project.version>
         <java.version>1.8</java.version>
@@ -72,7 +59,8 @@
         <lift-json.version>3.4.1</lift-json.version>
         <jolbox.version>0.8.0.RELEASE</jolbox.version>
         <fastjson-version>1.2.67</fastjson-version>
-        <jackson.version>2.9.9</jackson.version>
+        <!--        <jackson.version>2.9.9</jackson.version>-->
+        <jackson.version>2.10.0</jackson.version>
         <springboot.version>2.1.9.RELEASE</springboot.version>
         <!--        <scope>provided</scope>-->
         <scope>compile</scope>
@@ -86,10 +74,81 @@
 
     <profiles>
         <profile>
+            <id>scala-2.11</id>
+            <properties>
+                <scala.version>2.11.12</scala.version>
+                <scala.binary.version>2.11</scala.binary.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.0.0-M1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-versions</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <bannedDependencies>
+                                            <excludes combine.children="append">
+                                                <exclude>*:*_2.12</exclude>
+                                            </excludes>
+                                        </bannedDependencies>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>scala-2.12</id>
+            <properties>
+                <scala.version>2.12.10</scala.version>
+                <scala.binary.version>2.12</scala.binary.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-versions</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <bannedDependencies>
+                                            <excludes combine.children="append">
+                                                <exclude>*:*_2.11</exclude>
+                                            </excludes>
+                                        </bannedDependencies>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+
+        </profile>
+
+        <profile>
             <id>local</id>
             <properties>
                 <scope>compile</scope>
             </properties>
+            <modules>
+                <module>yisql-spark-2.4-adaptor</module>
+            </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -107,11 +166,8 @@
             </dependencies>
         </profile>
         <profile>
-            <!--            <id>jar</id>-->
+            <!-- 适配cdh5.15.0 -->
             <id>spark-2.4.0</id>
-            <!--            <properties>-->
-            <!--                <scope>provided</scope>-->
-            <!--            </properties>-->
             <properties>
                 <scope>provided</scope>
                 <scala.version>2.11.12</scala.version>
@@ -122,6 +178,7 @@
             </properties>
             <modules>
                 <module>yisql-spark-2.4-adaptor</module>
+                <module>yisql-provider</module>
             </modules>
             <dependencies>
                 <dependency>
@@ -136,6 +193,37 @@
                         <exclusion>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-spark-20_2.11</artifactId>
+                    <version>5.6.8</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.apache.spark</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.apache.hadoop</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.google.guava</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.fasterxml.jackson.module</groupId>
+                            <artifactId>*</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>net.jpountz.lz4</groupId>
+                            <artifactId>*</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -346,19 +434,19 @@
             <scope>${scope}</scope>
         </dependency>
         <!-- springboot版本依赖 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-            <scope>${scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <!--            <version>2.10.0</version>-->
-            <scope>${scope}</scope>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+        <!--            <artifactId>jackson-core</artifactId>-->
+        <!--            <version>${jackson.version}</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+        <!--            <artifactId>jackson-databind</artifactId>-->
+        <!--            <version>${jackson.version}</version>-->
+        <!--            &lt;!&ndash;            <version>2.10.0</version>&ndash;&gt;-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
@@ -366,5 +454,18 @@
             <classifier>jdk15</classifier>
         </dependency>
     </dependencies>
+
+    <modules>
+        <module>yisql-core</module>
+        <module>yisql-commons</module>
+        <module>yisql-dsl</module>
+        <module>yisql-cmd</module>
+        <module>yisql-jdbc</module>
+        <module>yisql-rest</module>
+        <!--        <module>yisql-spark-2.4-adaptor</module>-->
+        <!--        <module>yisql-spark-3.0-adaptor</module>-->
+        <!--        <module>yisql-provider</module>-->
+        <!--        <module>yisql-test</module>-->
+    </modules>
 
 </project>

@@ -51,7 +51,7 @@ class CommandTest extends BaseTest {
 
     val killJobTest =
         """
-          |!kill zhy1
+          |!kill zhy1;
         """.stripMargin
 
     @Test

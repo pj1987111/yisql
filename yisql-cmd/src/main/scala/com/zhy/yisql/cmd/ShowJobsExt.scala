@@ -1,6 +1,6 @@
 package com.zhy.yisql.cmd
 
-import com.zhy.yisql.common.utils.json.JsonUtils
+import org.apache.spark.utils.json.JsonUtils
 import com.zhy.yisql.core.cmds.SQLCmd
 import com.zhy.yisql.core.job.JobManager
 import com.zhy.yisql.core.util.SQLJobCollect

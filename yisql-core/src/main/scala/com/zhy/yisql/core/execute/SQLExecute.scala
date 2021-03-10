@@ -1,6 +1,7 @@
 package com.zhy.yisql.core.execute
 
-import com.zhy.yisql.common.utils.json.{JSONTool, JsonUtils}
+import com.zhy.yisql.common.utils.json.JSONTool
+import org.apache.spark.utils.json.JsonUtils
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.job._
 import com.zhy.yisql.core.platform.PlatformManager
