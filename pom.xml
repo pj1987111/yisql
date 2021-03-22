@@ -29,11 +29,11 @@
         <!-- spark 2.4 end -->
 
         <!-- spark 3.0 start -->
-        <!--        <scala.version>2.12.10</scala.version>-->
-        <!--        <scala.binary.version>2.12</scala.binary.version>-->
-        <!--        <spark.version>3.0.0</spark.version>-->
-        <!--        <spark.big.version>3.0</spark.big.version>-->
-        <!--        <spark.es.version>30</spark.es.version>-->
+<!--                <scala.version>2.12.10</scala.version>-->
+<!--                <scala.binary.version>2.12</scala.binary.version>-->
+<!--                <spark.version>3.0.0</spark.version>-->
+<!--                <spark.big.version>3.0</spark.big.version>-->
+<!--                <spark.es.version>30</spark.es.version>-->
         <!-- spark 3.0 end -->
 
         <druid-version>1.0.31</druid-version>
@@ -148,6 +148,7 @@
             </properties>
             <modules>
                 <module>yisql-spark-2.4-adaptor</module>
+                <module>yisql-provider/spark-adhoc-kafka_2.11</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -178,7 +179,7 @@
             </properties>
             <modules>
                 <module>yisql-spark-2.4-adaptor</module>
-                <module>yisql-provider</module>
+                <module>yisql-provider/spark-adhoc-kafka_2.11</module>
             </modules>
             <dependencies>
                 <dependency>
@@ -241,6 +242,7 @@
             </properties>
             <modules>
                 <module>yisql-spark-3.0-adaptor</module>
+                <module>yisql-provider/spark-adhoc-kafka_2.12</module>
             </modules>
             <dependencies>
                 <dependency>
@@ -462,10 +464,6 @@
         <module>yisql-cmd</module>
         <module>yisql-jdbc</module>
         <module>yisql-rest</module>
-        <!--        <module>yisql-spark-2.4-adaptor</module>-->
-        <!--        <module>yisql-spark-3.0-adaptor</module>-->
-        <!--        <module>yisql-provider</module>-->
-        <!--        <module>yisql-test</module>-->
     </modules>
 
 </project>

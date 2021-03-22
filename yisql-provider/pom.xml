@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>spark-adhoc-kafka_2.11</module>
+        <module>spark-adhoc-kafka_2.12</module>
     </modules>
 
 <!--    <dependencies>-->

@@ -16,9 +16,6 @@
 
         <guava.version>16.0</guava.version>
         <httpclient.version>4.5.3</httpclient.version>
-
-        <scope>provided</scope>
-
         <hadoop-version>2.6.0</hadoop-version>
     </properties>
 
@@ -27,6 +24,12 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
             <version>${hadoop-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>${scope}</scope>
         </dependency>
         <dependency>

@@ -18,5 +18,3 @@ $SPARK_HOME/bin/spark-submit --class com.zhy.yisql.StreamApp \
 -streaming.spark.service true \
 -streaming.thrift false \
 -streaming.enableHiveSupport true
-
--streaming.name yisql -streaming.platform spark -streaming.rest true -streaming.driver.port 9003 -streaming.spark.service true -streaming.thrift false -streaming.enableHiveSupport true

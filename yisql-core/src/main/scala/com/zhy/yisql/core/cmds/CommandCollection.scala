@@ -41,6 +41,9 @@ object CommandCollection {
     context.addEnv("createPythonEnvFromFile", """ run command as PythonEnvExt.`{}` where condaYamlFilePath="${HOME}/{}" and command="create"  """)
     context.addEnv("removePythonEnvFromFile", """ run command as PythonEnvExt.`{}` where condaYamlFilePath="${HOME}/{}" and command="remove" """)
 
+    /**
+      * spark资源管控
+      */
     context.addEnv("resource", """ run command as EngineResource.`` where action="{0}" and cpus="{1}" """)
 
     context.addEnv("model", """ run command as ModelCommand.`{1}` where action="{0}" """)

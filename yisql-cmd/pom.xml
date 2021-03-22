@@ -16,8 +16,14 @@
     <dependencies>
         <dependency>
             <groupId>com.zhy</groupId>
-            <artifactId>yisql-core</artifactId>
+            <artifactId>yisql-commons</artifactId>
             <version>${parent.version}</version>
+            <scope>${scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zhy</groupId>
+            <artifactId>yisql-core</artifactId>
+            <version>${spark.big.version}-${parent.version}</version>
             <scope>${scope}</scope>
         </dependency>
         <dependency>
@@ -48,6 +54,10 @@
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
