@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 object CmdRegister {
     private val mapping = new java.util.concurrent.ConcurrentHashMap[String, String]()
 
-    val packagePrefix = "com.zhy.yisql.cmd."
+    val packagePrefix = "com.zhy.yisql.addon.cmd."
 
     def wow(name: String) = mapping.put(name, packagePrefix + name)
 
@@ -26,6 +26,7 @@ object CmdRegister {
 
 
     wow("ShowCommand")
+    wow("ShowJobsExt")
     wow("EngineResource")
     wow("HDFSCommand")
     wow("NothingET")
@@ -35,7 +36,6 @@ object CmdRegister {
     wow("DeltaCompactionCommand")
     wow("DeltaCommandWrapper")
     wow("ShowTablesExt")
-    wow("ShowJobsExt")
     register("DTF", "tech.mlsql.ets.tensorflow.DistributedTensorflow")
     wow("PythonCommand")
     wow("SchedulerCommand")

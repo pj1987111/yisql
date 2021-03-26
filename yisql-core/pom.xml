@@ -15,14 +15,33 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.zhy</groupId>
-            <artifactId>yisql-commons</artifactId>
-            <version>${parent.version}</version>
+            <groupId>pj1987111</groupId>
+            <artifactId>yisql-common_${scala.binary.version}</artifactId>
+            <version>${yisql-common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-dsl</artifactId>
             <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pj1987111</groupId>
+            <artifactId>yisql_rest</artifactId>
+            <version>0.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
@@ -35,9 +54,13 @@
             <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <exclusions>
+<!--                <exclusion>-->
+<!--                    <groupId>javax.servlet</groupId>-->
+<!--                    <artifactId>javax.servlet-api</artifactId>-->
+<!--                </exclusion>-->
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
             <scope>${scope}</scope>
@@ -50,6 +73,10 @@
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
             <scope>${scope}</scope>
@@ -65,117 +92,117 @@
             <artifactId>spark-hive_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>${scope}</scope>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-common</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-exec</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-metastore</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-serde</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-shims</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+            <!--            <exclusions>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-common</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-exec</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-metastore</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-serde</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-shims</artifactId>-->
+            <!--                </exclusion>-->
+            <!--            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive-thriftserver_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>${scope}</scope>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-cli</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-jdbc</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.hive</groupId>-->
-<!--                    <artifactId>hive-beeline</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+            <!--            <exclusions>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-cli</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-jdbc</artifactId>-->
+            <!--                </exclusion>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>org.apache.hive</groupId>-->
+            <!--                    <artifactId>hive-beeline</artifactId>-->
+            <!--                </exclusion>-->
+            <!--            </exclusions>-->
         </dependency>
 
         <!--        hive版本降级为1.2.1，spark3原本依赖2.3.7-->
         <!--        spark-hive-thriftserver_2.12的传递依赖-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-cli</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.geronimo.specs</groupId>-->
-<!--                    <artifactId>geronimo-jaspic_1.0_spec</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-jdbc</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-beeline</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;        spark-hive_2.12的传递依赖&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-common</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-metastore</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.spark-project.hive</groupId>-->
-<!--            <artifactId>hive-exec</artifactId>-->
-<!--            <version>1.2.1.spark2</version>-->
-<!--            <scope>${scope}</scope>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.commons</groupId>-->
-<!--                    <artifactId>commons-lang3</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>janino</artifactId>-->
-<!--                    <groupId>org.codehaus.janino</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>commons-compiler</artifactId>-->
-<!--                    <groupId>org.codehaus.janino</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>calcite-core</artifactId>-->
-<!--                    <groupId>org.apache.calcite</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.fasterxml.jackson.module</groupId>-->
-<!--                    <artifactId>*</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-cli</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.apache.geronimo.specs</groupId>-->
+        <!--                    <artifactId>geronimo-jaspic_1.0_spec</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-jdbc</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-beeline</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
+        <!--        &lt;!&ndash;        spark-hive_2.12的传递依赖&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-common</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-metastore</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.spark-project.hive</groupId>-->
+        <!--            <artifactId>hive-exec</artifactId>-->
+        <!--            <version>1.2.1.spark2</version>-->
+        <!--            <scope>${scope}</scope>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.apache.commons</groupId>-->
+        <!--                    <artifactId>commons-lang3</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>janino</artifactId>-->
+        <!--                    <groupId>org.codehaus.janino</groupId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>commons-compiler</artifactId>-->
+        <!--                    <groupId>org.codehaus.janino</groupId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>calcite-core</artifactId>-->
+        <!--                    <groupId>org.apache.calcite</groupId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>com.fasterxml.jackson.module</groupId>-->
+        <!--                    <artifactId>*</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -229,6 +256,11 @@
             <artifactId>common-utils_${scala.binary.version}</artifactId>
             <version>0.3.9</version>
         </dependency>
+        <dependency>
+            <groupId>com.zhy</groupId>
+            <artifactId>spark-adhoc-kafka_${scala.binary.version}</artifactId>
+            <version>0.1.3</version>
+        </dependency>
         <!--        <dependency>-->
         <!--            <groupId>org.springframework.boot</groupId>-->
         <!--            <artifactId>spring-boot-starter-web</artifactId>-->
@@ -275,6 +307,10 @@
                                 <relocation>
                                     <pattern>org.hibernate.validator</pattern>
                                     <shadedPattern>yisql.org.hibernate.validator</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.netty</pattern>
+                                    <shadedPattern>yisql.io.netty</shadedPattern>
                                 </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>

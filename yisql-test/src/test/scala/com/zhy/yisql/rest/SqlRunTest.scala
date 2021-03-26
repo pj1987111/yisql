@@ -37,7 +37,7 @@ class SqlRunTest {
         params += ("owner" -> "testzhy")
         val requestParams = JSONTool.toJsonStr(params)
         println(requestParams)
-        val res = HttpClientCrawler.requestByMethod(url = "http://127.0.0.1:9003/sql/run", method = "POST", params = params)
+        val res = HttpClientCrawler.postJson(url = "http://127.0.0.1:9003/sql/run", params = params)
 //        println(request("http://127.0.0.1:9003/sql/run", requestParams))
         println(res)
     }

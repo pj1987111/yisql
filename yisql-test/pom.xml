@@ -13,19 +13,24 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.zhy</groupId>
-            <artifactId>yisql-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>pj1987111</groupId>
+            <artifactId>yisql-common_2.11</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>pj1987111</groupId>
+            <artifactId>yisql_rest</artifactId>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
-            <artifactId>yisql-rest</artifactId>
-            <version>${project.version}</version>
+            <artifactId>yisql-core</artifactId>
+            <version>${spark.big.version}-${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-cmd</artifactId>
-            <version>${project.version}</version>
+            <version>${spark.big.version}-${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -22,6 +22,7 @@
 *.rar
 
 target/
+.bak/
 .idea/
 logs/
 

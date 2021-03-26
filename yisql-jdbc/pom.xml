@@ -12,11 +12,6 @@
     <artifactId>yisql-jdbc</artifactId>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.zhy</groupId>-->
-<!--            <artifactId>yisql-commons</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>

@@ -1,5 +1,6 @@
 package com.zhy.yisql.jdbc;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -75,48 +77,28 @@ public class Utils {
 
   public static String internalExecuteQuery(String sql, YiSQLConnectionParam params) throws YiSQLException {
     try {
-      return requestByMethodJson(String.format("http://%s:%s/sql/run", params.getHost(), params.getPort()),
-          "POST", params.toJson(sql));
+      return requestByMethod(String.format("http://%s:%s/sql/run", params.getHost(), params.getPort()),
+          params.toJson(sql));
     } catch (Exception e) {
       throw new YiSQLException(e.getMessage());
     }
-  }
-
-  public static String requestByMethodJson(String url, String method, String paramsJson) throws Exception {
-    Map<String, String> params = mapper.readValue(paramsJson, new TypeReference<Map<String, String>>() {
-    });
-    return requestByMethod(url, method, params);
   }
 
   private static CloseableHttpClient client() {
     return HttpClients.custom().build();
   }
 
-  public static String requestByMethod(String url, String method, Map<String, String> params) throws Exception {
-
+  public static String requestByMethod(String url, String paramsJson) throws Exception {
     CloseableHttpResponse response = null;
     CloseableHttpClient hc = client();
     try {
       HttpUriRequest request = null;
-      switch (method.toLowerCase()) {
-        case "get": {
-          URIBuilder builder = new URIBuilder(url);
-          params.forEach((s1, s2) -> builder.setParameter(s1, s2));
-          request = new HttpGet(builder.build());
-          break;
-        }
-        case "post": {
-          List<BasicNameValuePair> newParams = new ArrayList<>();
-          params.forEach((s1, s2) -> newParams.add(new BasicNameValuePair(s1, s2)));
-          UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(newParams, Charset.forName("utf-8"));
-          HttpPost httpPost = new HttpPost(url);
-          httpPost.setEntity(urlEncodedFormEntity);
-          request = httpPost;
-          break;
-        }
-        default:
-      }
-      response = hc.execute(request);
+
+      StringEntity stringEntity = new StringEntity(paramsJson, Charset.forName("utf-8"));
+      HttpPost httpPost = new HttpPost(url);
+      httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+      httpPost.setEntity(stringEntity);
+      response = hc.execute(httpPost);
       HttpEntity entity = response.getEntity();
       String res = null;
       if (entity != null) {
@@ -127,7 +109,6 @@ public class Utils {
       if (response != null) {
         response.close();
       }
-
     }
   }
 

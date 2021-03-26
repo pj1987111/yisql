@@ -54,6 +54,10 @@ class CommandTest extends BaseTest {
           |!kill zhy1;
         """.stripMargin
 
+    val hdfsCommandTest =
+        """
+          |!hdfs -ls /user/
+        """.stripMargin
     @Test
     def deltaSelect(): Unit = {
         sqlParseInner(deltaSelectTest)
@@ -79,4 +83,8 @@ class CommandTest extends BaseTest {
         sqlParseInner(killJobTest)
     }
 
+    @Test
+    def hdfsTest(): Unit = {
+        sqlParseInner(hdfsCommandTest)
+    }
 }

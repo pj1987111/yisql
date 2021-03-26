@@ -1,7 +1,6 @@
 package com.zhy.yisql.core.execute
 
 import com.zhy.yisql.common.utils.json.JSONTool
-import org.apache.spark.utils.json.JsonUtils
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.job._
 import com.zhy.yisql.core.platform.PlatformManager
@@ -117,7 +116,7 @@ class SQLExecute(_params: Map[String, String]) {
         val userDefineParams = params.filter(f => f._1.startsWith("context.")).map(f => (f._1.substring("context.".length), f._2))
 
         SQLExecuteContext.setContext(ExecuteContext(context, param("owner"), groupId,
-            userDefineParams ++ Map("__PARAMS__" -> JsonUtils.toJson(params()))
+            userDefineParams ++ Map("__PARAMS__" -> JSONTool.toJsonStr(params()))
         ))
         context.addEnv("HOME", pathPrefix.pathPrefix(None))
         context.addEnv("OWNER", ownerOption.getOrElse("anonymous"))

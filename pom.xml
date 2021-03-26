@@ -20,6 +20,9 @@
         <java_target_version>1.8</java_target_version>
         <file_encoding>UTF-8</file_encoding>
 
+        <scope>compile</scope>
+<!--        <scope>provided</scope>-->
+
         <!-- spark 2.4 start -->
         <scala.version>2.11.12</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
@@ -36,6 +39,7 @@
 <!--                <spark.es.version>30</spark.es.version>-->
         <!-- spark 3.0 end -->
 
+        <yisql-common.version>0.2.0</yisql-common.version>
         <druid-version>1.0.31</druid-version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.1.8</logback.version>
@@ -61,16 +65,17 @@
         <fastjson-version>1.2.67</fastjson-version>
         <!--        <jackson.version>2.9.9</jackson.version>-->
         <jackson.version>2.10.0</jackson.version>
-        <springboot.version>2.1.9.RELEASE</springboot.version>
+        <springboot.version>2.0.8.RELEASE</springboot.version>
+        <httpclient.version>4.5.3</httpclient.version>
         <!--        <scope>provided</scope>-->
-        <scope>compile</scope>
     </properties>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.4.RELEASE</version>
-    </parent>
+<!--    <parent>-->
+<!--        <groupId>org.springframework.boot</groupId>-->
+<!--        <artifactId>spring-boot-starter-parent</artifactId>-->
+<!--&lt;!&ndash;        <version>2.1.4.RELEASE</version>&ndash;&gt;-->
+<!--        <version>2.0.8.RELEASE</version>-->
+<!--    </parent>-->
 
     <profiles>
         <profile>
@@ -153,18 +158,18 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-web</artifactId>-->
+<!--                    <exclusions>-->
+<!--                        <exclusion>-->
+<!--                            <groupId>org.springframework.boot</groupId>-->
+<!--                            <artifactId>spring-boot-starter-logging</artifactId>-->
+<!--                        </exclusion>-->
+<!--                    </exclusions>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
         </profile>
         <profile>
             <!-- 适配cdh5.15.0 -->
@@ -181,54 +186,23 @@
                 <module>yisql-spark-2.4-adaptor</module>
                 <module>yisql-provider/spark-adhoc-kafka_2.11</module>
             </modules>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <!-- 单独打jar包要去除下面的，直接跑的话不能去除下面的-->
-                        <exclusion>
-                            <groupId>org.hibernate.validator</groupId>
-                            <artifactId>hibernate-validator</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.elasticsearch</groupId>
-                    <artifactId>elasticsearch-spark-20_2.11</artifactId>
-                    <version>5.6.8</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.apache.spark</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.apache.hadoop</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.google.guava</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.fasterxml.jackson.module</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>net.jpountz.lz4</groupId>
-                            <artifactId>*</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-web</artifactId>-->
+<!--                    <exclusions>-->
+<!--                        &lt;!&ndash; 低版本不用去 2.0.8,单独打jar包要去除下面的，直接跑的话不能去除下面的&ndash;&gt;-->
+<!--                        <exclusion>-->
+<!--                            <groupId>org.hibernate.validator</groupId>-->
+<!--                            <artifactId>hibernate-validator</artifactId>-->
+<!--                        </exclusion>-->
+<!--                        <exclusion>-->
+<!--                            <groupId>org.springframework.boot</groupId>-->
+<!--                            <artifactId>spring-boot-starter-logging</artifactId>-->
+<!--                        </exclusion>-->
+<!--                    </exclusions>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
         </profile>
         <profile>
             <id>spark-3.0.0</id>
@@ -244,23 +218,23 @@
                 <module>yisql-spark-3.0-adaptor</module>
                 <module>yisql-provider/spark-adhoc-kafka_2.12</module>
             </modules>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <!-- 单独打jar包要去除下面的，直接跑的话不能去除下面的-->
-                        <exclusion>
-                            <groupId>org.hibernate.validator</groupId>
-                            <artifactId>hibernate-validator</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-web</artifactId>-->
+<!--                    <exclusions>-->
+<!--                        &lt;!&ndash; 低版本不用去 2.0.8, 单独打jar包要去除下面的，直接跑的话不能去除下面的&ndash;&gt;-->
+<!--                        <exclusion>-->
+<!--                            <groupId>org.hibernate.validator</groupId>-->
+<!--                            <artifactId>hibernate-validator</artifactId>-->
+<!--                        </exclusion>-->
+<!--                        <exclusion>-->
+<!--                            <groupId>org.springframework.boot</groupId>-->
+<!--                            <artifactId>spring-boot-starter-logging</artifactId>-->
+<!--                        </exclusion>-->
+<!--                    </exclusions>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
         </profile>
     </profiles>
 
@@ -427,14 +401,20 @@
             <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
             <version>${json4s.version}</version>
             <scope>${scope}</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
-            <version>${jackson.version}</version>
-            <scope>${scope}</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.module</groupId>-->
+<!--            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>-->
+<!--            <version>${jackson.version}</version>-->
+<!--            <scope>${scope}</scope>-->
+<!--        </dependency>-->
         <!-- springboot版本依赖 -->
         <!--        <dependency>-->
         <!--            <groupId>com.fasterxml.jackson.core</groupId>-->
@@ -459,11 +439,29 @@
 
     <modules>
         <module>yisql-core</module>
-        <module>yisql-commons</module>
         <module>yisql-dsl</module>
-        <module>yisql-cmd</module>
         <module>yisql-jdbc</module>
-        <module>yisql-rest</module>
+        <module>yisql-test</module>
     </modules>
 
+    <!--    <distributionManagement>-->
+    <!--        <snapshotRepository>-->
+    <!--            <id>sonatype-nexus-snapshots</id>-->
+    <!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+    <!--        </snapshotRepository>-->
+    <!--        <repository>-->
+    <!--            <id>sonatype-nexus-staging</id>-->
+    <!--            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+    <!--        </repository>-->
+    <!--    </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>fraudmetrixRepo</id>
+            <url>http://maven.fraudmetrix.cn/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>fraudmetrixRepo</id>
+            <url>http://maven.fraudmetrix.cn/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

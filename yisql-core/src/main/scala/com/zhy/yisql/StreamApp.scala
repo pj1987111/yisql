@@ -1,9 +1,7 @@
 package com.zhy.yisql
 
-import com.zhy.yisql.common.utils.base.TryTool
 import com.zhy.yisql.common.utils.param.ParamsUtil
 import com.zhy.yisql.core.platform.PlatformManager
-import com.zhy.yisql.core.platform.lifecycle.PlatformLifecycle
 
 /**
   *  \* Created with IntelliJ IDEA.

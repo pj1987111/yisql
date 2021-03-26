@@ -5,7 +5,7 @@ import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.common.utils.param.ParamsUtil
 import com.zhy.yisql.core.execute.SQLExecute
 import com.zhy.yisql.core.platform.PlatformManager
-import org.junit.Before
+import org.junit.{Before, Test}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -32,7 +32,7 @@ class BaseTest {
         val sqlExeMap = exeMap + ("sql" -> sql)
         val res = if (restMode) {
             val requestParams = JSONTool.toJsonStr(sqlExeMap)
-            HttpClientCrawler.requestByMethod(url = restUrl, method = "POST", params = sqlExeMap)
+            HttpClientCrawler.postJson(url = restUrl, params = sqlExeMap)
         } else {
             val executor = new SQLExecute(sqlExeMap)
             executor.sql(sql)
@@ -43,7 +43,7 @@ class BaseTest {
 
     def jobList(url: String) = {
         val res = if (restMode) {
-            HttpClientCrawler.requestByMethod(url = url, method = "POST", Map[String, String]())
+            HttpClientCrawler.postJson(url = url, Map[String, String]())
         }
         println(res)
     }
@@ -55,7 +55,7 @@ class BaseTest {
         if(jobName.isDefined)
             killMap+=("jobName"->jobName.get)
         val res = if (restMode) {
-            HttpClientCrawler.requestByMethod(url = url, method = "POST", killMap)
+            HttpClientCrawler.postJson(url = url, killMap)
         }
         println(res)
     }
@@ -82,5 +82,11 @@ class BaseTest {
             platform.run(params)
         }
         //restmode需要启动ServerMain方法的rest服务
+    }
+
+    @Test
+    def testConn(): Unit = {
+        val res = HttpClientCrawler.postJson(url = s"http://$rootUrl/test", Map[String, String]())
+        println(res)
     }
 }

@@ -32,7 +32,6 @@
         <spark.version>3.0.0</spark.version>
 
         <guava.version>16.0</guava.version>
-        <httpclient.version>4.5.3</httpclient.version>
 
         <serviceframework.version>2.0.0</serviceframework.version>
         <scope>provided</scope>
