@@ -15,9 +15,9 @@ import org.junit.{Before, Test}
   *  \* Description: 
   *  \*/
 class BaseTest {
-//    val rootUrl = "cdh217:9003"
+    val rootUrl = "cdh217:9003"
 //    val rootUrl = "cdh218:9003"
-    val rootUrl = "127.0.0.1:9003"
+//    val rootUrl = "127.0.0.1:9003"
     //rest测试或直接执行
     val restMode = true
     val restUrl = s"http://$rootUrl/sql/run"
