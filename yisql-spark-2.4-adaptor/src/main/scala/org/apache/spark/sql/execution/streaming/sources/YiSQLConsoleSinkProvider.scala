@@ -1,4 +1,4 @@
-package com.zhy.yisql.core.datasource.sink
+package org.apache.spark.sql.execution.streaming.sources
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -11,7 +11,7 @@ import java.io.DataOutputStream
 import java.net.Socket
 
 import com.zhy.yisql.common.utils.log.Logging
-import com.zhy.yisql.core.execute.SQLExecuteContext
+//import com.zhy.yisql.core.execute.SQLExecuteContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.execution.streaming.sources.YiSQLConsoleWriter
 import org.apache.spark.sql.sources.v2.writer.streaming.StreamWriter
@@ -33,11 +33,11 @@ class YiSQLConsoleSinkProvider extends DataSourceV2
     with DataSourceRegister
     with CreatableRelationProvider with Logging {
 
-  val context = SQLExecuteContext.getContext()
+//  val context = SQLExecuteContext.getContext()
 
   override def createStreamWriter(queryId: String, schema: StructType, mode: OutputMode, options: DataSourceOptions): StreamWriter = {
     logInfo("in YiSQLConsoleSinkProvider createStreamWriter...")
-    SQLExecuteContext.setContext(context)
+//    SQLExecuteContext.setContext(context)
 
     new YiSQLConsoleWriter(schema, options, createWriteStream(options))
   }

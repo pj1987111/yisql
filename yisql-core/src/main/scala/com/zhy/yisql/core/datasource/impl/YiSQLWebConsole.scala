@@ -41,7 +41,7 @@ class YiSQLWebConsole extends BaseStreamSource with BaseBatchSource {
 
   }
 
-  override def fullFormat: String = "com.zhy.yisql.core.datasource.sink.YiSQLConsoleSinkProvider"
+  override def fullFormat: String = "org.apache.spark.sql.execution.streaming.sources.YiSQLConsoleSinkProvider"
 
   override def shortFormat: String = "webConsole"
 }

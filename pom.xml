@@ -37,19 +37,19 @@
         <httpclient.version>4.5.3</httpclient.version>
 
         <!-- spark 2.4 start -->
-        <scala.version>2.11.12</scala.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <spark.version>2.4.0</spark.version>
-        <spark.big.version>2.4</spark.big.version>
-        <spark.es.version>20</spark.es.version>
+<!--                <scala.version>2.11.12</scala.version>-->
+<!--                <scala.binary.version>2.11</scala.binary.version>-->
+<!--                <spark.version>2.4.0</spark.version>-->
+<!--                <spark.big.version>2.4</spark.big.version>-->
+<!--                <spark.es.version>20</spark.es.version>-->
         <!-- spark 2.4 end -->
 
         <!-- spark 3.0 start -->
-        <!--        <scala.version>2.12.10</scala.version>-->
-        <!--        <scala.binary.version>2.12</scala.binary.version>-->
-        <!--        <spark.version>3.0.0</spark.version>-->
-        <!--        <spark.big.version>3.0</spark.big.version>-->
-        <!--        <spark.es.version>30</spark.es.version>-->
+        <scala.version>2.12.10</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <spark.version>3.0.0</spark.version>
+        <spark.big.version>3.0</spark.big.version>
+        <spark.es.version>30</spark.es.version>
         <!-- spark 3.0 end -->
     </properties>
 
@@ -340,27 +340,16 @@
         <module>yisql-core</module>
         <module>yisql-dsl</module>
         <module>yisql-jdbc</module>
-        <module>yisql-test</module>
     </modules>
 
-    <!--    <distributionManagement>-->
-    <!--        <snapshotRepository>-->
-    <!--            <id>sonatype-nexus-snapshots</id>-->
-    <!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
-    <!--        </snapshotRepository>-->
-    <!--        <repository>-->
-    <!--            <id>sonatype-nexus-staging</id>-->
-    <!--            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
-    <!--        </repository>-->
-    <!--    </distributionManagement>-->
     <distributionManagement>
-        <repository>
-            <id>fraudmetrixRepo</id>
-            <url>http://maven.fraudmetrix.cn/nexus/content/repositories/releases/</url>
-        </repository>
         <snapshotRepository>
-            <id>fraudmetrixRepo</id>
-            <url>http://maven.fraudmetrix.cn/nexus/content/repositories/snapshots/</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 </project>

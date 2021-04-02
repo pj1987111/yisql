@@ -80,7 +80,3 @@ class YiSQLConsoleWriter(schema: StructType, options: DataSourceOptions, dOut: D
     new String(format(s"ConsoleWriter[numRows=$numRowsToShow, truncate=$isTruncated]"))
   }
 }
-
-object SocketCache {
-
-}

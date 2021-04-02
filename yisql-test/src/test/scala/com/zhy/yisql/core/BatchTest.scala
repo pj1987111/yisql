@@ -135,7 +135,7 @@ class BatchTest extends BaseTest {
           |load jsonStr.`jstr` as data1;
           |
           |save append data1
-          |as kafka.`zhy`
+          |as kafka.`g1`
           |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
           |and `etl.sql`="${targetSql}";
         """.stripMargin

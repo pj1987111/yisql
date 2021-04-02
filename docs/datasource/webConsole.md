@@ -27,4 +27,30 @@ and dropDuplicate="true"
 and duration="10"
 and checkpointLocation="/tmp/s-cpl7";
 ```
+
+
+启动一个离线批任务，模拟插入几条json数据测试一下
+```
+set jstr='''
+{"id":"1101","name":"小明1","age":20,"message":"testmsg1","date":"20210112","version":1}
+{"id":"1102","name":"小明2","age":21,"message":"testmsg2","date":"20210112","version":1}
+{"id":"1103","name":"小明3","age":22,"message":"testmsg3","date":"20210112","version":1}
+{"id":"1104","name":"小明4","age":23,"message":"testmsg4","date":"20210112","version":1}
+{"id":"1105","name":"小明5","age":24,"message":"testmsg5","date":"20210112","version":1}
+{"id":"1106","name":"小明6","age":25,"message":"testmsg6","date":"20210112","version":1}
+{"id":"1107","name":"小明7","age":26,"message":"testmsg7","date":"20210112","version":1}
+{"id":"1108","name":"小明8","age":27,"message":"testmsg8","date":"20210112","version":1}
+{"id":"1109","name":"小明9","age":28,"message":"testmsg9","date":"20210112","version":1}
+{"id":"1110","name":"小明10","age":29,"message":"testmsg10","date":"20210112","version":2}
+''';
+
+set targetSql="select to_json(struct(*)) as value from data1 where age>=25";
+
+load jsonStr.`jstr` as data1;
+
+save append data1
+as kafka.`g1`
+`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+and `etl.sql`="${targetSql}";
+```
 ![](.webConsole_images/f1394bf4.png)
