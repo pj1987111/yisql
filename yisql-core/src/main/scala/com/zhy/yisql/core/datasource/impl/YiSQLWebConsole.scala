@@ -1,11 +1,8 @@
 package com.zhy.yisql.core.datasource.impl
 
-import java.io.DataOutputStream
-import java.net.Socket
-
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -22,20 +19,6 @@ class YiSQLWebConsole extends BaseStreamSource with BaseBatchSource {
   override def sLoad(streamReader: DataStreamReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"stream load is not support with ${shortFormat} ")
   }
-
-//  override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-//    val option = config.config
-//    val host = option.getOrElse("host", "127.0.0.1")
-//    val port = option.getOrElse("port", "6049")
-//    val socket = new Socket(host, port.toInt)
-//
-//    val dOut = new DataOutputStream(socket.getOutputStream)
-//
-//    writer
-//    dOut.writeInt(bytes.length)
-//    dOut.write(bytes)
-//    dOut.flush()
-//  }
 
   override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
 

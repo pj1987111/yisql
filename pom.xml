@@ -21,6 +21,7 @@
         <file_encoding>UTF-8</file_encoding>
 
         <yisql-common.version>0.2.0</yisql-common.version>
+        <yisql-rest.version>0.2.2</yisql-rest.version>
         <druid-version>1.0.31</druid-version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.1.8</logback.version>
@@ -35,21 +36,24 @@
         <os-lib.version>0.2.9</os-lib.version>
         <lift-json.version>3.4.1</lift-json.version>
         <httpclient.version>4.5.3</httpclient.version>
+        <elasticsearch.spark.version>7.12.0</elasticsearch.spark.version>
 
         <!-- spark 2.4 start -->
-<!--                <scala.version>2.11.12</scala.version>-->
-<!--                <scala.binary.version>2.11</scala.binary.version>-->
-<!--                <spark.version>2.4.0</spark.version>-->
-<!--                <spark.big.version>2.4</spark.big.version>-->
-<!--                <spark.es.version>20</spark.es.version>-->
+        <scala.version>2.11.12</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
+        <spark.version>2.4.0</spark.version>
+        <spark.big.version>2.4</spark.big.version>
+        <spark.es.version>20</spark.es.version>
+        <jackson.version>2.6.7</jackson.version>
         <!-- spark 2.4 end -->
 
         <!-- spark 3.0 start -->
-        <scala.version>2.12.10</scala.version>
-        <scala.binary.version>2.12</scala.binary.version>
-        <spark.version>3.0.0</spark.version>
-        <spark.big.version>3.0</spark.big.version>
-        <spark.es.version>30</spark.es.version>
+<!--        <scala.version>2.12.10</scala.version>-->
+<!--        <scala.binary.version>2.12</scala.binary.version>-->
+<!--        <spark.version>3.0.0</spark.version>-->
+<!--        <spark.big.version>3.0</spark.big.version>-->
+<!--        <spark.es.version>30</spark.es.version>-->
+<!--        <jackson.version>2.10.0</jackson.version>-->
         <!-- spark 3.0 end -->
     </properties>
 
@@ -340,6 +344,7 @@
         <module>yisql-core</module>
         <module>yisql-dsl</module>
         <module>yisql-jdbc</module>
+        <module>yisql-test</module>
     </modules>
 
     <distributionManagement>

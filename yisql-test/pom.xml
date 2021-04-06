@@ -14,18 +14,23 @@
     <dependencies>
         <dependency>
             <groupId>io.github.pj1987111</groupId>
-            <artifactId>yisql-common_2.11</artifactId>
-            <version>0.2.0</version>
+            <artifactId>yisql-common_${scala.binary.version}</artifactId>
+            <version>${yisql-common.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pj1987111</groupId>
             <artifactId>yisql_rest</artifactId>
-            <version>0.2.1</version>
+            <version>${yisql-rest.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
             <artifactId>yisql-core</artifactId>
             <version>${spark.big.version}-${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zhy</groupId>
+            <artifactId>yisql-spark-${spark.big.version}-adaptor</artifactId>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zhy</groupId>
@@ -47,6 +52,22 @@
             <groupId>tech.mlsql</groupId>
             <artifactId>mysql-binlog_2.11</artifactId>
             <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 
