@@ -1,5 +1,7 @@
 将包拷贝至spark的jar目录中
 
+执行
+
 $SPARK_HOME/bin/spark-submit --class com.zhy.yisql.StreamApp \
 --driver-memory 1g \
 --jars /home/admin/spark-2.4.0-bin-2.6.0-cdh5.15.0/jars/*.jar \
