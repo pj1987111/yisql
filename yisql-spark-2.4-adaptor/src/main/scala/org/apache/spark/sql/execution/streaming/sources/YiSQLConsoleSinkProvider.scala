@@ -5,12 +5,11 @@ import java.net.Socket
 
 import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.execution.streaming.Sink
-import org.apache.spark.sql.sources.StreamSinkProvider
+import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, RelationProvider, StreamSinkProvider}
 import org.apache.spark.sql.streaming.OutputMode
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
 import scala.collection.JavaConverters._
-
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou
@@ -18,12 +17,27 @@ import scala.collection.JavaConverters._
   *  \* Time: 22:46
   *  \* Description: 
   *  \*/
-class YiSQLConsoleSinkProvider extends StreamSinkProvider with Serializable with Logging {
+class YiSQLConsoleSinkProvider extends StreamSinkProvider
+    with CreatableRelationProvider
+    with Serializable with Logging {
   override def createSink(sqlContext: SQLContext,
                           parameters: Map[String, String],
                           partitionColumns: Seq[String],
                           outputMode: OutputMode): Sink = {
     new YiSQLConsoleSink(sqlContext, parameters)
+  }
+
+  override def createRelation(sqlContext: SQLContext, mode: SaveMode, parameters: Map[String, String], df: DataFrame): BaseRelation = {
+    val dOut = ConsoleUtil.createWriteStream(parameters)
+    val numRowsToShow = parameters.getOrElse("numRows", "20").toInt
+    val isTruncated = parameters.getOrElse("truncate", "true").toBoolean
+
+    val value = df.showString(numRowsToShow, 20, isTruncated)
+    value.split("\n").foreach { line =>
+      dOut.write(ConsoleUtil.format(line))
+    }
+    dOut.flush()
+    null
   }
 }
 
@@ -40,14 +54,14 @@ class YiSQLConsoleSink(sqlContext: SQLContext, parameters: Map[String, String])
     val df = sqlContext.internalCreateDataFrame(rdd, data.schema)
 //    df.show(false)
 
-    val dOut = createWriteStream(parameters)
-    dOut.write(format("-------------------------------------------"))
-    dOut.write(format(s"Batch: $batchId"))
-    dOut.write(format("-------------------------------------------"))
+    val dOut = ConsoleUtil.createWriteStream(parameters)
+    dOut.write(ConsoleUtil.format("-------------------------------------------"))
+    dOut.write(ConsoleUtil.format(s"Batch: $batchId"))
+    dOut.write(ConsoleUtil.format("-------------------------------------------"))
 
     val value = df.showString(numRowsToShow, 20, isTruncated)
     value.split("\n").foreach { line =>
-      dOut.write(format(line))
+      dOut.write(ConsoleUtil.format(line))
     }
     dOut.flush()
     //df.foreachPartition用法2.12有问题，需要改成 df.rdd.foreachPartition
@@ -55,16 +69,28 @@ class YiSQLConsoleSink(sqlContext: SQLContext, parameters: Map[String, String])
     //      iter.foreach(row => {
     //        println(row)
     //        val dOut = createWriteStream(parameters)
-    //        dOut.write(format("-------------------------------------------"))
-    //        dOut.write(format(s"Batch: $batchId"))
-    //        dOut.write(format("-------------------------------------------"))
+    //        dOut.write(ConsoleUtil.format("-------------------------------------------"))
+    //        dOut.write(ConsoleUtil.format(s"Batch: $batchId"))
+    //        dOut.write(ConsoleUtil.format("-------------------------------------------"))
     //
     //
-    //        dOut.write(format(row.toString()))
+    //        dOut.write(ConsoleUtil.format(row.toString()))
     //
     //      })
     //    })
 
+  }
+
+  override def toString(): String = {
+    new String(ConsoleUtil.format(s"YiSQLConsoleSink[numRows=$numRowsToShow, truncate=$isTruncated]"))
+  }
+}
+
+object ConsoleUtil {
+  def createWriteStream(parameters: Map[String, String]): DataOutputStream = {
+    val host = parameters.getOrElse("host", "127.0.0.1")
+    val port = parameters.getOrElse("port", "6049")
+    SocketCache.getStream(host, port.toInt).get
   }
 
   def format(str: String) = {
@@ -72,16 +98,6 @@ class YiSQLConsoleSink(sqlContext: SQLContext, parameters: Map[String, String])
     //      options.get("LogPrefix").get()
     //    } else ""
     s"${str}\n".getBytes
-  }
-
-  def createWriteStream(parameters: Map[String, String]): DataOutputStream = {
-    val host = parameters.getOrElse("host", "127.0.0.1")
-    val port = parameters.getOrElse("port", "6049")
-    SocketCache.getStream(host, port.toInt).get
-  }
-
-  override def toString(): String = {
-    new String(format(s"YiSQLConsoleSink[numRows=$numRowsToShow, truncate=$isTruncated]"))
   }
 }
 

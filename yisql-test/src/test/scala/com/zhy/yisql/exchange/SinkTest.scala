@@ -2,6 +2,7 @@ package com.zhy.yisql.exchange
 
 import java.sql.Timestamp
 
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
 
@@ -43,12 +44,26 @@ class Spark30Test {
 
     query.awaitTermination()
   }
+
+  @Test
+  def testCk(): Unit = {
+    val spark = SparkSession.builder()
+        .appName("TextApp")
+        .master("local[2]")
+        .getOrCreate()
+    val df = spark.read
+        .format("jdbc")
+        .option("url", "jdbc:clickhouse://192.168.6.52:8123")
+        .option("user", "default")
+        .option("password", "ck2020")
+        //        .option("query", "select id from testParquet where name='p_test_tikv_cpu_dj_20190626_092737932'")
+        .option("query", "SELECT * FROM test_users where name='dd'")
+        .load()
+    df.show()
+
+    val query = df.write
+        .format("org.apache.spark.sql.execution.streaming.sources.YiSQLConsoleSinkProvider")
+        .option("port", "6666")
+        .save()
+  }
 }
-
-case class Event(word: String, timestamp: Timestamp)
-
-// stream internal state
-case class State(c: Int)
-
-// stream output
-case class StateUpdate(updateTimestamp: Timestamp, word: String, c: Int)
