@@ -1,8 +1,5 @@
 package com.zhy.yisql.exchange
 
-import java.sql.Timestamp
-
-import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
 
@@ -13,7 +10,7 @@ import org.junit.Test
   *  \* Time: 23:37
   *  \* Description: 
   *  \*/
-class Spark30Test {
+class SinkTest {
 
   @Test
   def testWebConsoleSink(): Unit = {

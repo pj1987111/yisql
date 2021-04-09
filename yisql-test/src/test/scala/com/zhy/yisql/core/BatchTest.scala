@@ -1,7 +1,5 @@
 package com.zhy.yisql.core
 
-import java.net.InetAddress
-
 import org.junit.Test
 
 /**
@@ -344,6 +342,31 @@ class BatchTest extends BaseTest {
           |
           |select count(*) from data1 as table2;
         """.stripMargin
+
+    val ckReadWriteTest =
+      """
+        |
+        |set user="default";
+        |set password="ck2020";
+        |
+        |connect ck where
+        |url="jdbc:clickhouse://192.168.6.52:8123"
+        |and user="${user}"
+        |and password="${password}"
+        |as ck1;
+        |
+        |load ck1.`` where
+        |query="SELECT * FROM test_users where name='dd'"
+        |as data1;
+        |
+        |save append data1 ck1.`test_users`;
+        |
+        |load ck1.`` where
+        |query="SELECT * FROM test_users where name='dd'"
+        |as data2;
+        |
+        |select count(*) from data2 as data3;
+      """.stripMargin
     @Test
     def readJsonParOrc(): Unit = {
         sqlParseInner(readJsonParOrcTest)
@@ -415,4 +438,8 @@ class BatchTest extends BaseTest {
         sqlParseInner(esReadTest)
     }
 
+    @Test
+    def ckReadWrite(): Unit = {
+        sqlParseInner(ckReadWriteTest)
+    }
 }

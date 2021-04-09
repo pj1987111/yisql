@@ -21,22 +21,27 @@ class StatementAdaptor(cmdParserListener: CmdParserListener, f: String => Unit) 
       case "save" =>
         SingleStatement(saveStatement = new SaveAdaptor(root).analyze(ctx))
 
-//      case "connect" =>
-//        SingleStatement(connectStatement = new ConnectAdaptor(root).analyze(ctx))
+      case "connect" =>
+        SingleStatement(connectStatement = new ConnectAdaptor(root).analyze(ctx))
+
       case "create" =>
         SingleStatement(createStatement = new CreateAdaptor(root).analyze(ctx))
+
       case "insert" =>
         SingleStatement(insertStatement = new InsertAdaptor(root).analyze(ctx))
-//      case "drop" =>
-//        SingleStatement(dropStatement = new DropAdaptor(root).analyze(ctx))
-//      case "refresh" =>
-//        SingleStatement(refreshStatement = new RefreshAdaptor(root).analyze(ctx))
+
+      //      case "drop" =>
+      //        SingleStatement(dropStatement = new DropAdaptor(root).analyze(ctx))
+      //      case "refresh" =>
+      //        SingleStatement(refreshStatement = new RefreshAdaptor(root).analyze(ctx))
       case "set" =>
         SingleStatement(setStatement = new SetAdaptor(root).analyze(ctx))
+
       case "run" =>
         SingleStatement(runStatement = new RunAdaptor(root).analyze(ctx))
-//      case "register" =>
-//        SingleStatement(registerStatement = new RegisterAdaptor(root).analyze(ctx))
+
+      //      case "register" =>
+      //        SingleStatement(registerStatement = new RegisterAdaptor(root).analyze(ctx))
       case a if a.startsWith("!") =>
         SingleStatement(commandStatement = new CommandAdaptor(cmdParserListener).analyze(ctx))
       case _ => throw new RuntimeException(s"Unknow statement:${PREFIX} ${ctx.getText}")
@@ -55,31 +60,31 @@ class StatementAdaptor(cmdParserListener: CmdParserListener, f: String => Unit) 
 case class SingleStatement(loadStatement: LoadStatement = null,
                            selectStatement: SelectStatement = null,
                            saveStatement: SaveStatement = null,
-//                           connectStatement: ConnectStatement = null,
+                           connectStatement: ConnectStatement = null,
                            createStatement: CreateStatement = null,
                            insertStatement: InsertStatement = null,
-//                           dropStatement: DropStatement = null,
-//                           refreshStatement: RefreshStatement = null,
+                           //                           dropStatement: DropStatement = null,
+                           //                           refreshStatement: RefreshStatement = null,
                            setStatement: SetStatement = null,
                            runStatement: RunStatement = null,
-//                           registerStatement: RegisterStatement = null,
+                           //                           registerStatement: RegisterStatement = null,
                            commandStatement: CommandStatement = null
-//                           includeStatement: IncludeStatement = null
+                           //                           includeStatement: IncludeStatement = null
                           ) {
   def unwrap: AnyRef = {
     if (loadStatement != null) return loadStatement
     if (selectStatement != null) return selectStatement
     if (saveStatement != null) return saveStatement
-//    if (connectStatement != null) return connectStatement
+    if (connectStatement != null) return connectStatement
     if (createStatement != null) return createStatement
     if (insertStatement != null) return insertStatement
-//    if (dropStatement != null) return dropStatement
-//    if (refreshStatement != null) return refreshStatement
+    //    if (dropStatement != null) return dropStatement
+    //    if (refreshStatement != null) return refreshStatement
     if (setStatement != null) return setStatement
     if (runStatement != null) return runStatement
-//    if (registerStatement != null) return registerStatement
+    //    if (registerStatement != null) return registerStatement
     if (commandStatement != null) return commandStatement
-//    if (includeStatement != null) return includeStatement
+    //    if (includeStatement != null) return includeStatement
     null
   }
 

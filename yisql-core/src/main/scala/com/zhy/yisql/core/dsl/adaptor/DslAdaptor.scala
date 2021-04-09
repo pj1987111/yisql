@@ -3,6 +3,7 @@ package com.zhy.yisql.core.dsl.adaptor
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.dsl.template.TemplateMerge
+import com.zhy.yisql.core.execute.ConnectMeta
 import com.zhy.yisql.dsl.parser.DSLSQLLexer
 import com.zhy.yisql.dsl.parser.DSLSQLParser.{ExpressionContext, SqlContext}
 import org.antlr.v4.runtime.misc.Interval
@@ -124,4 +125,23 @@ trait DslTool {
 //
 //        Array(dbName, finalPath)
 //    }
+
+    /**
+      *
+      * @param format 新或旧format(别名)
+      * @return 原始format  原始option
+      */
+    def formatAlias(format:String): (String, Map[String, String]) = {
+        ConnectMeta.options(format).getOrElse((format, Map[String, String]()))
+    }
+
+    def mergeOptions(optionTemplate: Map[String, String], thisOption: Map[String, String]): Map[String, String] = {
+        var params = optionTemplate
+        if(thisOption!=null) {
+            for (params2_entry <- thisOption) {
+                params += (params2_entry._1 -> params2_entry._2)
+            }
+        }
+        params
+    }
 }

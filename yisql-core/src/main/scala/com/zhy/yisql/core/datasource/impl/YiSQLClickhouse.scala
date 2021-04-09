@@ -7,6 +7,11 @@ package com.zhy.yisql.core.datasource.impl
   *  \* Time: 12:39
   *  \* Description: 
   *  \*/
-class YiSQLClickhouse {
+class YiSQLClickhouse extends YiSQLJDBC {
 
+  override def forceUseFormat: String = super.fullFormat
+
+  override def fullFormat: String = "ck"
+
+  override def shortFormat: String = fullFormat
 }
