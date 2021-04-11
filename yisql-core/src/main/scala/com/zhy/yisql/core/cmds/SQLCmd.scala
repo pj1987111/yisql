@@ -17,4 +17,14 @@ trait SQLCmd extends Serializable with Logging {
         import sparkSession.implicits._
         Seq.empty[(String, String)].toDF("param", "description")
     }
+
+    def emptyDataFrame()(implicit df: DataFrame) = {
+        import df.sparkSession.implicits._
+        Seq.empty[String].toDF("name")
+    }
+
+    def emptyDataFrame(spark: SparkSession, name : String = "name") = {
+        import spark.implicits._
+        Seq.empty[String].toDF(name)
+    }
 }

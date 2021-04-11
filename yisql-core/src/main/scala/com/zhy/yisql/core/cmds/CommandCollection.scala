@@ -29,7 +29,8 @@ object CommandCollection {
     }
     context.addEnv("desc", """run command as ShowTableExt.`` where parameters='''{:all}''' """)
     context.addEnv("kill", """run command as Kill.`{}`""")
-    context.addEnv("jdbc", """ run command as JDBC.`{}` where `driver-statement-0`='''{}''' """)
+//    context.addEnv("jdbc", """ run command as JDBC.`{}` where `driver-statement-0`='''{}''' """)
+    context.addEnv("jdbc", """ run command as JDBC.`{}` where parameters='''{:all}''' """)
 
     context.addEnv("cache", """ run {} as CacheExt.`` where lifeTime="{}" """)
     context.addEnv("unCache", """ run {} as CacheExt.`` where execute="uncache" """)

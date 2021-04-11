@@ -1,6 +1,7 @@
 package com.zhy.yisql.core.execute
 
 import com.zhy.yisql.common.utils.json.JSONTool
+import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.job._
 import com.zhy.yisql.core.platform.PlatformManager
@@ -17,7 +18,7 @@ import scala.collection.mutable
   *  \* Time: 21:38
   *  \* Description: 
   *  \*/
-class SQLExecute(_params: Map[String, String]) {
+class SQLExecute(_params: Map[String, String]) extends Logging {
     private val extraParams = mutable.HashMap[String, String]()
     private var _autoClean = false
 
@@ -69,6 +70,11 @@ class SQLExecute(_params: Map[String, String]) {
             })
             if (!silence)
                 outputResult = getScriptResult(listener, sparkSession)
+        } catch {
+            case e: Exception => {
+                logError(e.getMessage)
+                e.printStackTrace()
+            }
         } finally {
             //            sparkSession.close()
         }

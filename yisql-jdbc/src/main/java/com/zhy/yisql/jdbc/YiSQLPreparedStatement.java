@@ -40,10 +40,15 @@ public class YiSQLPreparedStatement implements PreparedStatement {
   @Override
   public ResultSet executeQuery() throws SQLException {
     String respJsonStr = Utils.internalExecuteQuery(sql, conn.getParam());
-    JSONObject dataWithSchema = JSONObject.fromObject(respJsonStr);
-    JSONObject schema = dataWithSchema.getJSONObject("schema");
-    YiSQLResultSetMetaData meta = new YiSQLResultSetMetaData(schema.getJSONArray("fields"));
-    resultSet = new YiSQLResultSet(dataWithSchema, meta, conn);
+    try {
+      JSONObject dataWithSchema = JSONObject.fromObject(respJsonStr);
+      JSONObject schema = dataWithSchema.getJSONObject("schema");
+      YiSQLResultSetMetaData meta = new YiSQLResultSetMetaData(schema.getJSONArray("fields"));
+      resultSet = new YiSQLResultSet(dataWithSchema, meta, conn);
+    } catch (Exception e) {
+      e.printStackTrace();
+      resultSet = new YiSQLResultSet();
+    }
     return resultSet;
   }
 

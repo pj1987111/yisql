@@ -152,7 +152,12 @@ class PlatformManager extends Logging {
         if (params.getBooleanParam("streaming.unitest.startRuntime", true)) {
             runtime.startRuntime
         }
+
+        runtime.warmUp
+
         PlatformManager.RUNTIME_IS_READY.compareAndSet(false, true)
+        logInfo("yisql is ready to service!")
+
         if (params.getBooleanParam("streaming.unitest.awaitTermination", true)) {
             runtime.awaitTermination
         }

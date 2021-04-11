@@ -24,6 +24,8 @@ trait StreamingRuntime {
 
     def startHttpServer
 
+    def warmUp
+
     def params: JMap[Any, Any]
 }
 

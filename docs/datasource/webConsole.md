@@ -1,5 +1,5 @@
 由于流程序是一个源源不断的结果，所以不能用传统的批命令的方式返回，
-yisql支持一种较webConsole的sink，可以将数据以socket方式发送到socketserver上。
+yisql支持一种webConsole的sink，可以将数据以socket方式发送到socketserver上，通过这种方式，可以快速验证流任务的正确性。注意，这只是方便测试使用，不要将其放到生产上。:)
 
 通过命令启动socket server监听
 ```
@@ -8,7 +8,7 @@ nc -l 6049
 
 启动一个实时流交换程序
 读取kafka数据，通过socket将数据输出
-```
+```sql
 set streamName="zhy1";
 
 load kafka.`g1` options
@@ -30,7 +30,7 @@ and checkpointLocation="/tmp/s-cpl7";
 
 
 启动一个离线批任务，模拟插入几条json数据测试一下
-```
+```sql
 set jstr='''
 {"id":"1101","name":"小明1","age":20,"message":"testmsg1","date":"20210112","version":1}
 {"id":"1102","name":"小明2","age":21,"message":"testmsg2","date":"20210112","version":1}

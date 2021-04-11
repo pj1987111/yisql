@@ -15,7 +15,11 @@ import java.sql.Types;
  *  \
  */
 public class YiSQLResultSetMetaData implements ResultSetMetaData {
-  private JSONArray schema;
+  private JSONArray schema = new JSONArray();
+
+  public YiSQLResultSetMetaData(){
+
+  }
 
   public YiSQLResultSetMetaData(JSONArray schema) {
     this.schema = schema;

@@ -25,10 +25,15 @@ public class YiSQLStatement implements Statement {
   @Override
   public ResultSet executeQuery(String sql) throws SQLException {
     String respJsonStr = Utils.internalExecuteQuery(sql, conn.getParam());
-    JSONObject dataWithSchema = JSONObject.fromObject(respJsonStr);
-    JSONObject schema = dataWithSchema.getJSONObject("schema");
-    YiSQLResultSetMetaData meta = new YiSQLResultSetMetaData(schema.getJSONArray("fields"));
-    rs = new YiSQLResultSet(dataWithSchema, meta, conn);
+    try {
+      JSONObject dataWithSchema = JSONObject.fromObject(respJsonStr);
+      JSONObject schema = dataWithSchema.getJSONObject("schema");
+      YiSQLResultSetMetaData meta = new YiSQLResultSetMetaData(schema.getJSONArray("fields"));
+      rs = new YiSQLResultSet(dataWithSchema, meta, conn);
+    } catch (Exception e) {
+      e.printStackTrace();
+      rs = new YiSQLResultSet();
+    }
     return rs;
   }
 

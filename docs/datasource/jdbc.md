@@ -5,30 +5,40 @@
 JDBC其实是一类数据源，比如MySQL, Oracle,Hive thrift server,clickhouse 等等，只要数据源支持JDBC协议，那么就可以
 通过JDBC进行加载。在这里，我们会以clickhouse为主要例子进行介绍，其他也会提及。
 
-首先我们需要建立连接，这是通过connect语法来完成的：
+首先我们需要使用connect语法新建一个连接：
 
 ```sql
- set user="root";
+ set user="default";
+ set password="ck2020";
  
- connect jdbc where
- url="jdbc:mysql://127.0.0.1:3306/wow?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false"
- and driver="com.mysql.jdbc.Driver"
+ connect ck where
+ url="jdbc:clickhouse://192.168.6.52:8123"
  and user="${user}"
  and password="${password}"
- as db_1;
+ as ck1;
  
 ```
 
-这句话表示，我希望连接jdbc数据源，连接相关的参数在where语句里，驱动是MySQL的驱动，然后设置用户名和密码。
-我们把我们这个链接叫做db_1,其实就是wow的别名，wow是MySQL里的一个DB.
+这句话表示，我希望连接ck数据源，连接相关的参数在where语句里，使用clickhouse的驱动，然后设置用户名和密码。
+我们把我们这个连接的别名起名叫ck1.
 
 接着我就可以这个数据库里加载任意表了：
 
 ```
-load jdbc.`db_1.table1` as table1;
-load jdbc.`db_1.table2` as table2;
+#1 可以直接读整表
 
-select * from table1 as output;
+load ck1.`test_users` as table1;
+
+#2 可以在计算层过滤数据
+
+select count(*) from table1 where name='dd' as data2;
+
+#3 也可以在存储层过滤数据，条件会下推到数据库端执行，一般会有更好的性能
+
+load ck1.`` where
+query="SELECT * FROM test_users where name='dd'"
+as data1;
+
 ```
 
 下面是一些参见参数：
@@ -54,133 +64,200 @@ select * from table1 as output;
 其中，partitionColumn, lowerBound, upperBound,numPartitions 用来控制加载表的并行度。如果你
 加载数据太慢，那么可以调整着几个参数。
 
-MLSQL内置参数：
+内置参数对应谓词下推分区：
 
 | Property Name  |  Meaning |
 |---|---|
 |prePtnArray|Prepartitioned array, default comma delimited|
 |prePtnDelimiter|Prepartition separator|
 
-预分区使用样例：
+谓词下推分区使用样例：
 
-```
-load jdbc.`db.table` options
-and driver="com.mysql.jdbc.Driver"
-and url="jdbc:mysql://127.0.0.1:3306/...."
-and user="..."
-and password="...."
-and prePtnArray = "age<=10 | age > 10"
+```sql
+load ck1.`datainsight.activity_info_csv` options
+prePtnArray = "price<=200 | price > 200 and price <= 8000 | price>8000"
 and prePtnDelimiter = "\|"
-as table1;
+as table4;
 ```
 
 当然，我们也可以不用connect语法，直接使用Load语法：
+load语法就需要写全配置，如果是要多次使用，还是推荐用connect+load/save
 
 ```sql
-load jdbc.`db.table` options
-and driver="com.mysql.jdbc.Driver"
-and url="jdbc:mysql://127.0.0.1:3306/...."
-and user="..."
-and password="...."
-as table1;
+set user="default";
+set password="ck2020";
+
+load ck.`datainsight.activity_info_csv` where
+url="jdbc:clickhouse://192.168.6.52:8123"
+and user="${user}"
+and password="${password}"
+as tab2;
 ```
 
-值得注意的是，JDBC还支持使用MySQL原生SQL的方式去加载MySQL数据。比如：
-
-```sql
-load jdbc.`db_1.test1` where directQuery='''
-select * from test1 where a = "b"
-''' as newtable;
-
-select * from newtable;
-```
-
-这种情况要求加载的数据集不能太大。 如果你希望对这个语句也进行权限控制，如果是到表级别，那么只要系统开启授权即可。
-如果是需要控制到列，那么启动时需要添加如下参数：
-
-```
---conf "spark.mlsql.enable.runtime.directQuery.auth=true" 
-```
-
-
-## 保存更新数据
+## 保存数据
 
 如同加载数据一样，你可以复用前面的数据连接：
 
 ```sql
- set user="root";
- 
- connect jdbc where
- url="jdbc:mysql://127.0.0.1:3306/wow?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false"
- and driver="com.mysql.jdbc.Driver"
- and user="${user}"
- and password="${password}"
- as db_1;
- 
+ set user="default";
+set password="ck2020";
+
+connect ck where
+url="jdbc:clickhouse://192.168.6.52:8123"
+and user="${user}"
+and password="${password}"
+as ck1;
 ```
 
 接着对得到的数据进行保存：
 
-```
-save append tmp_article_table as jdbc.`db_1.crawler_table`;
+```sql
+load ck1.`` where
+query="SELECT * FROM test_users where name='dd'"
+as data1;
+
+save append data1 ck1.`test_users`;
 ```
 
-这句话表示，我们需要保存，并且使用追加的方式，往 db_1中的 crawler_table里添加数据，这些数据来源于表
-tmp_article_table。 如果你需要覆盖请使用 
+这样就可以将data1表中的数据以追加的方式写入test_users。如果你需要覆盖请使用 
 
 ```
 save overwrite ....
 ```
 
 
-如果你希望先创建表，然后再写入表，那么你可以使用ET JDBC,该ET本质上是在Driver端执行各种操作指令的。
+如果你希望先创建表，然后再写入表，那么你可以使用!jdbc命令，其本质上是在Driver端执行各种操作指令的。
 
-```
-run command as JDBC.`db_1` where 
-driver-statement-0="drop table test1"
-and driver-statement-1="create table test1.....";
+!jdbc format别名 driver "driver名" sql "sql语句"
 
-save append tmp_article_table as jdbc.`db_1.test1`;
-```
-
-
-这段语句，我们先删除test1,然后创建test1,最后使用save语句把进行数据结果的保存。
-
-## 如何执行Upsert语义(目前只支持MySQL)
-
-要让MLSQL在保存数据时执行Upsert语义的话，你只需要提供提供idCol字段即可。下面是一个简单的例子：
+其中，考虑到username,passwd这些敏感信息，需要提前使用connect命令建立好数据源别名
 
 ```sql
-save append tmp_article_table as jdbc.`db_1.test1`
-where idCol="a,b,c";
-```
-
-MLSQL内部使用了MySQL的duplicate key语法，所以用户需要对应的数据库表确实有重复联合主键的约束。那如果没有实现在数据库层面定义联合约束主键呢？
-结果会是数据不断增加，而没有执行update操作。
-
-idCol的作用有两个，一个是标记，标记数据需要执行Upsert操作，第二个是确定需要的更新字段，因为主键自身的字段是不需要更新的。MLSQL会将表所有的字段减去
-idCol定义的字段，得到需要更新的字段。
-
-## 如何将流式数据写入MySQL
-
-下面有个非常简单的例子：
+!jdbc ck1 driver "ru.yandex.clickhouse.ClickHouseDriver" sql "drop table test_users3;" 
+!jdbc ck1 driver "ru.yandex.clickhouse.ClickHouseDriver" sql "create table test_users3 as test_users;" 
 
 ```
-set streamName="mysql-test";
 
-.......
+创建好表之后，就可以使用插入语法将数据导入到新表中了
 
-save append table21  
-as streamJDBC.`mysql1.test1` 
-options mode="Complete"
-and `driver-statement-0`="create table  if not exists test1(k TEXT,c BIGINT)"
-and `statement-0`="insert into wow.test1(k,c) values(?,?)"
-and duration="3"
-and checkpointLocation="/tmp/cpl3";
+```sql
+save append data1 ck1.`test_users3`;
 ```
 
-我们使用streamJDBC数据源可以完成将数据写入到MySQL中。driver-statement-0 在整个运行期间只会执行一次。statement-0
-则会针对每条记录执行。 insert语句中的占位符顺序需要和table21中的列顺序保持一致。
+这段语句，我们先删除test_users3,然后以test_users的格式来创建test_users3,最后使用save语句把进行数据结果的保存。
+
+## 如何将流式数据写入JDBC
+
+我们看一个如何将流数据写入JDBC的一个例子，这里还是用clickhouse来测试，其他jdbc类的数据库也是一样的操作：
+
+首先，我们先创建一个clickhouse的connect，供后序使用，这里都是一些通用jdbc的连接信息配置
+
+```sql
+set user="default";
+set password="ck2020";
+connect ck where
+url="jdbc:clickhouse://192.168.6.52:8123"
+and user="${user}"
+and password="${password}"
+as ck1;
+```
+
+第二步，我们通过!jdbc来创建一张表，由于上一步配置了connect，所以这里就不需要配置连接相关的信息 
+
+```sql
+!jdbc ck1 driver "ru.yandex.clickhouse.ClickHouseDriver" sql "create table test_users3 as test_users;" 
+```
+
+第三步，也是最重要的一步，我们创建一个流任务，从kafka->clickhouse，流任务和批任务的区别就在于其最开头多了一句
+set streamName="kafka2ck"; 这里直接使用了load语法，如果后面还有重复使用这个kafka的话可以用connect语法配置数据源。
+注意这里使用了set sourceSchema，将值设置到了valueSchema中，这里的配置是解析kafka中json数据的，具体的配置我将单独展开来介绍。
+还有一个需要注意的点是，流任务都需要设定执行间隔duration，这里设置了10，单位是秒。
+
+```sql
+--kafka->ck实时流
+set streamName="kafka2ck";
+set sourceSchema="st(field(name,string),field(city,string),field(age,integer))";
+load kafka.`zhy` options
+`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+and `enable.auto.commit`="true"
+and `group.id`="zhy1234"
+and `auto.offset.reset`="latest"
+and `valueSchema`="${sourceSchema}"
+and `containRaw`="false"
+as kafka_post_kafka;
+save append kafka_post_kafka as ck1.`test_users3` where
+and duration="10";
+```
+
+第四步，执行后，可以通过`!show jobs;`查看正在执行的任务，应该可以看到例如下面的结果。这表示任务一直在执行。
+
+```sql
+{
+    "d908cdba-35dc-446b-b8c5-ef00145bd01f":{
+        "owner":"testzhy",
+        "jobType":"stream",
+        "jobName":"kafka2ck",
+        "jobContent":"set streamName="kafka2ck";
+set sourceSchema="st(field(name,string),field(city,string),field(age,integer))";
+load kafka.`zhy` options
+`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+and `enable.auto.commit`="true"
+and `group.id`="zhy1234"
+and `auto.offset.reset`="latest"
+and `valueSchema`="${sourceSchema}"
+and `containRaw`="false"
+as kafka_post_kafka;
+save append kafka_post_kafka as ck1.`test_users3` where
+and duration="10"",
+        "groupId":"d908cdba-35dc-446b-b8c5-ef00145bd01f",
+        "progress":{
+            "totalJob":1,
+            "currentJobIndex":1,
+            "script":"save append kafka_post_kafka as ck1.`test_users3` where
+and duration="10""
+        },
+        "startTime":1618108012800,
+        "timeout":-1
+    }
+}
+```
+
+第五步，流任务已经顺利跑起来了，我们接下来就需要往kafka里输入点数据来验证流任务的正确性
+
+在yisql中，这样的操作非常方便。如下所示用set语法创建一段插入kafka的json数据，使用jsonStr数据源来创建这些数据。
+
+然后设置targetSql对应到写入kafka源的etl.sql参数，这个设置是可以加上一些etl的操作，比如对列加上一些函数处理，比如where过滤等操作。然后执行下面的语句，将数据写入kafka。
+
+```sql
+--模拟json插入kafka，并加上条件
+set jstr='''
+{"id":"1101","name":"小明1","age":20,"city":"hz","date":"20210112","version":1}
+{"id":"1102","name":"小明2","age":21,"city":"hz","date":"20210112","version":1}
+{"id":"1103","name":"小明3","age":22,"city":"sh","date":"20210112","version":1}
+{"id":"1104","name":"小明4","age":23,"city":"sh","date":"20210112","version":1}
+{"id":"1105","name":"小明5","age":24,"city":"bj","date":"20210112","version":1}
+{"id":"1106","name":"小明6","age":25,"city":"bj","date":"20210112","version":1}
+{"id":"1107","name":"小明7","age":26,"city":"wh","date":"20210112","version":1}
+{"id":"1108","name":"小明8","age":27,"city":"wh","date":"20210112","version":1}
+''';
+set targetSql="select to_json(struct(*)) as value from data1 where age>=25";
+load jsonStr.`jstr` as data1;
+
+save append data1
+as kafka.`zhy`
+`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+and `etl.sql`="${targetSql}";
+```
+
+第六步，结果验证 输入下面的sql验证一下流任务的正确性。
+
+```sql
+load ck1.`test_users3` as table1;
+```
+
+可以看到数据已经成功写入clickhouse，而且过滤操作也生效，只写入了age大于等于25的数据。
+
+![](.jdbc_images/43fac548.png)
 
 
 

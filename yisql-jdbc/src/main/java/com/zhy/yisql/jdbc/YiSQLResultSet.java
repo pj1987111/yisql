@@ -26,13 +26,11 @@ import java.util.stream.Stream;
  */
 public class YiSQLResultSet implements ResultSet {
 
-  private JSONObject dataWithSchema;
   private YiSQLResultSetMetaData meta;
-  private YiSQLConnection conn;
 
-  private JSONArray schema;
-  private List<String> fields;
-  private JSONArray data;
+  private JSONArray schema = new JSONArray();
+  private List<String> fields = new ArrayList();
+  private JSONArray data = new JSONArray();
   private int pos = -1;
   private boolean isClosed = false;
   private YiSQLConnectionParam parameters;
@@ -41,9 +39,7 @@ public class YiSQLResultSet implements ResultSet {
   private FastDateFormat dateFormat;
 
   public YiSQLResultSet(JSONObject dataWithSchema, YiSQLResultSetMetaData meta, YiSQLConnection conn) {
-    this.dataWithSchema = dataWithSchema;
     this.meta = meta;
-    this.conn = conn;
     this.parameters = conn.getParam();
     this.schema = dataWithSchema.getJSONObject("schema").getJSONArray("fields");
     Stream<String> stream = schema.stream().map(o->((JSONObject) o).getString("name"));
@@ -52,6 +48,11 @@ public class YiSQLResultSet implements ResultSet {
     this.timeZone = TimeZone.getTimeZone(parameters.getTimeZone());
     this.timestampFormat = FastDateFormat.getInstance(parameters.getTimestampFormat(), timeZone, Locale.US);;
     this.dateFormat = FastDateFormat.getInstance(parameters.getDateFormat(), Locale.US);
+  }
+
+  public YiSQLResultSet() {
+    this.data = new JSONArray();
+    this.meta = new YiSQLResultSetMetaData();
   }
 
   @Override
@@ -70,13 +71,21 @@ public class YiSQLResultSet implements ResultSet {
     return data.getJSONObject(pos) == null;
   }
 
+  private boolean isNull(JSONObject obj, String key) {
+    return !obj.containsKey(key);
+  }
+
   @Override
   public String getString(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return null;
     return data.getJSONObject(pos).getString(fields.get(columnIndex-1));
   }
 
   @Override
   public boolean getBoolean(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return false;
     return data.getJSONObject(pos).getBoolean(fields.get(columnIndex-1));
   }
 
@@ -87,31 +96,43 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public short getShort(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return 0;
     return (short) data.getJSONObject(pos).getInt(fields.get(columnIndex-1));
   }
 
   @Override
   public int getInt(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return 0;
     return data.getJSONObject(pos).getInt(fields.get(columnIndex-1));
   }
 
   @Override
   public long getLong(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return 0;
     return data.getJSONObject(pos).getLong(fields.get(columnIndex-1));
   }
 
   @Override
   public float getFloat(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return 0;
     return (float)data.getJSONObject(pos).getDouble(fields.get(columnIndex-1));
   }
 
   @Override
   public double getDouble(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return 0;
     return data.getJSONObject(pos).getDouble(fields.get(columnIndex-1));
   }
 
   @Override
   public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return null;
     return new java.math.BigDecimal(data.getJSONObject(pos).getDouble(fields.get(columnIndex-1))).setScale(scale);
   }
 
@@ -264,7 +285,9 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public Object getObject(int columnIndex) throws SQLException {
-    return data.getJSONObject(pos).get(columnIndex-1);
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return null;
+    return data.getJSONObject(pos).get(fields.get(columnIndex-1));
   }
 
   @Override
@@ -289,6 +312,8 @@ public class YiSQLResultSet implements ResultSet {
 
   @Override
   public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
+    if(isNull(data.getJSONObject(pos), fields.get(columnIndex-1)))
+      return null;
     return getBigDecimal(columnIndex-1, 0);
   }
 

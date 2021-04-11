@@ -10,6 +10,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.reflect.{ClassLoaderTool, ScalaReflect}
 import com.zhy.yisql.core.datasource.datalake.DataLake
+import com.zhy.yisql.core.execute.SQLExecute
 import com.zhy.yisql.core.job.{JobManager, StreamManager}
 import com.zhy.yisql.core.platform.PlatformManager
 import com.zhy.yisql.rest.RestServer
@@ -39,8 +40,6 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     sessionManager.start()
 
     override def params: JMap[Any, Any] = _params
-
-//    startHttpServer
 
     initUDF()
     StreamManager.start(sparkSession)
@@ -96,7 +95,6 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
         }
 
         val ss = sparkSession.getOrCreate()
-        ss
 
 //        lifeCyleCallback.foreach { callback =>
 //            callback.afterRuntimeStarted(params.map(f => (f._1.toString, f._2.toString)).toMap, conf, ss)
@@ -108,6 +106,14 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
 
         show(params.asScala.map(kv => (kv._1.toString, kv._2.toString)).toMap)
         ss
+    }
+
+    def warmUp(): Unit = {
+        val warmUpSql = s"select 1 as dummy;"
+        val executor = new SQLExecute(Map[String,String]())
+        executor.sql(warmUpSql)
+        executor.simpleExecute()
+        logInfo("end warmUp...")
     }
 
     def initUDF() = {
