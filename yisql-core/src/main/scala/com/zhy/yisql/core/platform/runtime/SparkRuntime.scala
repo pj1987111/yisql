@@ -1,7 +1,6 @@
 package com.zhy.yisql.core.platform.runtime
 
 import java.lang.reflect.Modifier
-import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 import java.util.{Map => JMap}

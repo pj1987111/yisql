@@ -20,7 +20,7 @@
         <java_target_version>1.8</java_target_version>
         <file_encoding>UTF-8</file_encoding>
 
-        <yisql-common.version>0.2.0</yisql-common.version>
+        <yisql-common.version>0.3.0</yisql-common.version>
         <yisql-rest.version>0.2.2</yisql-rest.version>
         <druid-version>1.0.31</druid-version>
         <slf4j.version>1.7.5</slf4j.version>
