@@ -15,6 +15,7 @@ JDBC其实是一类数据源，比如MySQL, Oracle,Hive thrift server,clickhouse
  url="jdbc:clickhouse://192.168.6.52:8123"
  and user="${user}"
  and password="${password}"
+ and driver="ru.yandex.clickhouse.ClickHouseDriver"
  as ck1;
  
 ```
@@ -106,6 +107,7 @@ connect ck where
 url="jdbc:clickhouse://192.168.6.52:8123"
 and user="${user}"
 and password="${password}"
+and driver="ru.yandex.clickhouse.ClickHouseDriver"
 as ck1;
 ```
 
@@ -159,6 +161,7 @@ connect ck where
 url="jdbc:clickhouse://192.168.6.52:8123"
 and user="${user}"
 and password="${password}"
+and driver="ru.yandex.clickhouse.ClickHouseDriver"
 as ck1;
 ```
 

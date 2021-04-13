@@ -2,7 +2,6 @@ package com.zhy.yisql.addon.cmd
 
 import com.zhy.yisql.core.cmds.SQLCmd
 import com.zhy.yisql.core.execute.ConnectMeta
-import net.sf.json.JSONObject
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import tech.mlsql.common.utils.serder.json.JSONTool
 

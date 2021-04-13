@@ -54,4 +54,11 @@ class DslTest {
     val context = new ScriptSQLExecListener(spark, null)
     SQLExecuteContext.parse(sql, context)
   }
+
+  @Test
+  def mergeTest(): Unit = {
+    val sql1 = "!hive merge table hhy.json_test_tab partition 'date=20210112,version=1';"
+    val context = new ScriptSQLExecListener(spark, null)
+    SQLExecuteContext.parse(sql1, context)
+  }
 }

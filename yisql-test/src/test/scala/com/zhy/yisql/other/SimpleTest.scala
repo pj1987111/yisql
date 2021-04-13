@@ -4,6 +4,7 @@ import java.io.DataOutputStream
 import java.net.Socket
 
 import com.zhy.yisql.common.utils.bean.BeanUtils
+import org.apache.commons.lang3.StringUtils
 //import com.zhy.yisql.rest.entity.SQLRunEntity
 import org.junit.Test
 
@@ -60,5 +61,12 @@ class SimpleTest {
       params += (params2_entry._1 -> params2_entry._2)
     }
     params
+  }
+
+  @Test
+  def simple(): Unit = {
+    val partionSpec = "partition(date=20210112,version=1)"
+    val dsV =StringUtils.substringBetween(StringUtils.substringAfter(partionSpec, "partition"), "(", ")").split(",")
+    println(1)
   }
 }
