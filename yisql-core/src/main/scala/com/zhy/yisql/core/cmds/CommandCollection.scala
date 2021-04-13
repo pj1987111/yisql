@@ -28,8 +28,14 @@ object CommandCollection {
       } else context.addEnv(k._1, s"""run command as ${k._2}.`` where parameters='''{:all}'''""")
     }
     context.addEnv("desc", """run command as ShowTableExt.`` where parameters='''{:all}''' """)
-    context.addEnv("kill", """run command as Kill.`{}`""")
-//    context.addEnv("jdbc", """ run command as JDBC.`{}` where `driver-statement-0`='''{}''' """)
+    //    context.addEnv("kill", """run command as Kill.`` where type="{0}" and value="{1}" """)
+    context.addEnv("kill", """run command as Kill.`{}/{}` """)
+//    context.addEnv("kill",
+//      """
+//        |run command as Kill.`` where parameters='''{:all}'''
+//      """.stripMargin)
+
+    //    context.addEnv("jdbc", """ run command as JDBC.`{}` where `driver-statement-0`='''{}''' """)
     context.addEnv("jdbc", """ run command as JDBC.`{}` where parameters='''{:all}''' """)
 
     context.addEnv("cache", """ run {} as CacheExt.`` where lifeTime="{}" """)
@@ -92,9 +98,9 @@ object CommandCollection {
       """.stripMargin)
 
     context.addEnv("schemainfer",
-        """
-          |run command as SchemaInferCommand.`` where parameters='''{:all}'''
-        """.stripMargin)
+      """
+        |run command as SchemaInferCommand.`` where parameters='''{:all}'''
+      """.stripMargin)
   }
 
   def evaluateYiSQL(spark: SparkSession, sql: String) = {

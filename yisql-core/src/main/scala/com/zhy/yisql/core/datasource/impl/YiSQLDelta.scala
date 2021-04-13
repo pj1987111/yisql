@@ -15,99 +15,99 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, f
   *  \* Description: 
   *  \*/
 class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
-    override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-        val context = SQLExecuteContext.getContext()
-        val format = config.config.getOrElse("implClass", fullFormat)
-        val owner = config.config.get("owner").getOrElse(context.owner)
+  override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
+    val context = SQLExecuteContext.getContext()
+    val format = config.config.getOrElse("implClass", fullFormat)
+    val owner = config.config.get("owner").getOrElse(context.owner)
 
-        //timestampAsOf
-        val parameters = config.config
+    //timestampAsOf
+    val parameters = config.config
 
-        def paramValidate = {
-            throw new RuntimeException("Both startingVersion,endingVersion are  required")
-        }
-
-        def buildDF(version: Long) = {
-            val newOpt = if (version > 0) Map("versionAsOf" -> version.toString) else Map()
-            val reader = config.df.get.sparkSession.read
-
-            val dataLake = new DataLake(config.df.get.sparkSession)
-            val finalPath = if (dataLake.isEnable) {
-                dataLake.identifyToPath(config.path)
-            } else {
-                resourceRealPath(context.execListener, Option(owner), config.path)
-            }
-
-            reader.options(config.config ++ newOpt).
-                    format(format).
-                    load(finalPath)
-        }
-
-        //todo 获取最大版本号
-        (parameters.get("startingVersion").map(_.toLong), parameters.get("endingVersion").map(_.toLong)) match {
-            case (None, None) => buildDF(-1)
-            case (None, Some(_)) => throw paramValidate
-            case (Some(_), None) => throw paramValidate
-            case (Some(start), Some(end)) =>
-                (start until end).map { version =>
-                    buildDF(version).withColumn("__delta_version__", F.lit(version))
-                }.reduce((total, cur) => total.union(cur))
-        }
+    def paramValidate = {
+      throw new RuntimeException("Both startingVersion,endingVersion are  required")
     }
 
-    override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-        val context = SQLExecuteContext.getContext()
-        val format = config.config.getOrElse("implClass", fullFormat)
-        val partitionByCol = config.config.getOrElse("partitionByCol", "").split(",").filterNot(_.isEmpty)
-        if (partitionByCol.length > 0) {
-            writer.partitionBy(partitionByCol: _*)
-        }
+    def buildDF(version: Long) = {
+      val newOpt = if (version > 0) Map("versionAsOf" -> version.toString) else Map()
+      val reader = config.df.get.sparkSession.read
 
-        val dataLake = new DataLake(config.df.get.sparkSession)
-        val finalPath = if (dataLake.isEnable) {
-            dataLake.identifyToPath(config.path)
-        } else {
-            resourceRealPath(context.execListener, Option(context.owner), config.path)
-        }
-        writer.options(config.config).mode(config.mode).format(format).save(finalPath)
+      val dataLake = new DataLake(config.df.get.sparkSession)
+      val finalPath = if (dataLake.isEnable) {
+        dataLake.identifyToPath(config.path)
+      } else {
+        resourceRealPath(context.execListener, Option(owner), config.path)
+      }
+
+      reader.options(config.config ++ newOpt).
+          format(format).
+          load(finalPath)
     }
 
-    override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
-        val format = config.config.getOrElse("implClass", fullFormat)
-        val context = SQLExecuteContext.getContext()
-        val owner = config.config.get("owner").getOrElse(context.owner)
+    //todo 获取最大版本号
+    (parameters.get("startingVersion").map(_.toLong), parameters.get("endingVersion").map(_.toLong)) match {
+      case (None, None) => buildDF(-1)
+      case (None, Some(_)) => throw paramValidate
+      case (Some(_), None) => throw paramValidate
+      case (Some(start), Some(end)) =>
+        (start until end).map { version =>
+          buildDF(version).withColumn("__delta_version__", F.lit(version))
+        }.reduce((total, cur) => total.union(cur))
+    }
+  }
 
-        val dataLake = new DataLake(config.df.get.sparkSession)
-        val finalPath = if (dataLake.isEnable) {
-            dataLake.identifyToPath(config.path)
-        } else {
-            resolvePath(config.path, owner)
-        }
-
-        reader.options(config.config).format(format).load(finalPath)
+  override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
+    val context = SQLExecuteContext.getContext()
+    val format = config.config.getOrElse("implClass", fullFormat)
+    val partitionByCol = config.config.getOrElse("partitionByCol", "").split(",").filterNot(_.isEmpty)
+    if (partitionByCol.length > 0) {
+      writer.partitionBy(partitionByCol: _*)
     }
 
-    def resolvePath(path: String, owner: String): String = {
-        val context = SQLExecuteContext.getContext()
-        resourceRealPath(context.execListener, Option(owner), path)
+    val dataLake = new DataLake(config.df.get.sparkSession)
+    val finalPath = if (dataLake.isEnable) {
+      dataLake.identifyToPath(config.path)
+    } else {
+      resourceRealPath(context.execListener, Option(context.owner), config.path)
+    }
+    writer.options(config.config).mode(config.mode).format(format).save(finalPath)
+  }
+
+  override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
+    val format = config.config.getOrElse("implClass", fullFormat)
+    val context = SQLExecuteContext.getContext()
+    val owner = config.config.get("owner").getOrElse(context.owner)
+
+    val dataLake = new DataLake(config.df.get.sparkSession)
+    val finalPath = if (dataLake.isEnable) {
+      dataLake.identifyToPath(config.path)
+    } else {
+      resolvePath(config.path, owner)
     }
 
-    override def sSave(streamWriter: DataStreamWriter[Row], config: DataSinkConfig): Any = {
-        val dataLake = new DataLake(config.df.get.sparkSession)
-        val context = SQLExecuteContext.getContext()
-        val finalPath = if (dataLake.isEnable) {
-            dataLake.identifyToPath(config.path)
-        } else {
-            resolvePath(config.path, context.owner)
-        }
-//        val newConfig = config.copy(
-//            config = Map("path" -> config.path, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
-        val newConfig = config.copy(
-            config = Map("path" -> finalPath, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
-        super.sSave(streamWriter, newConfig)
+    reader.options(config.config).format(format).load(finalPath)
+  }
+
+  def resolvePath(path: String, owner: String): String = {
+    val context = SQLExecuteContext.getContext()
+    resourceRealPath(context.execListener, Option(owner), path)
+  }
+
+  override def sSave(streamWriter: DataStreamWriter[Row], config: DataSinkConfig): Any = {
+    val dataLake = new DataLake(config.df.get.sparkSession)
+    val context = SQLExecuteContext.getContext()
+    val finalPath = if (dataLake.isEnable) {
+      dataLake.identifyToPath(config.path)
+    } else {
+      resolvePath(config.path, context.owner)
     }
+    //        val newConfig = config.copy(
+    //            config = Map("path" -> config.path, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
+    val newConfig = config.copy(
+      config = Map("path" -> finalPath, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
+    super.sSave(streamWriter, newConfig)
+  }
 
-    override def fullFormat: String = "org.apache.spark.sql.delta.sources.MLSQLDeltaDataSource"
+  override def fullFormat: String = "org.apache.spark.sql.delta.sources.MLSQLDeltaDataSource"
 
-    override def shortFormat: String = "delta"
+  override def shortFormat: String = "delta"
 }

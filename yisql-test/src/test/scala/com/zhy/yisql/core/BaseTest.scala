@@ -19,7 +19,8 @@ class BaseTest {
 //    val rootUrl = "cdh218:9003"
     val rootUrl = "127.0.0.1:9003"
     //rest测试或直接执行
-    val restMode = true
+//    val restMode = true
+    val restMode = false
     val restUrl = s"http://$rootUrl/sql/run"
     val jobListUrl = s"http://$rootUrl/job/list"
     val jobKillUrl = s"http://$rootUrl/job/kill"

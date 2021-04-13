@@ -22,6 +22,8 @@ class ShowCommand extends SQLCmd {
             context.execListener.addEnv("__show_help_content__",
                 """
                   |command
+                  |!show formats;
+                  |!show formats [aliasFormat]
                   |!show jobs;
                   |!show job [groupId/name]
                   |!show datasources;
@@ -35,6 +37,7 @@ class ShowCommand extends SQLCmd {
                   |!show function [functionName];
                   |!show tables;
                   |!show tables from [database];
+                  |!show connects;
                 """.stripMargin)
 
             s"""
@@ -57,6 +60,8 @@ class ShowCommand extends SQLCmd {
             case Array("tables" ,"from" ,name ,"named" ,aliasName) => s"run command as ShowTablesExt.`` as ${aliasName};"
             case Array("jobs") => s"run command as ShowJobsExt.``;"
             case Array("job", name) => s"run command as ShowJobsExt.`${name}`;"
+            case Array("formats") => s"run command as ShowFormatsExt.``;"
+            case Array("formats", name) => s"run command as ShowFormatsExt.`${name}`;"
             case Array("commands") | Array() | Array("help") | Array("-help") =>
                 help
             case _ => s"load _yisql_.`${newPath.mkString("/")}` as output;"

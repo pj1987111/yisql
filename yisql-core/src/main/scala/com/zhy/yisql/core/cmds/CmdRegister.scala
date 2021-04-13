@@ -29,6 +29,7 @@ object CmdRegister {
 
     easyRegister("ShowCommand")
     easyRegister("ShowJobsExt")
+    easyRegister("ShowFormatsExt")
     easyRegister2("JDBC", "JDBCCommand")
     easyRegister("EngineResource")
     easyRegister("HDFSCommand")
@@ -54,5 +55,5 @@ object CmdRegister {
     register("ThenCommand", "tech.mlsql.ets.ifstmt.ThenCommand")
     register("FiCommand", "tech.mlsql.ets.ifstmt.FiCommand")
     register("ElseCommand", "tech.mlsql.ets.ifstmt.ElseCommand")
-    easyRegister2("Kill", "SQLYiSQLJobExt")
+    easyRegister2("Kill", "KillCommand")
 }

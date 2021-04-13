@@ -49,6 +49,8 @@ class JDBCCommand extends SQLCmd {
       case Array("driver", driverName, "sql", sql) =>
         _params += ("driver" -> driverName)
         _params += ("driver-statement-0"-> sql)
+      case Array("sql", sql) =>
+        _params += ("driver-statement-0"-> sql)
     }
 
     ConnectMeta.presentThenCall(fFormat, options => {

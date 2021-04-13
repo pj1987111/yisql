@@ -35,4 +35,8 @@ object ConnectMeta {
   def toMap = {
     formatMapping.asScala.toMap
   }
+
+  def removeFormatAlias(formatAlias: String) = {
+    formatMapping.remove(formatAlias)
+  }
 }
