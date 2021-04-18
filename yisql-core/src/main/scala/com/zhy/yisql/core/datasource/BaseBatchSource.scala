@@ -63,7 +63,6 @@ trait BaseBatchSource extends BatchSource with BatchSink with Registry with DslT
         // if contains splitter, then we will try to find dbname in dbMapping.
         // otherwize we will do nothing since elasticsearch use something like index/type
         // it will do no harm.
-        val format = config.config.getOrElse("implClass", fullFormat)
         writer.mode(config.mode)
         //load configs should overwrite connect configs
         writer.options(config.config)

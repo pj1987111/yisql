@@ -367,6 +367,47 @@ class BatchTest extends BaseTest {
         |
         |select count(*) from data2 as data3;
       """.stripMargin
+
+    /**
+      * json字符串写入es
+      */
+    val json2HbaseTest =
+        """
+          |set jstr='''
+          |{"id":"1101","name":"小明1","age":20,"message":"testmsg1","date":"20210112","version":1}
+          |{"id":"1102","name":"小明2","age":21,"message":"testmsg2","date":"20210112","version":1}
+          |{"id":"1103","name":"小明3","age":22,"message":"testmsg3","date":"20210112","version":1}
+          |{"id":"1104","name":"小明4","age":23,"message":"testmsg4","date":"20210112","version":1}
+          |{"id":"1105","name":"小明5","age":24,"message":"testmsg5","date":"20210112","version":1}
+          |{"id":"1106","name":"小明6","age":25,"message":"testmsg6","date":"20210112","version":1}
+          |{"id":"1107","name":"小明7","age":26,"message":"testmsg7","date":"20210112","version":1}
+          |{"id":"1108","name":"小明8","age":27,"message":"testmsg8","date":"20210112","version":1}
+          |{"id":"1109","name":"小明9","age":28,"message":"testmsg9","date":"20210112","version":1}
+          |{"id":"1110","name":"小明10","age":29,"message":"testmsg10","date":"20210112","version":2}
+          |''';
+          |
+          |load jsonStr.`jstr` as data1;
+          |
+          |connect hbase where
+          |zk="cdh217,cdh219,cdh218,cdh207,cdh131"
+          |and znode="/hbase"
+          |and rootdir="hdfs://tdhdfs/opt/hbase"
+          |and `family`="cf"
+          |as hbase1;
+          |
+          |save overwrite data1 as hbase1.`hhy:t2`
+          |where rowkey="id";
+          |
+          |load hbase1.`hhy:t2`
+          |where `field.type.name`="StringType"
+          |and `field.type.age`="IntegerType"
+          |and `field.type.message`="StringType"
+          |and `field.type.date`="StringType"
+          |and `field.type.version`="IntegerType"
+          |as hbase_out;
+          |
+        """.stripMargin
+
     @Test
     def readJsonParOrc(): Unit = {
         sqlParseInner(readJsonParOrcTest)
@@ -441,5 +482,10 @@ class BatchTest extends BaseTest {
     @Test
     def ckReadWrite(): Unit = {
         sqlParseInner(ckReadWriteTest)
+    }
+
+    @Test
+    def hbaseReadWrite(): Unit = {
+        sqlParseInner(json2HbaseTest)
     }
 }

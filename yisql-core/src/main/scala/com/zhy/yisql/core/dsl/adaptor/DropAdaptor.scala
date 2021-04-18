@@ -30,24 +30,24 @@ import org.antlr.v4.runtime.misc.Interval
   *  \* Date: 2021-02-12
   *  \* Time: 21:41
   *  \* Description: 
-  * hive 创建
+  * hive 删除
   *  \*/
-class CreateAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
-  def analyze(ctx: SqlContext): CreateStatement = {
-    val input = ctx.start.getTokenSource.asInstanceOf[DSLSQLLexer]._input
-    val start = ctx.start.getStartIndex
-    val stop = ctx.stop.getStopIndex
+class DropAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
+  def analyze(ctx: SqlContext): DropStatement = {
+    val input = ctx.start.getTokenSource().asInstanceOf[DSLSQLLexer]._input
+    val start = ctx.start.getStartIndex()
+    val stop = ctx.stop.getStopIndex()
     val interval = new Interval(start, stop)
     val originalText = input.getText(interval)
     val sql = TemplateMerge.merge(originalText, scriptSQLExecListener.env().toMap)
-    CreateStatement(originalText, sql)
+    DropStatement(originalText, sql)
   }
 
   override def parse(ctx: SqlContext): Unit = {
-    val CreateStatement(originalText, sql) = analyze(ctx)
+    val DropStatement(originalText, sql) = analyze(ctx)
     scriptSQLExecListener.sparkSession.sql(sql).count()
     scriptSQLExecListener.setLastSelectTable(null)
   }
 }
 
-case class CreateStatement(raw: String, sql: String)
+case class DropStatement(raw: String, sql: String)

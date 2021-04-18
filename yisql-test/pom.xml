@@ -70,17 +70,23 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- 可能带来的access问题 https://stackoverflow.com/questions/36427291/illegalaccesserror-to-guavas-stopwatch-from-org-apache-hadoop-mapreduce-lib-inp-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+        </dependency>
+
         <dependency>
             <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
             <version>0.3.0</version>
         </dependency>
 
-        <!-- 可能带来的access问题 https://stackoverflow.com/questions/36427291/illegalaccesserror-to-guavas-stopwatch-from-org-apache-hadoop-mapreduce-lib-inp-->
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <groupId>io.github.pj1987111</groupId>
+            <artifactId>spark-hbase_2.4.3_2.11</artifactId>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
 
@@ -145,4 +151,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
