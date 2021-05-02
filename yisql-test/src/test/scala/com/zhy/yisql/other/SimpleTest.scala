@@ -5,8 +5,11 @@ import java.net.Socket
 
 import com.zhy.yisql.common.utils.bean.BeanUtils
 import org.apache.commons.lang3.StringUtils
+import tech.mlsql.common.utils.base.Templates
 //import com.zhy.yisql.rest.entity.SQLRunEntity
 import org.junit.Test
+
+import org.apache.spark.util.kvstore._
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -68,5 +71,15 @@ class SimpleTest {
     val partionSpec = "partition(date=20210112,version=1)"
     val dsV =StringUtils.substringBetween(StringUtils.substringAfter(partionSpec, "partition"), "(", ")").split(",")
     println(1)
+  }
+
+  @Test
+  def templateTest(): Unit = {
+    val str = "run command as PythonCommand.`` where parameters='''{:all}''' as {-1:next(named,uuid())}"
+    val seq = Seq("on", "orginal_text_corpus",
+      "\ndata = context.fetch_once_as_rows()\ndef process(data):\n    for row in data:\n        new_row = { }\n        new_row[\"content\"] = \"---\" + row[\"content\"]+\"---\"\n        yield new_row\n\ncontext.build_result(process(data))",
+      "named", "mlsql_temp_table")
+    val txt = Templates.evaluate(str, seq)
+    println(txt)
   }
 }

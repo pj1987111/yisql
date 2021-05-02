@@ -12,11 +12,11 @@
     <artifactId>yisql-test</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>io.github.pj1987111</groupId>
-            <artifactId>yisql-common_${scala.binary.version}</artifactId>
-            <version>${yisql-common.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.pj1987111</groupId>-->
+<!--            <artifactId>yisql-common_${scala.binary.version}</artifactId>-->
+<!--            <version>${yisql-common.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.github.pj1987111</groupId>
             <artifactId>yisql_rest</artifactId>
@@ -43,11 +43,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>tech.mlsql</groupId>
-            <artifactId>pyjava-2.4_2.11</artifactId>
-            <version>0.2.8.4_fixbugs</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.pj1987111</groupId>-->
+<!--            <artifactId>pyjava-2.4_2.11</artifactId>-->
+<!--            <version>0.3.0.1</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>tech.mlsql</groupId>
             <artifactId>mysql-binlog_2.11</artifactId>
@@ -87,6 +87,26 @@
             <groupId>io.github.pj1987111</groupId>
             <artifactId>spark-hbase_2.4.3_2.11</artifactId>
             <version>0.1.0</version>
+        </dependency>
+
+        <!-- py4j测试 -->
+        <dependency>
+            <groupId>net.sf.py4j</groupId>
+            <artifactId>py4j</artifactId>
+            <version>0.10.8.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalactic</groupId>
+            <artifactId>scalactic_${scala.binary.version}</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
