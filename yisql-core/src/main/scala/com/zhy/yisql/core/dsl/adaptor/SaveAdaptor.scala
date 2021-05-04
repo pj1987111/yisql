@@ -88,7 +88,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
         val res = datasource.asInstanceOf[ {def sSave(writer: DataStreamWriter[Row], config: DataSinkConfig): Any}].sSave(
           df.writeStream,
           // here we should change final_path to path in future
-          DataSinkConfig(path, option, mode, Option(df), Option(scriptSQLExecListener.env()("streamName"))))
+          DataSinkConfig(path, option, mode, Option(df), Option(scriptSQLExecListener.env()("streamName")), spark))
         res
       } else {
         val newOption = if (partitionByCol.nonEmpty) {
@@ -98,7 +98,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
         val res = datasource.asInstanceOf[ {def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any}].bSave(
           df.write,
           // here we should change final_path to path in future
-          DataSinkConfig(path, newOption, mode, Option(df), None))
+          DataSinkConfig(path, newOption, mode, Option(df), None, spark))
         res
       }
     }.getOrElse {

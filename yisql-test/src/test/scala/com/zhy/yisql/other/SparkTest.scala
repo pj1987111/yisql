@@ -28,4 +28,6 @@ class SparkTest {
     val df = spark.sql("select hhy_dw.license_check('沪AGG7609_4')")
     df.show()
   }
+
+
 }

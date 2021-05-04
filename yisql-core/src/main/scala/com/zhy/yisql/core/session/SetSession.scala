@@ -17,14 +17,14 @@ class SetSession(spark: SparkSession, owner: String) {
   def envTableName = HashUtils.md5Hash(owner)
 
   private def isTheSame(oldItem: SetItem, newItem: SetItem) = {
-    (newItem.k, newItem.config(SetSession.__MLSQL_CL__)) == (oldItem.k, oldItem.config(SetSession.__MLSQL_CL__))
+    (newItem.k, newItem.config(SetSession.__YISQL_CL__)) == (oldItem.k, oldItem.config(SetSession.__YISQL_CL__))
   }
 
   def set(k: String, v: String, config: Map[String, String]) = {
     if (envTableExists) {
       val oldItems = spark.table(envTableName).as[SetItem].collect().toList
       val newItem = SetItem(k, v,
-        Map(SetSession.__MLSQL_CL__ -> SetSession.SET_STATEMENT_CL) ++ config
+        Map(SetSession.__YISQL_CL__ -> SetSession.SET_STATEMENT_CL) ++ config
       )
       val newItems = oldItems.filterNot { oldItem =>
         isTheSame(oldItem, newItem)
@@ -53,19 +53,19 @@ class SetSession(spark: SparkSession, owner: String) {
 
   def fetchPythonEnv = {
     filterEnvTable((item) => {
-      item.config(SetSession.__MLSQL_CL__) == SetSession.PYTHON_ENV_CL
+      item.config(SetSession.__YISQL_CL__) == SetSession.PYTHON_ENV_CL
     })
   }
 
   def fetchPythonRunnerConf = {
     filterEnvTable((item) => {
-      item.config(SetSession.__MLSQL_CL__) == SetSession.PYTHON_RUNNER_CONF_CL
+      item.config(SetSession.__YISQL_CL__) == SetSession.PYTHON_RUNNER_CONF_CL
     })
   }
 
   def fetchSetStatement = {
     filterEnvTable((item) => {
-      item.config(SetSession.__MLSQL_CL__) == SetSession.SET_STATEMENT_CL
+      item.config(SetSession.__YISQL_CL__) == SetSession.SET_STATEMENT_CL
     })
   }
 
@@ -84,7 +84,7 @@ object SetSession {
   val PYTHON_ENV_CL = "python_env_cl"
   val PYTHON_RUNNER_CONF_CL = "python_runner_conf_cl"
   val SET_STATEMENT_CL = "set_statement_cl"
-  val __MLSQL_CL__ = "__mlsql_cl__"
+  val __YISQL_CL__ = "__yisql_cl__"
 }
 
 case class SetItem(k: String, v: String, config: Map[String, String])

@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource
 
 import com.zhy.yisql.common.utils.log.Logging
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import tech.mlsql.common.utils.reflect.ClassPath
 
 import scala.collection.JavaConverters._
@@ -78,8 +78,8 @@ case class DataSourceConfig(path: String, config: Map[String, String], df: Optio
   * @param df
   * @param jobName 任务名，用于流任务注册
   */
-case class DataSinkConfig(path: String, config: Map[String, String], mode: String, df: Option[DataFrame] = None, jobName: Option[String]) {
+case class DataSinkConfig(path: String, config: Map[String, String], mode: String, df: Option[DataFrame] = None, jobName: Option[String], spark: SparkSession) {
     def cloneWithNewMode(newMode: String): DataSinkConfig = {
-        DataSinkConfig(path, config, newMode, df, jobName)
+        DataSinkConfig(path, config, newMode, df, jobName, spark)
     }
 }

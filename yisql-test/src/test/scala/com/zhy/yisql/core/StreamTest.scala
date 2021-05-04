@@ -11,8 +11,6 @@ import org.junit.Test
   *  \*/
 class StreamTest extends BaseTest {
 
-  import org.apache.log4j.Level
-
   val kafka2consoleTest =
     """
       |set streamName="zhy1";
@@ -93,6 +91,42 @@ class StreamTest extends BaseTest {
       |`es.index.auto.create`="true"
       |and `es.nodes`="cdh173"
       |and `etl.sql`="${targetSql}"
+      |and duration="10";
+    """.stripMargin
+
+  val kafka2ElasticPythonTest =
+    """
+      |set streamName="zhy1";
+      |set sourceSchema="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer),field(age,integer))";
+      |set targetCode='''
+      |data = context.fetch_once_as_rows()
+      |def process(data):
+      |    for row in data:
+      |        new_row = { }
+      |        new_row["id"] = "---" + row["id"]+"---"
+      |        new_row["name"] = "---" + row["name"]+"---"
+      |        new_row["message"] = "---" + row["message"]+"---"
+      |        new_row["date"] = row["date"]
+      |        yield new_row
+      |
+      |context.build_result(process(data))
+      |''';
+      |!python conf "python.bin.path=/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ";
+      |!python conf "schema=st(field(id,string),field(name,string),field(message,string),field(date,string))";
+      |
+      |load kafka.`zhy` options
+      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |and `enable.auto.commit`="true"
+      |and `group.id`="zhy1234"
+      |and `auto.offset.reset`="latest"
+      |and `valueSchema`="${sourceSchema}"
+      |and `containRaw`="false"
+      |as kafka_post_kafka;
+      |
+      |save append kafka_post_kafka as es.`zhypy/z1` where
+      |`es.index.auto.create`="true"
+      |and `es.nodes`="cdh173"
+      |and `etl.code`="${targetCode}"
       |and duration="10";
     """.stripMargin
 
@@ -195,6 +229,11 @@ class StreamTest extends BaseTest {
   @Test
   def kafka2Elastic(): Unit = {
     sqlParseInner(kafka2ElasticTest)
+  }
+
+  @Test
+  def kafka2ElasticPython(): Unit = {
+    sqlParseInner(kafka2ElasticPythonTest)
   }
 
   @Test
