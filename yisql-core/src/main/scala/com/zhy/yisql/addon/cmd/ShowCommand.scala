@@ -22,6 +22,7 @@ class ShowCommand extends SQLCmd {
             context.execListener.addEnv("__show_help_content__",
                 """
                   |command
+                  |!show
                   |!show formats;
                   |!show formats [aliasFormat]
                   |!show jobs;
@@ -62,6 +63,7 @@ class ShowCommand extends SQLCmd {
             case Array("job", name) => s"run command as ShowJobsExt.`${name}`;"
             case Array("formats") => s"run command as ShowFormatsExt.``;"
             case Array("formats", name) => s"run command as ShowFormatsExt.`${name}`;"
+            case Array("schema", name) => s"run command as ShowSchemaExt.`${name}`;"
             case Array("commands") | Array() | Array("help") | Array("-help") =>
                 help
             case _ => s"load _yisql_.`${newPath.mkString("/")}` as output;"

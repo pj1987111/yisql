@@ -83,6 +83,7 @@ object PythonExecutor {
     val runnerConf = getSchemaAndConf(envSession)
     (envs, runnerConf)
   }
+
   /**
     * python代码嵌入处理
     * 离线数据
@@ -102,6 +103,8 @@ object PythonExecutor {
   /**
     * python代码嵌入处理
     * 实时处理回调
+    *
+    * 由于executor中执行，参数需要外传，因为和外部线程不在同个线程中
     *
     * @param session
     * @param code
@@ -132,7 +135,7 @@ object PythonExecutor {
     try {
       val data = rdd.mapPartitions { iter =>
 
-        val enconder = RowEncoder.apply(sourceSchema).resolveAndBind()
+        val encoder = RowEncoder.apply(sourceSchema).resolveAndBind()
         val envs4j = new util.HashMap[String, String]()
         envs.foreach(f => envs4j.put(f._1, f._2))
 
@@ -143,7 +146,7 @@ object PythonExecutor {
         )
 
         val newIter = iter.map { irow =>
-          enconder.toRow(irow)
+          encoder.toRow(irow)
         }
         val commonTaskContext = new SparkContextImp(TaskContext.get(), batch)
         val columnarBatchIter = batch.compute(Iterator(newIter), TaskContext.getPartitionId(), commonTaskContext)

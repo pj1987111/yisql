@@ -1,8 +1,8 @@
 package org.apache.spark.sql.streaming
 
-import com.zhy.yisql.core.datasource.DataSinkConfig
-import org.apache.spark.sql.{DataFrameWriter, Dataset, Row, SparkSession}
 import com.zhy.yisql.addon.cmd.python.PythonExecutor.{getBinAndRunConf, streamExecute}
+import com.zhy.yisql.core.datasource.DataSinkConfig
+import org.apache.spark.sql.{DataFrameWriter, Dataset, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.

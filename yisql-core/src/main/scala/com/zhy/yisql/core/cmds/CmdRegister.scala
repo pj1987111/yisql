@@ -30,6 +30,7 @@ object CmdRegister {
     easyRegister("ShowCommand")
     easyRegister("ShowJobsExt")
     easyRegister("ShowFormatsExt")
+    easyRegister("ShowSchemaExt")
     easyRegister2("JDBC", "JDBCCommand")
     easyRegister("HiveCommand")
     easyRegister("EngineResource")

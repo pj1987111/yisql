@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.zhy.yisql.core.dsl.adaptor.DslTool
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, Trigger}
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.

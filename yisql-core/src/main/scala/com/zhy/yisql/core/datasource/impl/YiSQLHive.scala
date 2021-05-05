@@ -2,7 +2,7 @@ package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Dataset, Row}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 
 /**
   *  \* Created with IntelliJ IDEA.

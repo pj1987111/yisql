@@ -20,8 +20,6 @@ class YiSQLElasticSearch extends BaseStreamSource with BaseBatchSource {
 
   override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
     val newConfig = config.cloneWithNewMode("append")
-    val context = SQLExecuteContext.getContext()
-    val owner = context.owner
     ForeachBatchRunner.run(dataStreamWriter, config, (writer: DataFrameWriter[Row], batchId: Long) => {
       bSave(writer, newConfig)
     })
