@@ -343,6 +343,27 @@ class BatchTest extends BaseTest {
           |select count(*) from data1 as table2;
         """.stripMargin
 
+    val esReadPushDownTest =
+        """
+          |set pushdownq='''
+          |{
+          |  "query" : {
+          |	  "bool": {
+          |	      "must": [
+          |	        { "match": { "id":   "---1108---"}},
+          |	        { "match": { "date": "20210112" }}
+          |	      ]
+          |    }
+          |  }
+          |}
+          |'''
+          |
+          |load es.`zhypy/z1` where
+          |and es.nodes="cdh173"
+          |and es.query="${pushdownq}"
+          |as data1;
+        """.stripMargin
+
     val ckReadWriteTest =
       """
         |
@@ -477,6 +498,11 @@ class BatchTest extends BaseTest {
     @Test
     def esRead(): Unit = {
         sqlParseInner(esReadTest)
+    }
+
+    @Test
+    def esPushdownRead(): Unit = {
+        sqlParseInner(esReadPushDownTest)
     }
 
     @Test
