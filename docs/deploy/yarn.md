@@ -12,7 +12,7 @@ $SPARK_HOME/bin/spark-submit --class com.zhy.yisql.StreamApp \
 --num-executors 1 \
 --name yisql \
 --conf "spark.sql.hive.thriftServer.singleSession=true" \
-/home/admin/spark-2.4.0-bin-2.6.0-cdh5.15.0/jars/yisql-core-2.4-1.0-SNAPSHOT.jar \
+/home/admin/spark-2.4.0-bin-2.6.0-cdh5.15.0/jars/yisql-core-2.4-1.0.jar \
 -streaming.name yisql \
 -streaming.platform spark \
 -streaming.rest true \
