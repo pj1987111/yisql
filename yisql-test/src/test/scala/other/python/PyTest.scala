@@ -1,5 +1,6 @@
 package other.python
 
+import com.zhy.yisql.common.utils.reflect.ScalaMethodMacros
 import org.apache.spark.{SparkConf, SparkContext, TaskContext}
 import org.apache.spark.sql.{Row, SQLContext, SparkSession, SparkUtils}
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
@@ -27,6 +28,10 @@ class PyTest {
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
     sparkSession = sqlContext.sparkSession
+
+    val TTT = "vvv"
+    val vv = ScalaMethodMacros.str(TTT)
+    println(vv)
   }
 
   /**
@@ -52,11 +57,11 @@ class PyTest {
           |
           |def process():
           |    for item in data_manager.fetch_once_as_rows():
-          |        item["value1"] = item["value"] + "_suffix"
+          |        item["value"] = item["value"] + "_suffix"
           |        yield item
           |
           |context.build_result(process())
-        """.stripMargin, envs, "python3", "3.7.3")))), sourceSchema,
+        """.stripMargin, envs, "python3", "3.6")))), sourceSchema,
       //          "GMT", Map("python.bin.path"->"/usr/local/bin/python3.71")
       "GMT", Map("python.bin.path" -> "/Library/Frameworks/Python.framework/Versions/3.6/bin/python3")
     )
@@ -88,7 +93,7 @@ class PyTest {
     val df = session.createDataset[String](Seq("a1", "b1")).toDF("value")
     df.show()
     val struct = df.schema
-    df.foreachPartition(rows=>{
+    df.foreachPartition(rows => {
       rows.foreach(row => {
         println(row)
       })
@@ -99,17 +104,21 @@ class PyTest {
     * Using python code snippet to process data in Spark
     */
   @Test
-  def test2_err(): Unit = {
+  def test3(): Unit = {
     val session = sparkSession
     import session.implicits._
     val timezoneid = session.sessionState.conf.sessionLocalTimeZone
     val df = session.createDataset[String](Seq("a1", "b1")).toDF("value")
     val struct = df.schema
     val abc = df.rdd.mapPartitions { iter =>
-      val enconder = RowEncoder.apply(struct).resolveAndBind()
+      val encoder = RowEncoder.apply(struct).resolveAndBind()
       val envs = new java.util.HashMap[String, String]()
-      //            envs.put(PythonConf.PYTHON_ENV, "source activate streamingpro-spark-2.4.x")
-      //            envs.put(PythonConf.PYTHON_ENV, "export ARROW_PRE_0_15_IPC_FORMAT=1 ")
+      //      envs.put(PythonConf.PYTHON_ENV, "source activate streamingpro-spark-2.4.x")
+      envs.put(ScalaMethodMacros.str(PythonConf.PYTHON_ENV), "export ARROW_PRE_0_15_IPC_FORMAT=1 ")
+      envs.put("PYTHON_ENV", "export ARROW_PRE_0_15_IPC_FORMAT=1 ")
+
+      //      envs.put(PythonConf.PYTHON_ENV, "export ARROW_PRE_0_15_IPC_FORMAT=1 ")
+      println(envs)
       val batch = new ArrowPythonRunner(
         Seq(ChainedPythonFunctions(Seq(PythonFunction(
           """
@@ -119,22 +128,21 @@ class PyTest {
             |    print(item)
             |df = pd.DataFrame({'AAA': [4, 5, 6, 7],'BBB': [10, 20, 30, 40],'CCC': [100, 50, -30, -50]})
             |data_manager.set_output([[df['AAA'],df['BBB']]])
-          """.stripMargin, envs, "python3", "3.7.3")))), struct,
-//        timezoneid, Map("python.bin.path" -> "/usr/local/bin/python3.7")
-            timezoneid, Map("python.bin.path" -> "/Library/Frameworks/Python.framework/Versions/3.7/bin/python3")
+          """.stripMargin, envs, "python", "3.6")))), struct,
+        //        timezoneid, Map("python.bin.path" -> "/usr/local/bin/python3.7")
+        timezoneid, Map("python.bin.path" -> "/Library/Frameworks/Python.framework/Versions/3.6/bin/python3")
 
       )
-      val newIter = iter.map { irow =>
-        enconder.toRow(irow)
-      }
-      val commonTaskContext = new SparkContextImp(TaskContext.get(), batch)
-      val columnarBatchIter = batch.compute(Iterator(newIter), TaskContext.getPartitionId(), commonTaskContext)
+      val columnarBatchIter = batch.compute(
+        Iterator(iter.map(irow => encoder.toRow(irow))),
+        TaskContext.getPartitionId(),
+        new SparkContextImp(TaskContext.get(), batch))
       columnarBatchIter.flatMap { batch =>
-        batch.rowIterator.asScala.map(_.copy)
+        batch.rowIterator.asScala
       }
     }
 
-    val wow = SparkUtils.internalCreateDataFrame(session, abc, StructType(Seq(StructField("AAA", LongType), StructField("BBB", LongType))), false)
-    wow.show()
+    val outDf = SparkUtils.internalCreateDataFrame(session, abc, StructType(Seq(StructField("AAA", LongType), StructField("BBB", LongType))), false)
+    outDf.show()
   }
 }

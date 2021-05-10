@@ -145,11 +145,10 @@ object PythonExecutor {
           timezoneID, runnerConf
         )
 
-        val newIter = iter.map { irow =>
-          encoder.toRow(irow)
-        }
-        val commonTaskContext = new SparkContextImp(TaskContext.get(), batch)
-        val columnarBatchIter = batch.compute(Iterator(newIter), TaskContext.getPartitionId(), commonTaskContext)
+        val columnarBatchIter = batch.compute(
+          Iterator(iter.map(irow => encoder.toRow(irow))),
+          TaskContext.getPartitionId(),
+          new SparkContextImp(TaskContext.get(), batch))
         columnarBatchIter.flatMap { batch =>
           batch.rowIterator.asScala
         }

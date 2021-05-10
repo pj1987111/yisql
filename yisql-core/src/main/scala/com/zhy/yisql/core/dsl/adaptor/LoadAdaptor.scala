@@ -48,10 +48,10 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
     DataSourceRegistry.fetch(format, option).map { datasource =>
       if (isStream) {
         table = datasource.asInstanceOf[ {def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame}].
-            sLoad(scriptSQLExecListener.sparkSession.readStream, dsConf)
+          sLoad(scriptSQLExecListener.sparkSession.readStream, dsConf)
       } else {
         table = datasource.asInstanceOf[ {def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame}].
-            bLoad(scriptSQLExecListener.sparkSession.read, dsConf)
+          bLoad(scriptSQLExecListener.sparkSession.read, dsConf)
       }
       table
     }.getOrElse {
