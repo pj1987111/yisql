@@ -1,5 +1,6 @@
 package other.sstream
 
+import com.zhy.yisql.core.util.SparkSimpleSchemaParser
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery, Trigger}
