@@ -1,12 +1,11 @@
 package com.zhy.yisql.addon.udf
 
-import java.util.UUID
-
 import org.apache.spark.sql.UDFRegistration
 
+import java.util.UUID
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.language.reflectiveCalls
 
 /**
   *  \* Created with IntelliJ IDEA.

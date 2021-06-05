@@ -2,15 +2,6 @@ package org.apache.spark.sql
 
 import java.lang.reflect.Type
 
-import org.apache.spark.sql.catalyst.JavaTypeInference
-import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import org.apache.spark.sql.execution.{ExplainMode, ExtendedMode}
-import org.apache.spark.sql.execution.command.ExplainCommand
-import org.apache.spark.sql.expressions.{SparkUserDefinedFunction, UserDefinedFunction}
-import org.apache.spark.sql.types.DataType
-import org.apache.spark.status.api.v1
-import org.apache.spark.util.Utils
-
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou

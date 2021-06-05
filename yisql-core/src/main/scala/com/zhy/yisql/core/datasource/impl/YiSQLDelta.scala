@@ -3,7 +3,6 @@ package com.zhy.yisql.core.datasource.impl
 import com.zhy.yisql.core.datasource.datalake.DataLake
 import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
 import com.zhy.yisql.core.execute.SQLExecuteContext
-import org.apache.spark.sql.delta.sources.DeltaDataSource
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, functions => F}
 

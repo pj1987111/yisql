@@ -2,15 +2,6 @@ package org.apache.spark.sql.kafka010
 
 import java.util.Locale
 import java.{util => ju}
-
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer}
-import org.apache.spark.internal.Logging
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
-import org.apache.spark.sql.sources.BaseRelation
-
 import scala.collection.JavaConverters._
 
 class AdHocKafkaSourceProvider extends KafkaSourceProvider {

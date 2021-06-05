@@ -1,11 +1,11 @@
 package org.apache.spark.sql.kafka010
 
-import java.util.{Locale, UUID}
-
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.util.UninterruptibleThread
+
+import java.util.{Locale, UUID}
 
 /**
   *  \* Created with IntelliJ IDEA.

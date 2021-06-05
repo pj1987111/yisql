@@ -1,10 +1,5 @@
 package com.zhy.yisql.core.platform.runtime
 
-import java.lang.reflect.Modifier
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicReference
-import java.util.{Map => JMap}
-
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.reflect.{ClassLoaderTool, ScalaReflect}
@@ -17,6 +12,10 @@ import org.apache.spark.sql.session.{SessionIdentifier, SessionManager}
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import org.apache.spark.{SQLConf, SparkConf}
 
+import java.lang.reflect.Modifier
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicReference
+import java.util.{Map => JMap}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
@@ -73,7 +72,7 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
             conf.set(DataLake.SPARK_DL_PATH, params.get(DataLake.STREAMING_DL_PATH).toString)
         }
 
-//        registerLifeCyleCallback("tech.mlsql.runtime.MetaStoreService")
+//        registerLifeCyleCallback("com.zhy.yisql.runtime.MetaStoreService")
 //        lifeCyleCallback.foreach { callback =>
 //            callback.beforeRuntimeStarted(params.map(f => (f._1.toString, f._2.toString)).toMap, conf)
 //        }
@@ -82,7 +81,7 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
 
         def setHiveConnectionURL = {
             val url = SQLConf.SQL_HIVE_CONNECTION.readFrom(configReader)
-            if (!url.isEmpty) {
+            if (url.nonEmpty) {
                 logInfo("set hive javax.jdo.option.ConnectionURL=" + url)
                 sparkSession.config("javax.jdo.option.ConnectionURL", url)
             }
@@ -118,13 +117,7 @@ class SparkRuntime(_params: JMap[Any, Any]) extends StreamingRuntime with Platfo
     def initUDF() = {
         params.put("_session_", sparkSession)
 //        registerUDF("streaming.core.compositor.spark.udf.Functions")
-//        registerUDF("tech.mlsql.crawler.udf.Functions")
         registerUDF("com.zhy.yisql.addon.udf.Functions")
-        //        if (params.containsKey(MLSQLConf.MLSQL_UDF_CLZZNAMES.key)) {
-        //            MLSQLConf.MLSQL_UDF_CLZZNAMES.readFrom(configReader).get.split(",").foreach { clzz =>
-        //                registerUDF(clzz)
-        //            }
-        //        }
         createTables
     }
 

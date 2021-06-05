@@ -18,8 +18,7 @@
 
 package org.apache.spark.sql.session
 
-import tech.mlsql.common.utils.log.Logging
-
+import com.zhy.yisql.common.utils.log.Logging
 
 class SQLOperationManager(_interval: Int) extends Logging {
 

@@ -2,8 +2,8 @@ package com.zhy.yisql.addon.cmd
 
 import com.zhy.yisql.core.cmds.SQLCmd
 import org.apache.spark.sql.delta.actions.{Action, AddFile, RemoveFile}
-import org.apache.spark.sql.delta.{DeltaLog, DeltaOptions}
 import org.apache.spark.sql.delta.commands.CompactTableInDelta
+import org.apache.spark.sql.delta.{DeltaLog, DeltaOptions}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**

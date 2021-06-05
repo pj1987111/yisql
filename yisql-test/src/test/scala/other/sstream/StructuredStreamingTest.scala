@@ -5,9 +5,6 @@ import org.apache.spark.sql.catalyst.expressions.JsonToStructs
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery, Trigger}
 import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession, functions => F}
 import org.junit.Test
-import tech.mlsql.schema.parser.SparkSimpleSchemaParser
-
-import scala.concurrent.duration._
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -37,7 +34,7 @@ class StructuredStreamingTest {
 //        val df = spark
 //                .readStream
 //                .format("kafka")
-//                .option("kafka.bootstrap.servers", "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092")
+//                .option("kafka.bootstrap.servers", "127.0.0.1:9092")
 //                .option("subscribe", "sstream")
 //                //默认是从lastest读，这里设置从头开始读
 //                .option("startingOffsets", "earliest")

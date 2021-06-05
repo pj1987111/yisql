@@ -18,9 +18,6 @@
 
 package org.apache.spark.sql.jdbc
 
-import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcOptionsInWrite, JdbcUtils}
-import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SaveMode}
-
 /**
   * Created by allwefantasy on 26/4/2018.
   */

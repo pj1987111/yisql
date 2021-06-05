@@ -1,8 +1,5 @@
 package com.zhy.yisql.addon.cmd.hive
 
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
-
 import com.zhy.yisql.addon.cmd.hive.ByteUnit._
 import com.zhy.yisql.common.utils.log.Logging
 import org.apache.commons.lang3.StringUtils
@@ -16,6 +13,8 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.catalog.CatalogTable
 import org.apache.spark.sql.{DataFrameWriter, Row, SparkSession}
 
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import scala.collection.parallel.ForkJoinTaskSupport

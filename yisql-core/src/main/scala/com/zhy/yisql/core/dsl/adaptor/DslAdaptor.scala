@@ -87,10 +87,6 @@ trait DslTool {
 
     }
 
-//    def withPathPrefix(context: MLSQLExecuteContext, path: String): String = {
-//        withPathPrefix(context.home, path)
-//    }
-
     def parseDBAndTableFromStr(str: String) = {
         val cleanedStr = cleanStr(str)
         val dbAndTable = cleanedStr.split("\\.")

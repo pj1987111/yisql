@@ -1,15 +1,13 @@
 package com.zhy.yisql.core.util
 
-import java.io.{BufferedReader, ByteArrayOutputStream, File, InputStream, InputStreamReader}
-
 import com.zhy.yisql.common.utils.hash.HashUtils
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, Path}
+import org.apache.hadoop.fs._
 import org.apache.hadoop.io.IOUtils
 import org.apache.spark.SparkUtils
-import org.apache.spark.deploy.SparkHadoopUtil
 
+import java.io.{FileSystem => _, _}
 import scala.collection.mutable.ArrayBuffer
 
 /**

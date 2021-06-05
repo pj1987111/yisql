@@ -51,7 +51,7 @@ class BatchTest extends BaseTest {
           |
           |--save append select_out
           |--as kafka.`zhy1`
-          |--`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+          |--`kafka.bootstrap.servers`="127.0.0.1:9092"
           |
             """.stripMargin
 
@@ -134,7 +134,7 @@ class BatchTest extends BaseTest {
           |
           |save append data1
           |as kafka.`g1`
-          |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+          |`kafka.bootstrap.servers`="127.0.0.1:9092"
           |and `etl.sql`="${targetSql}";
         """.stripMargin
 
@@ -143,14 +143,33 @@ class BatchTest extends BaseTest {
       */
     val kafkaReadTest =
         """
-          |load kafka.`zhy` where
-          |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+          |load kafka.`g1` where
+          |kafka.bootstrap.servers="127.0.0.1:9092"
           |and multiplyFactor="2"
           |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
           |as table1;
           |
-          |save append table1
-          |as console.``;
+          |--save append table1
+          |--as console.``;
+        """.stripMargin
+
+    val kafka2MysqlTest =
+        """
+          |load kafka.`g1` where
+          |kafka.bootstrap.servers="127.0.0.1:9092"
+          |and multiplyFactor="2"
+          |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
+          |and `containRaw`="false"
+          |as table2;
+          |
+          |set user="root";
+          |set password="root";
+          |
+          |save append table2 as jdbc.`z1` where
+          |url="jdbc:mysql://127.0.0.1:3306/zhy?useSSL=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false"
+          |and driver="com.mysql.jdbc.Driver"
+          |and user="${user}"
+          |and password="${password}";
         """.stripMargin
 
     /**
@@ -159,13 +178,13 @@ class BatchTest extends BaseTest {
     val kafkaAdhocTest =
         """
           |load adHocKafka.`zhy` where
-          |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+          |kafka.bootstrap.servers="127.0.0.1:9092"
           |and multiplyFactor="2"
           |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
           |as table1;
           |
           |load adHocKafka.`zhy` where
-          |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+          |kafka.bootstrap.servers="127.0.0.1:9092"
           |and multiplyFactor="2"
           |and timeFormat="yyyyMMdd"
           |and startingTime="20210212"
@@ -184,7 +203,7 @@ class BatchTest extends BaseTest {
           |--kafka数据重新插入，指定时间范围
           |--save append output
           |--as kafka.`zhy1`
-          |--`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092";
+          |--`kafka.bootstrap.servers`="127.0.0.1:9092";
           |
         """.stripMargin
 
@@ -194,7 +213,7 @@ class BatchTest extends BaseTest {
     val es2mysqlTest =
         """
           |set user="root";
-          |set password="123456";
+          |set password="root";
           |
           |load es.`zhy/z1` where
           |and es.nodes="cdh173"
@@ -447,6 +466,11 @@ class BatchTest extends BaseTest {
     @Test
     def json2Kafka(): Unit = {
         sqlParseInner(json2KafkaTest)
+    }
+
+    @Test
+    def kafka2Mysql(): Unit = {
+        sqlParseInner(kafka2MysqlTest)
     }
 
     @Test

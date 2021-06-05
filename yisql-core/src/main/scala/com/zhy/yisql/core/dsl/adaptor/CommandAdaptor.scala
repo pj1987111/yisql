@@ -1,10 +1,10 @@
 package com.zhy.yisql.core.dsl.adaptor
 
+import com.zhy.yisql.common.utils.base.Templates
 import com.zhy.yisql.core.dsl.processor.CmdParserListener
 import com.zhy.yisql.core.dsl.template.TemplateMerge
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser.{CommandValueContext, RawCommandValueContext, SqlContext}
-import tech.mlsql.common.utils.base.Templates
 
 import scala.collection.mutable.ArrayBuffer
 

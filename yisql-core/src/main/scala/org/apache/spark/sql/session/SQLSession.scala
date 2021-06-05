@@ -18,8 +18,8 @@
 
 package org.apache.spark.sql.session
 
+import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.SparkSession
-import tech.mlsql.common.utils.log.Logging
 
 import scala.collection.mutable.{HashSet => MHSet}
 

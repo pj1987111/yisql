@@ -1,8 +1,5 @@
 package com.zhy.yisql.core.job
 
-import java.util.UUID
-import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
-
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.core.execute.SQLExecuteContext
 import com.zhy.yisql.core.job.listener.JobListener
@@ -10,6 +7,8 @@ import com.zhy.yisql.core.job.listener.JobListener.{JobFinishedEvent, JobStarted
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.session.{SessionIdentifier, SparkSessionCacheManager}
 
+import java.util.UUID
+import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
@@ -170,11 +169,6 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
         logInfo("JobManager Timer cancel job group " + groupId)
         val job = groupIdJobInfo.get(groupId)
 
-        // when we try to kill stream job, we do not need to remove it from  groupIdToMLSQLJobInfo here.
-        // This is because once we kill the stream job successfully,
-        // then the MLSQLExternalStreamListener.onQueryTerminated will be invoked and remove it from  groupIdToMLSQLJobInfo.
-        // If we now remove it from JobManager.groupIdToMLSQLJobInfo, and finally the stream job is not killed, then
-        // the state of JobManager.groupIdToMLSQLJobInfo is not consistent with spark streams.
         def killStreamJob = {
             spark.streams.active.filter(f => f.id.toString == job.groupId).map(f => f.runId.toString).headOption match {
                 case Some(_) =>

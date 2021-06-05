@@ -1,7 +1,6 @@
 package other.python.py4j.p2j.stack;
 
 import py4j.GatewayServer;
-import com.zhy.yisql.common.utils.http.HttpClientCrawler;
 
 /**
  *  \* Created with IntelliJ IDEA.

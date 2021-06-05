@@ -2,8 +2,8 @@ package com.zhy.yisql.other
 
 import com.zhy.yisql.common.utils.bean.BeanUtils
 import com.zhy.yisql.common.utils.json.JSONTool
-import org.junit.Test
 import com.zhy.yisql.rest.entity.SQLRunEntity
+import org.junit.Test
 
 /**
   *  \* Created with IntelliJ IDEA.

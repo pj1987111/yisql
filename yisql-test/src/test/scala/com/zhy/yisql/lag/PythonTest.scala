@@ -40,7 +40,7 @@ class PythonTest extends BaseTest {
       |
       |load jsonStr.`rawText` as orginal_text_corpus;
       |
-      |!python conf "python.bin.path=/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ";
+      |!python env "PYTHON_ENV=source activate taihao-python3";
       |!python conf "schema=st(field(content,string))";
       |
       |!python on orginal_text_corpus '''
@@ -85,7 +85,7 @@ class PythonTest extends BaseTest {
       |
       |load jsonStr.`rawText` as orginal_text_corpus;
       |
-      |!python conf "python.bin.path=/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ";
+      |!python env "PYTHON_ENV=source activate taihao-python3";
       |!python conf "schema=st(field(con1,double),field(con2,long))";
       |
       |!python on orginal_text_corpus '''

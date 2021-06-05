@@ -1,7 +1,5 @@
 package org.apache.spark.sql
 
-import java.lang.reflect.Type
-
 import org.apache.spark.sql.catalyst.JavaTypeInference
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.command.ExplainCommand
@@ -9,6 +7,8 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.types.DataType
 import org.apache.spark.status.api.v1
 import org.apache.spark.util.Utils
+
+import java.lang.reflect.Type
 
 /**
   *  \* Created with IntelliJ IDEA.

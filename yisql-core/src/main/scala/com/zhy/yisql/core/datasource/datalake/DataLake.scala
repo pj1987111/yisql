@@ -1,9 +1,9 @@
 package com.zhy.yisql.core.datasource.datalake
 
+import com.zhy.yisql.common.utils.path.PathFun
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.SparkSession
-import tech.mlsql.common.utils.path.PathFun
 
 /**
   * 2019-08-31 WilliamZhu(allwefantasy@gmail.com)
@@ -14,7 +14,7 @@ class DataLake(sparkSession: SparkSession) {
 
     def appName = sparkSession.sparkContext.appName
 
-    def buildInDBs = Set("__mlsql__", "__tmp__")
+    def buildInDBs = Set("__yisql__", "__tmp__")
 
     def isEnable = sparkSession.sessionState.conf.contains(DataLake.SPARK_DL_PATH)
 

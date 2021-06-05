@@ -1,16 +1,15 @@
 package other.python.pyjava
 
-import java.util
-
 import com.zhy.yisql.common.utils.reflect.ScalaMethodMacros.str
 import org.apache.spark.TaskContext
-import org.apache.spark.sql.{SparkSession, SparkUtils}
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
+import org.apache.spark.sql.{SparkSession, SparkUtils}
 import org.junit.{Before, Test}
 import tech.mlsql.arrow.python.ispark._
 import tech.mlsql.arrow.python.runner.{ArrowPythonRunner, ChainedPythonFunctions, PythonConf, PythonFunction}
 
+import java.util
 import scala.collection.JavaConverters._
 
 /**

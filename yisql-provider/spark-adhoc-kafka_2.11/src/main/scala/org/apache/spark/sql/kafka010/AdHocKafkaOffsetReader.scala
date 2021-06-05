@@ -1,12 +1,11 @@
 package org.apache.spark.sql.kafka010
 
-import java.{util => ju}
-
 import org.apache.kafka.common.TopicPartition
 import org.apache.spark.util.{ThreadUtils, UninterruptibleThread}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
+import java.{util => ju}
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration

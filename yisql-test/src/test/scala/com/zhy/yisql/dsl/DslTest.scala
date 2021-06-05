@@ -1,7 +1,7 @@
 package com.zhy.yisql.dsl
 
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
-import com.zhy.yisql.core.execute.{PathPrefix, SQLExecuteContext}
+import com.zhy.yisql.core.execute.SQLExecuteContext
 import org.apache.spark.sql.SparkSession
 import org.junit.{Before, Test}
 

@@ -2,11 +2,6 @@ package org.apache.spark
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.zhy.yisql.common.utils.reflect.ScalaReflect
-import org.apache.spark.scheduler.cluster.{CoarseGrainedSchedulerBackend, StandaloneSchedulerBackend}
-import org.apache.spark.scheduler.local.LocalSchedulerBackend
-import org.apache.spark.sql.SparkSession
-
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou

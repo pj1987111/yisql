@@ -1,7 +1,5 @@
 package com.zhy.yisql.core.dsl.processor
 
-import java.util.concurrent.atomic.AtomicReference
-
 import com.zhy.yisql.core.dsl.adaptor._
 import com.zhy.yisql.core.execute.{BranchContext, BranchContextHolder, PathPrefix}
 import com.zhy.yisql.core.job.JobProgressListener
@@ -10,6 +8,7 @@ import com.zhy.yisql.dsl.parser.{DSLSQLBaseListener, DSLSQLLexer}
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.spark.sql.SparkSession
 
+import java.util.concurrent.atomic.AtomicReference
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 

@@ -1,10 +1,9 @@
 package com.zhy.yisql.addon.cmd.python
 
-import java.util
-
 import com.zhy.yisql.common.utils.reflect.ScalaMethodMacros
 import com.zhy.yisql.core.execute.SQLExecuteContext
 import com.zhy.yisql.core.session.SetSession
+import com.zhy.yisql.core.util.SparkSimpleSchemaParser
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
@@ -12,8 +11,8 @@ import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.{Dataset, Row, SparkSession, SparkUtils}
 import tech.mlsql.arrow.python.ispark.SparkContextImp
 import tech.mlsql.arrow.python.runner.{ArrowPythonRunner, ChainedPythonFunctions, PythonConf, PythonFunction}
-import tech.mlsql.schema.parser.SparkSimpleSchemaParser
 
+import java.util
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -52,7 +51,7 @@ object PythonExecutor {
   private def recognizeError(e: Exception) = {
     val buffer = ArrayBuffer[String]()
     //    LogUtils.format_full_exception(buffer, e, true)
-    val typeError = buffer.filter(f => f.contains("Previous exception in task: null")).filter(_.contains("org.apache.spark.sql.vectorized.ArrowColumnVector$ArrowVectorAccessor")).size > 0
+    val typeError = buffer.filter(f => f.contains("Previous exception in task: null")).exists(_.contains("org.apache.spark.sql.vectorized.ArrowColumnVector$ArrowVectorAccessor"))
     if (typeError) {
       throw new RuntimeException(
         """

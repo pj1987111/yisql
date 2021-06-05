@@ -1,14 +1,13 @@
 package org.apache.spark.sql.execution.streaming.sources
 
-import java.io.DataOutputStream
-import java.net.Socket
-
 import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.execution.streaming.Sink
-import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, RelationProvider, StreamSinkProvider}
+import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, StreamSinkProvider}
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
+import java.io.DataOutputStream
+import java.net.Socket
 import scala.collection.JavaConverters._
 /**
   *  \* Created with IntelliJ IDEA.

@@ -1,12 +1,12 @@
 package com.zhy.yisql.addon.cmd
 
 import com.alibaba.fastjson.JSON
+import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.core.cmds.SQLCmd
 import com.zhy.yisql.core.util.SparkSchemaJsonParser
 import org.apache.spark.sql.execution.datasources.json.JsonInferSchema
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String
-import tech.mlsql.common.utils.serder.json.JSONTool
 
 import scala.collection.JavaConversions._
 

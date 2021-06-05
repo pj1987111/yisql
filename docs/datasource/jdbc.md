@@ -181,7 +181,7 @@ set streamName="kafka2ck"; 这里直接使用了load语法，如果后面还有�
 set streamName="kafka2ck";
 set sourceSchema="st(field(name,string),field(city,string),field(age,integer))";
 load kafka.`zhy` options
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `enable.auto.commit`="true"
 and `group.id`="zhy1234"
 and `auto.offset.reset`="latest"
@@ -203,7 +203,7 @@ and duration="10";
         "jobContent":"set streamName="kafka2ck";
 set sourceSchema="st(field(name,string),field(city,string),field(age,integer))";
 load kafka.`zhy` options
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `enable.auto.commit`="true"
 and `group.id`="zhy1234"
 and `auto.offset.reset`="latest"
@@ -248,7 +248,7 @@ load jsonStr.`jstr` as data1;
 
 save append data1
 as kafka.`zhy`
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `etl.sql`="${targetSql}";
 ```
 

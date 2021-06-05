@@ -1,11 +1,5 @@
 package com.zhy.yisql.addon.cmd.hive
 
-import java.lang.reflect.Field
-import java.sql.Timestamp
-import java.util
-import java.util.List
-import java.util.concurrent.TimeUnit
-
 import com.google.common.primitives.{Ints, Longs}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
@@ -16,8 +10,13 @@ import org.apache.parquet.io.api.Binary
 import org.apache.parquet.schema.{GroupType, PrimitiveType}
 import org.apache.spark.sql.Row
 
-import scala.collection.mutable.Map
+import java.lang.reflect.Field
+import java.sql.Timestamp
+import java.util
+import java.util.List
+import java.util.concurrent.TimeUnit
 import scala.collection.JavaConversions._
+import scala.collection.mutable.Map
 
 /**
   *  \* Created with IntelliJ IDEA.

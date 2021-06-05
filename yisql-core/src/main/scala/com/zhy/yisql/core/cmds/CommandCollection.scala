@@ -88,7 +88,7 @@ object CommandCollection {
 
     // !callback post http://127.0.0.1:9002/jack when "started,progress,terminated"
     context.addEnv("callback",
-      """ run command as  MLSQLEventCommand.`` where
+      """ run command as  EventCommand.`` where
         |      eventName="{3}"
         |      and handleHttpUrl="{1}"
         |      and method="{0}" """.stripMargin)

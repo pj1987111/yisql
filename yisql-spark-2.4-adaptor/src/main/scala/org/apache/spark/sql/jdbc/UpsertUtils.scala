@@ -22,13 +22,12 @@ package org.apache.spark.sql.jdbc
   * Created by allwefantasy on 26/4/2018.
   */
 
-import java.sql.{BatchUpdateException, Connection, PreparedStatement}
-
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcUtils}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 
+import java.sql.{Connection, PreparedStatement}
 import scala.util.control.NonFatal
 
 object UpsertUtils extends Logging {

@@ -16,7 +16,7 @@ class StreamTest extends BaseTest {
       |set streamName="zhy1";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy1234"
       |and `failOnDataLoss`="false"
@@ -35,7 +35,7 @@ class StreamTest extends BaseTest {
       |set streamName="zhy1";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy123"
       |and `auto.offset.reset`="latest"
@@ -43,7 +43,7 @@ class StreamTest extends BaseTest {
       |
       |save append kafka_post_kafka
       |as kafka.`zhy1`
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and checkpointLocation="/tmp/cpl-testkafkaconsole1"
       |and duration="10"
     """.stripMargin
@@ -52,24 +52,24 @@ class StreamTest extends BaseTest {
     """
       |set streamName="zhy1";
       |set user="root";
-      |set password="123456";
+      |set password="root";
       |
-      |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |load kafka.`g1` options
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy123"
       |and `auto.offset.reset`="latest"
-      |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer),field(age,integer))"
+      |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
       |and `containRaw`="false"
-      |as kafka_post_kafka;
+      |as kafka_post_kafka1;
       |
-      |save append kafka_post_kafka as jdbc.`z1` where
-      |url="jdbc:mysql://10.57.30.217:3306/zhy?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false"
+      |save append kafka_post_kafka1 as jdbc.`z1` where
+      |url="jdbc:mysql://127.0.0.1:3306/zhy?useSSL=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false"
       |and driver="com.mysql.jdbc.Driver"
       |and user="${user}"
       |and password="${password}"
       |--and checkpointLocation="/tmp/cpl-testkafkaconsole2"
-      |and duration="10"
+      |and duration="10";
     """.stripMargin
 
   val kafka2ElasticTest =
@@ -79,7 +79,7 @@ class StreamTest extends BaseTest {
       |set targetSql="select * from kafka_post_kafka where age>=25";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy1234"
       |and `auto.offset.reset`="latest"
@@ -115,7 +115,7 @@ class StreamTest extends BaseTest {
       |!python conf "schema=st(field(id,string),field(name,string),field(message,string),field(date,string))";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy1234"
       |and `auto.offset.reset`="latest"
@@ -138,7 +138,7 @@ class StreamTest extends BaseTest {
       |set targetSql="select * from kafka_post_kafka";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy123"
       |and `auto.offset.reset`="latest"
@@ -161,7 +161,7 @@ class StreamTest extends BaseTest {
       |set targetSql="select * from kafka_post_kafka where age<=25";
       |
       |load kafka.`zhy` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="zhy123"
       |and `auto.offset.reset`="latest"
@@ -195,7 +195,7 @@ class StreamTest extends BaseTest {
       |set streamName="zhy1";
       |
       |load kafka.`g1` options
-      |`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+      |`kafka.bootstrap.servers`="127.0.0.1:9092"
       |and `enable.auto.commit`="true"
       |and `group.id`="newG1"
       |and `auto.offset.reset`="latest"

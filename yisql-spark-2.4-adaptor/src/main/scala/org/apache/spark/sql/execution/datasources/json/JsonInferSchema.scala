@@ -1,8 +1,5 @@
 package org.apache.spark.sql.execution.datasources.json
 
-import java.io.CharArrayWriter
-import java.util.Comparator
-
 import com.fasterxml.jackson.core._
 import org.apache.spark.sql.catalyst.analysis.TypeCoercion
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
@@ -15,6 +12,9 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.Utils
+
+import java.io.CharArrayWriter
+import java.util.Comparator
 
 object JsonInferSchema {
 

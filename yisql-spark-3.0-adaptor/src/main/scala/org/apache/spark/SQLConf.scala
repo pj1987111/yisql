@@ -1,10 +1,7 @@
 package org.apache.spark
 
-import java.util.{HashMap, Map => JMap}
 import java.util.concurrent.TimeUnit
-
-import org.apache.spark.internal.config.{ConfigBuilder, ConfigEntry, ConfigProvider, ConfigReader}
-
+import java.util.{HashMap, Map => JMap}
 import scala.collection.JavaConverters._
 
 /**
@@ -47,7 +44,7 @@ object SQLConf {
             .doc("the same with spark master").stringConf.createOptional
 
     val SQL_NAME: ConfigEntry[String] = SQLConfigBuilder("streaming.name")
-            .doc("The name will showed in yarn cluster and spark ui").stringConf.createWithDefault("mlsql")
+            .doc("The name will showed in yarn cluster and spark ui").stringConf.createWithDefault("yisql")
 
     val SQL_BIGDL_ENABLE: ConfigEntry[Boolean] = SQLConfigBuilder("streaming.bigdl.enable")
             .doc(
@@ -63,7 +60,7 @@ object SQLConf {
 
     val SQL_CLUSTER_PS_ENABLE: ConfigEntry[Boolean] = SQLConfigBuilder("streaming.ps.cluster.enable").doc(
         """
-          |MLSQL supports directly communicating with executor if you set this true.
+          |YISQL supports directly communicating with executor if you set this true.
         """.stripMargin).booleanConf.createWithDefault(true)
 
     val SQL_CLUSTER_PS_DRIVER_PORT: ConfigEntry[Int] = SQLConfigBuilder("spark.ps.cluster.driver.port").doc(
@@ -109,12 +106,12 @@ object SQLConf {
 
     val SQL_DEPLOY_REST_API = SQLConfigBuilder("streaming.deploy.rest.api").doc(
         """
-          |If you deploy MLSQL as predict service, please enable this.
+          |If you deploy as predict service, please enable this.
         """.stripMargin).booleanConf.createWithDefault(false)
 
     val SQL_SPARK_SERVICE = SQLConfigBuilder("streaming.spark.service").doc(
         """
-          |Run MLSQL as service and without quit.
+          |Run as service and without quit.
         """.stripMargin).booleanConf.createWithDefault(false)
 
 
@@ -129,46 +126,46 @@ object SQLConf {
         """.stripMargin).stringConf.createOptional
 
     val SESSION_IDLE_TIMEOUT: ConfigEntry[Long] =
-        SQLConfigBuilder("spark.mlsql.session.idle.timeout")
+        SQLConfigBuilder("spark.yisql.session.idle.timeout")
                 .doc("SparkSession timeout")
                 .timeConf(TimeUnit.MILLISECONDS)
                 .createWithDefault(TimeUnit.MINUTES.toMillis(30L))
 
     val SESSION_CHECK_INTERVAL: ConfigEntry[Long] =
-        SQLConfigBuilder("spark.mlsql.session.check.interval")
+        SQLConfigBuilder("spark.yisql.session.check.interval")
                 .doc("The check interval for backend session a.k.a SparkSession timeout")
                 .timeConf(TimeUnit.MILLISECONDS)
                 .createWithDefault(TimeUnit.MINUTES.toMillis(5L))
 
     val BIND_HOST: ConfigEntry[String] =
-        SQLConfigBuilder("spark.mlsql.bind.host")
+        SQLConfigBuilder("spark.yisql.bind.host")
                 .doc("Bind host on which to run.")
                 .stringConf
                 .createWithDefault(SQLSparkConst.localHostName())
 
     val SESSION_WAIT_OTHER_TIMES: ConfigEntry[Int] =
-        SQLConfigBuilder("spark.mlsql.session.wait.other.times")
+        SQLConfigBuilder("spark.yisql.session.wait.other.times")
                 .doc("How many times to check when another session with the same user is initializing " +
                         "SparkContext. Total Time will be times by " +
-                        "`spark.mlsql.session.wait.other.interval`")
+                        "`spark.yisql.session.wait.other.interval`")
                 .intConf
                 .createWithDefault(60)
 
     val SESSION_WAIT_OTHER_INTERVAL: ConfigEntry[Long] =
-        SQLConfigBuilder("spark.mlsql.session.wait.other.interval")
+        SQLConfigBuilder("spark.yisql.session.wait.other.interval")
                 .doc("The interval for checking whether other thread with the same user has completed" +
                         " SparkContext instantiation.")
                 .timeConf(TimeUnit.MILLISECONDS)
                 .createWithDefault(TimeUnit.SECONDS.toMillis(1L))
 
     val SESSTION_INIT_TIMEOUT: ConfigEntry[Long] =
-        SQLConfigBuilder("spark.mlsql.session.init.timeout")
+        SQLConfigBuilder("spark.yisql.session.init.timeout")
                 .doc("How long we suggest the server to give up instantiating SparkContext")
                 .timeConf(TimeUnit.SECONDS)
                 .createWithDefault(TimeUnit.SECONDS.toSeconds(60L))
 
     val ENABLE_MAX_RESULT_SIZE: ConfigEntry[Boolean] =
-        SQLConfigBuilder("spark.mlsql.enable.max.result.limit")
+        SQLConfigBuilder("spark.yisql.enable.max.result.limit")
                 .doc("enable restful max result size limitation. when you enable this configuration." +
                         " you should pass `maxResultSize` for your rest request." +
                         " if not, you take only max 1000 record.")
@@ -176,7 +173,7 @@ object SQLConf {
                 .createWithDefault(false)
 
     val RESTFUL_API_MAX_RESULT_SIZE: ConfigEntry[Long] =
-        SQLConfigBuilder("spark.mlsql.restful.api.max.result.size")
+        SQLConfigBuilder("spark.yisql.restful.api.max.result.size")
                 .doc("the max size of restful api result.")
                 .longConf
                 .createWithDefault(1000)

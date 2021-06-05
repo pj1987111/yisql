@@ -2,12 +2,6 @@ package org.apache.spark.sql.kafka010
 
 import java.util.{Locale, UUID}
 
-import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.common.serialization.ByteArrayDeserializer
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
-import org.apache.spark.util.UninterruptibleThread
-
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou

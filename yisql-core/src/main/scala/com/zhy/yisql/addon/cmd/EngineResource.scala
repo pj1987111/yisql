@@ -22,7 +22,6 @@ class EngineResource extends SQLCmd {
     val resourceControl = new SparkDynamicControlExecutors(spark)
 
     def isLocalMaster(conf: SparkConf): Boolean = {
-      //      val master = MLSQLConf.MLSQL_MASTER.readFrom(configReader).getOrElse("")
       val master = conf.get("spark.master", "")
       master == "local" || master.startsWith("local[")
     }

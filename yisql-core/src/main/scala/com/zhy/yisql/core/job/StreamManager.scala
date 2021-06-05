@@ -106,7 +106,7 @@ class YiSQLStreamingQueryListener extends StreamingQueryListener with Logging {
                     JobManager.addJobManually(job._2.copy(groupId = id))
                 }
             case None =>
-                // we only care when stream is restore from ck without MLSQL instance restart
+                // we only care when stream is restore from ck without instance restart
                 // restore from  StreamManager.store
                 StreamManager.getJob(id) match {
                     case Some(job) =>

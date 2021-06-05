@@ -1,6 +1,6 @@
 package org.apache.spark
 
-import org.apache.spark.sql.{SparkSession, SQLUtils}
+import org.apache.spark.sql.{SQLUtils, SparkSession}
 import org.apache.spark.status.api.v1
 
 import scala.collection.mutable.{Buffer, ListBuffer}
@@ -161,7 +161,7 @@ class SQLResource (spark: SparkSession, owner: String, getGroupId: String => Str
             }
         }
 
-        val mlsqlActiveJobs = activeJobs.map { f =>
+        val yisqlActiveJobs = activeJobs.map { f =>
 
             val (activeStages, completedStages, failedStages) = fetchStageByJob(f)
 
@@ -183,7 +183,7 @@ class SQLResource (spark: SparkSession, owner: String, getGroupId: String => Str
             )
         }
         SQLScriptJobGroup(
-            jobGroupId, activeJobs.size, completedJobs.size, failedJobs.size, mlsqlActiveJobs
+            jobGroupId, activeJobs.size, completedJobs.size, failedJobs.size, yisqlActiveJobs
         )
     }
 }

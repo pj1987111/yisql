@@ -3,19 +3,6 @@ package org.apache.spark.sql.execution.datasources.json
 import java.io.CharArrayWriter
 import java.util.Comparator
 
-import com.fasterxml.jackson.core._
-import org.apache.spark.sql.catalyst.analysis.TypeCoercion
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.catalyst.json.JacksonUtils.nextUntil
-import org.apache.spark.sql.catalyst.json.{CreateJacksonParser, JSONOptions, JacksonGenerator, JacksonParser}
-import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
-import org.apache.spark.sql.catalyst.util.{DropMalformedMode, FailFastMode, ParseMode, PermissiveMode}
-import org.apache.spark.sql.catalyst.util._
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-import org.apache.spark.unsafe.types.UTF8String
-import org.apache.spark.util.Utils
-
 object JsonInferSchema {
 
     def inferJson(json: Seq[UTF8String], sparkSession: SparkSession) = {
@@ -155,7 +142,6 @@ object JsonInferSchema {
       * Infer the type of a json document from the parser's token stream
       */
     private def inferField(parser: JsonParser, configOptions: JSONOptions): DataType = {
-        import com.fasterxml.jackson.core.JsonToken._
         parser.getCurrentToken match {
             case null | VALUE_NULL => NullType
 
@@ -203,7 +189,7 @@ object JsonInferSchema {
             case (VALUE_TRUE | VALUE_FALSE) if configOptions.primitivesAsString => StringType
 
             case VALUE_NUMBER_INT | VALUE_NUMBER_FLOAT =>
-                import JsonParser.NumberType._
+
                 parser.getNumberType match {
                     // For Integer values, use LongType by default.
                     case INT | LONG => LongType

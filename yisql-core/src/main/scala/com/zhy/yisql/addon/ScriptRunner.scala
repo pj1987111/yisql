@@ -1,10 +1,10 @@
 package com.zhy.yisql.addon
 
-import java.util.concurrent.{Callable, Executors}
-
 import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
 import com.zhy.yisql.core.job.{JobManager, JobType, SQLJobInfo}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+
+import java.util.concurrent.{Callable, Executors}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -100,7 +100,7 @@ object ScriptRunner {
       * """
       * |
       * """.stripMargin
-      * val jobInfo = JobManager.getJobInfo(context.owner, MLSQLJobType.SCRIPT, "", code, timeout)
+      * val jobInfo = JobManager.getJobInfo(context.owner, JobType.SCRIPT, "", code, timeout)
       *         ScriptRunner.runJob(code, jobInfo, (df) => {
       *
       * })

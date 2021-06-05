@@ -1,12 +1,13 @@
 package com.zhy.yisql.core.datasource.impl
 
-import java.util.Properties
-
 import com.zhy.yisql.common.utils.reflect.ScalaReflect
 import com.zhy.yisql.core.datasource._
+import org.apache.spark.sql._
 import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
-import org.apache.spark.sql._
+
+import java.util.Properties
+import scala.language.reflectiveCalls
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -20,7 +21,7 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
   def forceUseFormat: String = ""
 
   def useFormat(config: Map[String, String]): String = {
-    val format = if(forceUseFormat.length>0) {
+    val format = if(forceUseFormat.nonEmpty) {
       forceUseFormat
     } else {
       config.getOrElse("implClass", fullFormat)
@@ -29,12 +30,12 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
   }
 
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-    var dbtable = config.path
+    val dbtable = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.
     val format = useFormat(config.config)
-    var url = config.config.get("url")
+    val url = config.config.get("url")
     reader.options(config.config)
 
     val table = if (config.config.contains("query")) {
@@ -55,7 +56,7 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
     val columns = table.columns
     val colNames = new Array[String](columns.length)
     for (i <- columns.indices) {
-      val (dbtable, column) = parseTableAndColumnFromStr(columns(i))
+      val (_, column) = parseTableAndColumnFromStr(columns(i))
       colNames(i) = column
     }
     val newdf = table.toDF(colNames: _*)
@@ -63,7 +64,7 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
   }
 
   override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-    var dbtable = config.path
+    val dbtable = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.

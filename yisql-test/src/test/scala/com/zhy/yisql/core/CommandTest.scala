@@ -1,6 +1,5 @@
 package com.zhy.yisql.core
 
-import com.zhy.yisql.core.execute.SQLExecute
 import org.junit.Test
 
 /**
@@ -30,13 +29,13 @@ class CommandTest extends BaseTest {
           |--!kafka streamOffset /tmp/s-cpl6;
           |
           |--采样数据推测类型，并存储环境变量
-          |--!kafka registerSchema 2 "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092" zhy;
+          |--!kafka registerSchema 2 "127.0.0.1:9092" zhy;
           |
           |--采样数据推测类型
-          |!kafka schemaInfer 20 "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092" zhy;
+          |!kafka schemaInfer 20 "127.0.0.1:9092" zhy;
           |
           |--采样数据
-          |--!kafka sampleData 20 "10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092" zhy;
+          |--!kafka sampleData 20 "127.0.0.1:9092" zhy;
         """.stripMargin
 
     val listJobsTest =
@@ -51,7 +50,7 @@ class CommandTest extends BaseTest {
 
     val killJobTest =
         """
-          |!kill zhy1;
+          |!kill job zhy1;
         """.stripMargin
 
     val hdfsCommandTest =

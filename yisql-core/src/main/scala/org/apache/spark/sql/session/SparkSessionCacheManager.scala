@@ -1,12 +1,11 @@
 package org.apache.spark.sql.session
 
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
-
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.SparkSession
 
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
 import scala.collection.JavaConverters._
 
 /**

@@ -1,12 +1,11 @@
 package org.apache.spark
 
-import java.io.File
-
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.util.{ShutdownHookManager, Utils, VersionUtils}
 import org.slf4j.Logger
 
+import java.io.File
 import scala.util.matching.Regex
 
 /**

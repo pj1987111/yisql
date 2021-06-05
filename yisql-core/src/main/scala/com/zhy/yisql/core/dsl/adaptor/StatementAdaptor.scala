@@ -1,8 +1,10 @@
 package com.zhy.yisql.core.dsl.adaptor
 
+import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.core.dsl.processor.CmdParserListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser
-import tech.mlsql.common.utils.serder.json.JSONTool
+
+import scala.language.reflectiveCalls
 
 /**
   * 2019-04-11 WilliamZhu(allwefantasy@gmail.com)
@@ -47,7 +49,7 @@ class StatementAdaptor(cmdParserListener: CmdParserListener, f: String => Unit) 
       case _ => throw new RuntimeException(s"Unknow statement:${PREFIX} ${ctx.getText}")
     }
     cmdParserListener.addSingleStatement(statement)
-    f(statement.unwrap.asInstanceOf[ {def raw(): String}].raw)
+    f(statement.unwrap.asInstanceOf[ {def raw(): String}].raw())
   }
 }
 

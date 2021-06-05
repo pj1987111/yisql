@@ -2,13 +2,10 @@ package com.zhy.yisql.rest
 
 import com.zhy.yisql.common.utils.http.HttpClientCrawler
 import com.zhy.yisql.common.utils.json.JSONTool
-import org.apache.commons.httpclient.{HttpClient, HttpStatus}
-import org.apache.http.client.entity.UrlEncodedFormEntity
+import org.apache.commons.httpclient.HttpStatus
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.{ContentType, StringEntity}
-import org.apache.http.entity.mime.MultipartEntity
-import org.apache.http.entity.mime.content.StringBody
-import org.apache.http.impl.client.{DefaultHttpClient, HttpClients}
+import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.junit.Test
 
@@ -26,7 +23,7 @@ class SqlRunTest {
         params += ("sql" ->
                 """
                   |load kafka.`zhy` where
-                  |kafka.bootstrap.servers="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+                  |kafka.bootstrap.servers="127.0.0.1:9092"
                   |and multiplyFactor="2"
                   |and `valueSchema`="st(field(id,string),field(name,string),field(message,string),field(date,string),field(version,integer))"
                   |as table1;

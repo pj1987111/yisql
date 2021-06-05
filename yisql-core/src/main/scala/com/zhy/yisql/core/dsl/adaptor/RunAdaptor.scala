@@ -1,11 +1,11 @@
 package com.zhy.yisql.core.dsl.adaptor
 
-import java.util.UUID
-
 import com.zhy.yisql.core.cmds.{CmdRegister, SQLCmd}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.dsl.template.TemplateMerge
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
+
+import java.util.UUID
 
 /**
   *  \* Created with IntelliJ IDEA.

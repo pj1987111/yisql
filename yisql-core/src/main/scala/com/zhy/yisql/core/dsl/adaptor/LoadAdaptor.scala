@@ -7,6 +7,8 @@ import com.zhy.yisql.dsl.parser.DSLSQLParser._
 import org.apache.spark.sql.streaming.DataStreamReader
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
+import scala.language.reflectiveCalls
+
 /**
   *  \* Created with IntelliJ IDEA.
   *  \* User: hongyi.zhou
@@ -28,13 +30,13 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
           format = aliasV._1
           option = aliasV._2
         case s: ExpressionContext =>
-          option += (cleanStr(s.qualifiedName().getText) -> evaluate(getStrOrBlockStr(s), scriptSQLExecListener.env))
+          option += (cleanStr(s.qualifiedName().getText) -> evaluate(getStrOrBlockStr(s), scriptSQLExecListener.env()))
         case s: BooleanExpressionContext =>
           option += (cleanStr(s.expression().qualifiedName().getText) -> evaluate(getStrOrBlockStr(s.expression()), scriptSQLExecListener.env))
         case s: PathContext =>
-          path = evaluate(s.getText, scriptSQLExecListener.env)
+          path = evaluate(s.getText, scriptSQLExecListener.env())
         case s: TableNameContext =>
-          tableName = evaluate(s.getText, scriptSQLExecListener.env)
+          tableName = evaluate(s.getText, scriptSQLExecListener.env())
         case _ =>
       }
     }

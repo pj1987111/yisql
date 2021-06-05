@@ -1,15 +1,11 @@
 package com.zhy.yisql.other
 
-import java.io.DataOutputStream
-import java.net.Socket
-
-import com.zhy.yisql.common.utils.bean.BeanUtils
+import com.zhy.yisql.common.utils.base.Templates
 import org.apache.commons.lang3.StringUtils
-import tech.mlsql.common.utils.base.Templates
-//import com.zhy.yisql.rest.entity.SQLRunEntity
 import org.junit.Test
 
-import org.apache.spark.util.kvstore._
+import java.io.DataOutputStream
+import java.net.Socket
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -78,7 +74,8 @@ class SimpleTest {
     val str = "run command as PythonCommand.`` where parameters='''{:all}''' as {-1:next(named,uuid())}"
     val seq = Seq("on", "orginal_text_corpus",
       "\ndata = context.fetch_once_as_rows()\ndef process(data):\n    for row in data:\n        new_row = { }\n        new_row[\"content\"] = \"---\" + row[\"content\"]+\"---\"\n        yield new_row\n\ncontext.build_result(process(data))",
-      "named", "mlsql_temp_table")
+      "named", "yisql_temp_table")
+
     val txt = Templates.evaluate(str, seq)
     println(txt)
   }

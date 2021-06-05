@@ -1,7 +1,5 @@
 package com.zhy.yisql.core.dsl.adaptor
 
-import java.util.UUID
-
 import com.zhy.yisql.core.datasource.{DataSinkConfig, DataSourceRegistry}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
@@ -11,7 +9,9 @@ import com.zhy.yisql.dsl.parser.DSLSQLParser._
 import org.apache.spark.sql._
 import org.apache.spark.sql.streaming.{DataStreamWriter, OutputMode, StreamingQuery}
 
+import java.util.UUID
 import scala.collection.mutable.ArrayBuffer
+import scala.language.reflectiveCalls
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -21,7 +21,7 @@ import scala.collection.mutable.ArrayBuffer
   *  \* Description: 
   *  \*/
 class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
-  val isStream: Boolean = isStream(scriptSQLExecListener.env)
+  val isStream: Boolean = isStream(scriptSQLExecListener.env())
 
   def analyze(ctx: SqlContext): SaveStatement = {
     var mode = if (isStream) OutputMode.Append else SaveMode.ErrorIfExists
@@ -38,9 +38,9 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
           format = aliasV._1
           option = aliasV._2
         case s: PathContext =>
-          path = evaluate(cleanStr(s.getText), scriptSQLExecListener.env)
+          path = evaluate(cleanStr(s.getText), scriptSQLExecListener.env())
         case s: TableNameContext =>
-          tableName = evaluate(s.getText, scriptSQLExecListener.env)
+          tableName = evaluate(s.getText, scriptSQLExecListener.env())
         case s: OverwriteContext =>
           mode = SaveMode.Overwrite
         case s: AppendContext =>
@@ -58,7 +58,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
         case s: ColGroupContext =>
           partitionByCol += cleanStr(s.col().identifier().getText)
         case s: ExpressionContext =>
-          option += (cleanStr(s.qualifiedName().getText) -> evaluate(getStrOrBlockStr(s), scriptSQLExecListener.env))
+          option += (cleanStr(s.qualifiedName().getText) -> evaluate(getStrOrBlockStr(s), scriptSQLExecListener.env()))
         case s: BooleanExpressionContext =>
           option += (cleanStr(s.expression().qualifiedName().getText) -> evaluate(getStrOrBlockStr(s.expression()), scriptSQLExecListener.env))
         case _ =>

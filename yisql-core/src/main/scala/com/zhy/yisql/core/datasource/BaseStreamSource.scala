@@ -1,10 +1,10 @@
 package com.zhy.yisql.core.datasource
 
-import java.util.concurrent.TimeUnit
-
 import com.zhy.yisql.core.dsl.adaptor.DslTool
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, Trigger}
 import org.apache.spark.sql.{DataFrame, Row}
+
+import java.util.concurrent.TimeUnit
 
 /**
   *  \* Created with IntelliJ IDEA.

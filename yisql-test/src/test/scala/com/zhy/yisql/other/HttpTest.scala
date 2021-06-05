@@ -1,7 +1,6 @@
 package com.zhy.yisql.other
 
 import com.zhy.yisql.common.utils.http.HttpClientCrawler
-import com.zhy.yisql.common.utils.json.JSONTool
 import org.junit.Test
 
 /**

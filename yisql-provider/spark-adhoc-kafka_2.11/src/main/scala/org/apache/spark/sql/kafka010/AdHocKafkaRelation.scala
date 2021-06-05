@@ -1,7 +1,5 @@
 package org.apache.spark.sql.kafka010
 
-import java.util.UUID
-
 import org.apache.kafka.common.TopicPartition
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
@@ -11,6 +9,8 @@ import org.apache.spark.sql.sources.{BaseRelation, TableScan}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.unsafe.types.UTF8String
+
+import java.util.UUID
 
 
 class AdHocKafkaRelation(

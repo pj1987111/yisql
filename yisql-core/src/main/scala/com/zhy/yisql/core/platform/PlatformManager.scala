@@ -1,15 +1,14 @@
 package com.zhy.yisql.core.platform
 
-import java.util
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
-import java.util.{Map => JMap}
-
 import com.zhy.yisql.common.utils.base.TryTool
 import com.zhy.yisql.common.utils.log.Logging
 import com.zhy.yisql.common.utils.param.ParamsUtil
 import com.zhy.yisql.core.platform.lifecycle.PlatformLifecycle
 import com.zhy.yisql.core.platform.runtime.{PlatformManagerListener, StreamingRuntime}
 
+import java.util
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
+import java.util.{Map => JMap}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 

@@ -21,7 +21,7 @@ class SetSession(spark: SparkSession, owner: String) {
   }
 
   def set(k: String, v: String, config: Map[String, String]) = {
-    if (envTableExists) {
+    if (envTableExists()) {
       val oldItems = spark.table(envTableName).as[SetItem].collect().toList
       val newItem = SetItem(k, v,
         Map(SetSession.__YISQL_CL__ -> SetSession.SET_STATEMENT_CL) ++ config
@@ -29,7 +29,7 @@ class SetSession(spark: SparkSession, owner: String) {
       val newItems = oldItems.filterNot { oldItem =>
         isTheSame(oldItem, newItem)
       } ++ List(newItem)
-      spark.createDataset[SetItem](newItems.toSeq).
+      spark.createDataset[SetItem](newItems).
           createOrReplaceTempView(envTableName)
     } else {
       spark.createDataset[SetItem](Seq(SetItem(k, v, config))).

@@ -12,7 +12,7 @@ nc -l 6049
 set streamName="zhy1";
 
 load kafka.`g1` options
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `enable.auto.commit`="true"
 and `group.id`="newG1"
 and `auto.offset.reset`="latest"
@@ -50,7 +50,7 @@ load jsonStr.`jstr` as data1;
 
 save append data1
 as kafka.`g1`
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `etl.sql`="${targetSql}";
 ```
 ![](.webConsole_images/f1394bf4.png)

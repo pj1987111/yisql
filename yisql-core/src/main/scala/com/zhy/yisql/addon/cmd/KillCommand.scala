@@ -5,7 +5,6 @@ import com.zhy.yisql.core.execute.{ConnectMeta, SQLExecuteContext}
 import com.zhy.yisql.core.job.JobManager
 import com.zhy.yisql.core.util.SQLJobCollect
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import tech.mlsql.common.utils.serder.json.JSONTool
 
 /**
   *  \* Created with IntelliJ IDEA.

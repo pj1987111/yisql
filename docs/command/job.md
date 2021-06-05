@@ -30,7 +30,7 @@ yisql可以通过sql来方便对job的管理
         "jobContent":"set streamName="kafka2ck";
 set sourceSchema="st(field(name,string),field(city,string),field(age,integer))";
 load kafka.`zhy` options
-`kafka.bootstrap.servers`="10.57.30.214:9092,10.57.30.215:9092,10.57.30.216:9092"
+`kafka.bootstrap.servers`="127.0.0.1:9092"
 and `enable.auto.commit`="true"
 and `group.id`="zhy1234"
 and `auto.offset.reset`="latest"

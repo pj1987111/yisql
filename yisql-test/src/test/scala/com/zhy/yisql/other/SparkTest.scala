@@ -1,7 +1,5 @@
 package com.zhy.yisql.other
 
-import com.zhy.yisql.common.utils.json.JSONTool
-import com.zhy.yisql.core.job.JobManager
 import org.apache.spark.sql.SparkSession
 import org.junit.{Before, Test}
 
