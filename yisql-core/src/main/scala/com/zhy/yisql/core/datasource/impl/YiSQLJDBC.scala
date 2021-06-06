@@ -4,7 +4,7 @@ import com.zhy.yisql.common.utils.reflect.ScalaReflect
 import com.zhy.yisql.core.datasource._
 import org.apache.spark.sql._
 import org.apache.spark.sql.execution.datasources.jdbc.JDBCOptions
-import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
+import org.apache.spark.sql.streaming.DataStreamReader
 
 import java.util.Properties
 import scala.language.reflectiveCalls
@@ -16,7 +16,7 @@ import scala.language.reflectiveCalls
   *  \* Time: 10:22
   *  \* Description: 
   *  \*/
-class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
+class YiSQLJDBC extends BaseMergeSource {
 
   def forceUseFormat: String = ""
 
@@ -30,7 +30,7 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
   }
 
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-    val dbtable = config.path
+    val dbTable = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.
@@ -46,9 +46,9 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
       val prePtn = config.config("prePtnArray")
           .split(config.config.getOrElse("prePtnDelimiter", ","))
 
-      reader.jdbc(url.get, dbtable, prePtn, new Properties())
+      reader.jdbc(url.get, dbTable, prePtn, new Properties())
     } else {
-      reader.option("dbtable", dbtable)
+      reader.option("dbTable", dbTable)
 
       reader.format(format).load()
     }
@@ -59,12 +59,12 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
       val (_, column) = parseTableAndColumnFromStr(columns(i))
       colNames(i) = column
     }
-    val newdf = table.toDF(colNames: _*)
-    newdf
+    val newDf = table.toDF(colNames: _*)
+    newDf
   }
 
   override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-    val dbtable = config.path
+    val dbTable = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.
@@ -81,23 +81,16 @@ class YiSQLJDBC extends BaseStreamSource with BaseBatchSource {
       val extraOptions = ScalaReflect.fromInstance[DataFrameWriter[Row]](writer)
           .method("extraOptions").invoke()
           .asInstanceOf[ {def toMap[T, U](implicit ev: _ <:< (T, U)): scala.collection.immutable.Map[T, U]}].toMap[String, String]
-      val jdbcOptions = new JDBCOptions(extraOptions + ("dbtable" -> dbtable))
+      val jdbcOptions = new JDBCOptions(extraOptions + ("dbtable" -> dbTable))
       writer.upsert(Option(item), jdbcOptions, config.df.get)
     }.getOrElse {
-      writer.option("dbtable", dbtable)
-      writer.format(format).save(dbtable)
+      writer.option("dbtable", dbTable)
+      writer.format(format).save(dbTable)
     }
   }
 
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"stream load is not support with ${shortFormat} ")
-  }
-
-  override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-    val newConfig = config.cloneWithNewMode("append")
-    ForeachBatchRunner.run(dataStreamWriter, config, (writer:DataFrameWriter[Row], batchId:Long) => {
-      bSave(writer, newConfig)
-    })
   }
 
   override def skipFormat: Boolean = true

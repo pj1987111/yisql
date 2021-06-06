@@ -1,6 +1,6 @@
 package com.zhy.yisql.core.datasource.impl
 
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
+import com.zhy.yisql.core.datasource.{BaseMergeSource, DataSinkConfig, DataSourceConfig}
 import com.zhy.yisql.core.util.SparkSchemaJsonParser
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
@@ -12,7 +12,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
   *  \* Time: 15:18
   *  \* Description: 
   *  \*/
-class YiSQLKafka extends BaseStreamSource with BaseBatchSource {
+class YiSQLKafka extends BaseMergeSource {
 
     //valueSchema="st(field(id,string),field(name,string),field(messgae,string),field(date,string),field(version,integer))"
     override def sLoad(streamReader: DataStreamReader, config: DataSourceConfig): DataFrame = {
@@ -66,7 +66,7 @@ class YiSQLKafka extends BaseStreamSource with BaseBatchSource {
     }
 
     def getKafkaBrokers(config: Map[String, String], url: String) = {
-        url -> config.getOrElse("metadata.broker.list", config.get("kafka.bootstrap.servers").get)
+        url -> config.getOrElse("metadata.broker.list", config("kafka.bootstrap.servers"))
     }
 
     def getWriteTopic = {
@@ -80,11 +80,13 @@ class YiSQLKafka extends BaseStreamSource with BaseBatchSource {
         var temp = (config - "metadata.broker.list" - "kafka.bootstrap.servers") ++ Map(
             getKafkaBrokers(config, url)
         )
-        if (path != null && !path.isEmpty) {
+        if (path != null && path.nonEmpty) {
             temp = temp ++ Map(topicKey -> path)
         }
         temp
     }
+
+    override def foreachBatchCallbackStreamEnable = false
 
     override def fullFormat: String = "kafka"
 

@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.datasource.impl
 
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
-import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row}
+import com.zhy.yisql.core.datasource.{BaseMergeSource, DataSourceConfig}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.streaming.DataStreamReader
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -11,17 +11,10 @@ import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row}
   *  \* Time: 15:19
   *  \* Description: 
   *  \*/
-class YiSQLElasticSearch extends BaseStreamSource with BaseBatchSource {
+class YiSQLElasticSearch extends BaseMergeSource {
 
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"stream load is not support with ${shortFormat} ")
-  }
-
-  override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-    val newConfig = config.cloneWithNewMode("append")
-    ForeachBatchRunner.run(dataStreamWriter, config, (writer: DataFrameWriter[Row], batchId: Long) => {
-      bSave(writer, newConfig)
-    })
   }
 
   override def skipFormat: Boolean = true

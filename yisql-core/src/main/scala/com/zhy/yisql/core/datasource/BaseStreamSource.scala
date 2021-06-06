@@ -40,7 +40,7 @@ trait BaseStreamSource extends StreamSource with StreamSink with Registry with D
     }
 
     def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-        //do nothing by default
+
     }
 
     def skipFormat: Boolean = {

@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource.impl
 
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter, ForeachBatchRunner}
+import com.zhy.yisql.core.datasource.{BaseMergeSource, DataSinkConfig, DataSourceConfig}
+import org.apache.spark.sql.streaming.DataStreamReader
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 
 /**
@@ -11,17 +11,17 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
   *  \* Time: 10:24
   *  \* Description: 
   *  \*/
-class YiSQLHbase extends BaseStreamSource with BaseBatchSource {
+class YiSQLHbase extends BaseMergeSource {
 
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
     var namespace = ""
-    val dbtable = config.path
+    val dbTable = config.path
 
     if (config.config.contains("namespace")) {
       namespace = config.config("namespace")
     }
 
-    val inputTableName = if (namespace == "") dbtable else s"${namespace}:${dbtable}"
+    val inputTableName = if (namespace == "") dbTable else s"${namespace}:${dbTable}"
 
     reader.option("inputTableName", inputTableName)
     val format = config.config.getOrElse("implClass", fullFormat)
@@ -51,13 +51,6 @@ class YiSQLHbase extends BaseStreamSource with BaseBatchSource {
 
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"stream load is not support with ${shortFormat} ")
-  }
-
-  override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-    val newConfig = config.cloneWithNewMode("append")
-    ForeachBatchRunner.run(dataStreamWriter, config, (writer:DataFrameWriter[Row], batchId:Long) => {
-      bSave(writer, newConfig)
-    })
   }
 
   override def skipFormat: Boolean = true

@@ -17,7 +17,7 @@ class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
     val context = SQLExecuteContext.getContext()
     val format = config.config.getOrElse("implClass", fullFormat)
-    val owner = config.config.get("owner").getOrElse(context.owner)
+    val owner = config.config.getOrElse("owner", context.owner)
 
     //timestampAsOf
     val parameters = config.config
@@ -74,7 +74,7 @@ class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
     val format = config.config.getOrElse("implClass", fullFormat)
     val context = SQLExecuteContext.getContext()
-    val owner = config.config.get("owner").getOrElse(context.owner)
+    val owner = config.config.getOrElse("owner", context.owner)
 
     val dataLake = new DataLake(config.df.get.sparkSession)
     val finalPath = if (dataLake.isEnable) {

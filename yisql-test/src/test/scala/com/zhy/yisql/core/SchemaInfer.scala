@@ -137,7 +137,12 @@ class SchemaInfer extends BaseTest {
     def valueSchema4 =
         """st(field(data,st(field(date,string),field(id,string),field(inner,st(field(age,string),field(message,string))),field(version,string))),field(table,string))""".stripMargin
 
-
+    @Test
+    def parseSchema(): Unit = {
+        val schemaStr = "st(field(id,string),field(name,string),field(message,string),field(date,string))"
+        val st = SparkSchemaJsonParser.parse(schemaStr)
+        println(st)
+    }
     @Test
     def read(): Unit = {
         val jsonVals = jsonVals4

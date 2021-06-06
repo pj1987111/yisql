@@ -35,7 +35,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
             <!-- log.dir 在maven profile里配置 -->
-            <fileNamePattern>${home.base}/logs/logback-error.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>./logs/logback-error.log.%d{yyyy-MM-dd}</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>

@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.datasource.impl
 
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
-import org.apache.spark.sql.{DataFrame, DataFrameReader, Row}
+import com.zhy.yisql.core.datasource.{BaseMergeSource, DataSourceConfig}
+import org.apache.spark.sql.streaming.DataStreamReader
+import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -11,7 +11,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, Row}
   *  \* Time: 23:09
   *  \* Description: 
   *  \*/
-class YiSQLWebConsole extends BaseStreamSource with BaseBatchSource {
+class YiSQLWebConsole extends BaseMergeSource {
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"batch load is not support with ${shortFormat} ")
   }
@@ -20,9 +20,7 @@ class YiSQLWebConsole extends BaseStreamSource with BaseBatchSource {
     throw new RuntimeException(s"stream load is not support with ${shortFormat} ")
   }
 
-  override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-
-  }
+  override def foreachBatchCallbackStreamEnable = false
 
   override def fullFormat: String = "org.apache.spark.sql.execution.streaming.sources.YiSQLConsoleSinkProvider"
 
