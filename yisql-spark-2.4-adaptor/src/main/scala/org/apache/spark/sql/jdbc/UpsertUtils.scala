@@ -18,10 +18,6 @@
 
 package org.apache.spark.sql.jdbc
 
-/**
-  * Created by allwefantasy on 26/4/2018.
-  */
-
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcUtils}
 import org.apache.spark.sql.types._

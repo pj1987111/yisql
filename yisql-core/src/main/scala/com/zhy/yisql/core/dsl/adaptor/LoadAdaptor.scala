@@ -45,8 +45,12 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
 
   override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
     val LoadStatement(_, format, path, option, tableName) = analyze(ctx)
+    log.info(option.toString)
+
     var table: DataFrame = null
     val dsConf = DataSourceConfig(cleanStr(path), option, Option(emptyDataFrame(scriptSQLExecListener.sparkSession)))
+
+    //todo 优化
     DataSourceRegistry.fetch(format, option).map { datasource =>
       if (isStream) {
         table = datasource.asInstanceOf[ {def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame}].
@@ -57,9 +61,15 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       }
       table
     }.getOrElse {
-      // calculate resource real absolute path
-      val resourcePath = resourceRealPath(scriptSQLExecListener, option.get("owner"), path)
-      table = scriptSQLExecListener.sparkSession.read.format(format).load(resourcePath)
+      if (isStream) {
+        throw new RuntimeException(s"load is not support with ${format}  in stream mode")
+      }
+      if (path == "-" || path.isEmpty) {
+          table = scriptSQLExecListener.sparkSession.read.options(option).format(format).load()
+      } else {
+          table = scriptSQLExecListener.sparkSession.read.options(option).format(format)
+            .load(resourceRealPath(scriptSQLExecListener, option.get("owner"), path))
+      }
     }
     table.createOrReplaceTempView(tableName)
     scriptSQLExecListener.setLastSelectTable(tableName)

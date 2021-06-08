@@ -18,10 +18,6 @@
 
 package org.apache.spark.sql.jdbc
 
-/**
-  * Created by allwefantasy on 26/4/2018.
-  */
-
 import java.sql.{Connection, PreparedStatement}
 import scala.util.control.NonFatal
 

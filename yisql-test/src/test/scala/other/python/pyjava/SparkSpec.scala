@@ -12,9 +12,6 @@ import tech.mlsql.arrow.python.runner.{ArrowPythonRunner, ChainedPythonFunctions
 import java.util
 import scala.collection.JavaConverters._
 
-/**
-  * 2019-08-14 WilliamZhu(allwefantasy@gmail.com)
-  */
 class SparkSpec  {
   var spark: SparkSession = _
 

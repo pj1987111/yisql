@@ -6,9 +6,6 @@ import com.zhy.yisql.dsl.parser.DSLSQLParser
 
 import scala.language.reflectiveCalls
 
-/**
-  * 2019-04-11 WilliamZhu(allwefantasy@gmail.com)
-  */
 class StatementAdaptor(cmdParserListener: CmdParserListener, f: String => Unit) extends DslAdaptor {
   override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
     val PREFIX = ctx.getChild(0).getText.toLowerCase()

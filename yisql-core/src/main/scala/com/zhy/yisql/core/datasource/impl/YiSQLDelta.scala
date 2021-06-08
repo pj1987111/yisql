@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.datalake.DataLake
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
+import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseMergeSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
 import com.zhy.yisql.core.execute.SQLExecuteContext
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, functions => F}
@@ -13,7 +13,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, f
   *  \* Time: 10:25
   *  \* Description: 
   *  \*/
-class YiSQLDelta extends BaseStreamSource with BaseBatchSource {
+class YiSQLDelta extends BaseMergeSource {
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
     val context = SQLExecuteContext.getContext()
     val format = config.config.getOrElse("implClass", fullFormat)

@@ -18,9 +18,6 @@
 
 package org.apache.spark.sql.jdbc
 
-/**
-  * Created by allwefantasy on 26/4/2018.
-  */
 object DataFrameWriterExtensions {
 
   implicit class Upsert(w: DataFrameWriter[Row]) {

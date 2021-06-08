@@ -29,9 +29,9 @@ class YiSQLConsoleSinkProvider extends StreamSinkProvider
   override def createRelation(sqlContext: SQLContext, mode: SaveMode, parameters: Map[String, String], df: DataFrame): BaseRelation = {
     val dOut = ConsoleUtil.createWriteStream(parameters)
     val numRowsToShow = parameters.getOrElse("numRows", "20").toInt
-    val isTruncated = parameters.getOrElse("truncate", "true").toBoolean
+    val truncateLength = parameters.getOrElse("truncateLength", "20").toInt
 
-    val value = df.showString(numRowsToShow, 20, isTruncated)
+    val value = df.showString(numRowsToShow, truncateLength, true)
     value.split("\n").foreach { line =>
       dOut.write(ConsoleUtil.format(line))
     }
@@ -89,7 +89,8 @@ object ConsoleUtil {
   def createWriteStream(parameters: Map[String, String]): DataOutputStream = {
     val host = parameters.getOrElse("host", "127.0.0.1")
     val port = parameters.getOrElse("port", "6049")
-    SocketCache.getStream(host, port.toInt).get
+    val socket = SocketCache.getSocket(host, port.toInt)
+    new DataOutputStream(socket.getOutputStream)
   }
 
   def format(str: String) = {
@@ -100,31 +101,33 @@ object ConsoleUtil {
   }
 }
 
-case class SerialStream(dOut: DataOutputStream) extends Serializable
-
 object SocketCache extends Logging {
-  private val socketStore = new java.util.concurrent.ConcurrentHashMap[(String, Int), DataOutputStream]()
+  private val socketStore = new java.util.concurrent.ConcurrentHashMap[(String, Int), Socket]()
 
-  def addStream(host: String, port: Int) = {
-    val socket = new Socket(host, port.toInt)
-    val outStream = new DataOutputStream(socket.getOutputStream)
-    socketStore.put((host, port), outStream)
-    Some(outStream)
+  def addSocket(host: String, port: Int) = {
+    val socket = new Socket(host, port)
+//    val outStream = new DataOutputStream(socket.getOutputStream)
+    socketStore.put((host, port), socket)
+    Some(socket)
   }
 
-  def removeStream(host: String, port: Int) = {
+  def removeSocket(host: String, port: Int) = {
     val outStream = socketStore.remove((host, port))
     outStream.close()
   }
 
-  def getStream(host: String, port: Int) = {
-    socketStore.asScala.get((host, port)).orElse(addStream(host, port))
+  def getSocket(host: String, port: Int) = {
+    var socketCache = socketStore.asScala.get((host, port)).orElse(addSocket(host, port)).get
+    if(socketCache.isClosed) {
+      socketCache = addSocket(host, port).get
+    }
+    socketCache
   }
 
   def close = {
     socketStore.asScala.foreach {
-      case (_, outStream) =>
-        outStream.close()
+      case (_, socket) =>
+        socket.close()
       case _ => // ignore
     }
     socketStore.clear()

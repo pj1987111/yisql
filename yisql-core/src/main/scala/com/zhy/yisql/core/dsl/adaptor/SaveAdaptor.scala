@@ -69,6 +69,8 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
 
   override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
     val SaveStatement(_, tableName, format, path, option, mode, partitionByCol) = analyze(ctx)
+    log.info(option.toString)
+
     val spark: SparkSession = scriptSQLExecListener.sparkSession
     val context = SQLExecuteContext.getContext()
     handleStreamJobManagerStart(context)
@@ -80,7 +82,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       spark.table(tableName)
     }
     if (option.contains("fileNum")) {
-      df = df.repartition(option.getOrElse("fileNum", "").toString.toInt)
+      df = df.repartition(option.getOrElse("fileNum", "").toInt)
     }
 
     val saveRes = DataSourceRegistry.fetch(format, option).map { datasource =>
@@ -109,10 +111,10 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       }
       writer.mode(mode)
       if (path == "-" || path.isEmpty) {
-        writer.format(option.getOrElse("implClass", format)).save()
+        writer.options(option).format(option.getOrElse("implClass", format)).save()
       }
       else {
-        writer.format(option.getOrElse("implClass", format)).save(resourceRealPath(context.execListener, Option(context.owner), path))
+        writer.options(option).format(option.getOrElse("implClass", format)).save(resourceRealPath(context.execListener, Option(context.owner), path))
       }
     }
 

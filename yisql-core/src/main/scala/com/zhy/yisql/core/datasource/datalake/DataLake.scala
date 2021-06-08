@@ -5,9 +5,6 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.SparkSession
 
-/**
-  * 2019-08-31 WilliamZhu(allwefantasy@gmail.com)
-  */
 class DataLake(sparkSession: SparkSession) {
 
     val BUILD_IN_DB_PREFIX = "__instances__"

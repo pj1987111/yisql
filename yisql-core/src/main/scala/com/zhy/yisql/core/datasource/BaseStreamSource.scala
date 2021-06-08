@@ -39,9 +39,7 @@ trait BaseStreamSource extends StreamSource with StreamSink with Registry with D
         writer.trigger(Trigger.ProcessingTime(duration, TimeUnit.SECONDS)).start()
     }
 
-    def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
-
-    }
+    def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit
 
     def skipFormat: Boolean = {
         false

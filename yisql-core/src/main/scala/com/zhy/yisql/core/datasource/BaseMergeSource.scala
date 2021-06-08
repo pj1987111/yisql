@@ -5,6 +5,13 @@ import org.apache.spark.sql.streaming.DataStreamWriter
 import org.apache.spark.sql.{Dataset, Row}
 
 trait BaseMergeSource extends BaseBatchSource with BaseStreamSource {
+  /**
+   * 流中跑批
+   * 高级etl批处理
+   *
+   * @param dataStreamWriter
+   * @param config
+   */
   override def foreachBatchCallback(dataStreamWriter: DataStreamWriter[Row], config: DataSinkConfig): Unit = {
     val newConfig = config.cloneWithNewMode("append")
     val configMap = newConfig.config

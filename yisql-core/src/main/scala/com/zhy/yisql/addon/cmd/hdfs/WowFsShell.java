@@ -39,9 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-/**
- * 2019-05-07 WilliamZhu(allwefantasy@gmail.com)
- */
 public class WowFsShell extends Configured implements Tool {
 
     static final Log LOG = LogFactory.getLog(WowFsShell.class);

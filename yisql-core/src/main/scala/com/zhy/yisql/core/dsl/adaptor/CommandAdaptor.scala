@@ -8,9 +8,6 @@ import com.zhy.yisql.dsl.parser.DSLSQLParser.{CommandValueContext, RawCommandVal
 
 import scala.collection.mutable.ArrayBuffer
 
-/**
-  * 2019-04-11 WilliamZhu(allwefantasy@gmail.com)
-  */
 class CommandAdaptor(cmdParserListener: CmdParserListener) extends DslAdaptor {
 
     def evaluate(str: String) = {

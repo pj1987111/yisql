@@ -103,6 +103,20 @@
             <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
+
+
+        <!-- ali test -->
+        <dependency>
+            <groupId>com.aliyun.emr</groupId>
+            <artifactId>emr-logservice_2.11</artifactId>
+            <version>1.9.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
