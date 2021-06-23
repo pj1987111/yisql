@@ -3,30 +3,30 @@ package com.zhy.yisql.core.platform.runtime
 import java.util.{Map => JMap}
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-02-02
-  *  \* Time: 22:01
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-02-02
+ *  \* Time: 22:01
+ *  \* Description: 
+ *  \ */
 trait StreamingRuntime {
-    def startRuntime: StreamingRuntime
+  def startRuntime: StreamingRuntime
 
-    def destroyRuntime(stopGraceful: Boolean, stopContext: Boolean = false): Boolean
+  def destroyRuntime(stopGraceful: Boolean, stopContext: Boolean = false): Boolean
 
-    def streamingRuntimeInfo: StreamingRuntimeInfo
+  def streamingRuntimeInfo: StreamingRuntimeInfo
 
-    def configureStreamingRuntimeInfo(streamingRuntimeInfo: StreamingRuntimeInfo)
+  def configureStreamingRuntimeInfo(streamingRuntimeInfo: StreamingRuntimeInfo)
 
-    def awaitTermination
+  def awaitTermination()
 
-    def startThriftServer
+  def startThriftServer()
 
-    def startHttpServer
+  def startHttpServer()
 
-    def warmUp
+  def warmUp()
 
-    def params: JMap[Any, Any]
+  def params: JMap[Any, Any]
 }
 
 
@@ -35,5 +35,5 @@ trait StreamingRuntimeInfo
 trait Event
 
 trait PlatformManagerListener {
-    def processEvent(event: Event)
+  def processEvent(event: Event)
 }

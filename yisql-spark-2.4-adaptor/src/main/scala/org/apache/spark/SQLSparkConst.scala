@@ -9,80 +9,80 @@ import java.io.File
 import scala.util.matching.Regex
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-02-18
-  *  \* Time: 21:11
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-02-18
+ *  \* Time: 21:11
+ *  \* Description: 
+ *  \ */
 object SQLSparkConst {
-    val SPARK_PREFIX = "spark."
-    val YARN_PREFIX = "yarn."
-    val HADOOP_PRFIX = "hadoop."
-    val SPARK_HADOOP_PREFIX = SPARK_PREFIX + HADOOP_PRFIX
-    val DRIVER_PREFIX = "driver."
+  val SPARK_PREFIX = "spark."
+  val YARN_PREFIX = "yarn."
+  val HADOOP_PRFIX = "hadoop."
+  val SPARK_HADOOP_PREFIX: String = SPARK_PREFIX + HADOOP_PRFIX
+  val DRIVER_PREFIX = "driver."
 
-    val KEYTAB = SPARK_PREFIX + YARN_PREFIX + "keytab"
-    val PRINCIPAL = SPARK_PREFIX + YARN_PREFIX + "principal"
-    val DRIVER_BIND_ADDR = SPARK_PREFIX + DRIVER_PREFIX + "bindAddress"
+  val KEYTAB: String = SPARK_PREFIX + YARN_PREFIX + "keytab"
+  val PRINCIPAL: String = SPARK_PREFIX + YARN_PREFIX + "principal"
+  val DRIVER_BIND_ADDR: String = SPARK_PREFIX + DRIVER_PREFIX + "bindAddress"
 
-    val HIVE_VAR_PREFIX: Regex = """set:hivevar:([^=]+)""".r
-    val USE_DB: Regex = """use:([^=]+)""".r
-    val QUEUE = SPARK_PREFIX + YARN_PREFIX + "queue"
-    val DEPRECATED_QUEUE = "mapred.job.queue.name"
+  val HIVE_VAR_PREFIX: Regex = """set:hivevar:([^=]+)""".r
+  val USE_DB: Regex = """use:([^=]+)""".r
+  val QUEUE: String = SPARK_PREFIX + YARN_PREFIX + "queue"
+  val DEPRECATED_QUEUE = "mapred.job.queue.name"
 
-    val SPARK_VERSION = org.apache.spark.SPARK_VERSION
+  val SPARK_VERSION: String = org.apache.spark.SPARK_VERSION
 
-    def addShutdownHook(f: () => Unit): Unit = {
-        ShutdownHookManager.addShutdownHook(f)
-    }
+  def addShutdownHook(f: () => Unit): Unit = {
+    ShutdownHookManager.addShutdownHook(f)
+  }
 
-    def initDaemon(log: Logger): Unit = {
-        Utils.initDaemon(log)
-    }
+  def initDaemon(log: Logger): Unit = {
+    Utils.initDaemon(log)
+  }
 
-    def getJobGroupIDKey(): String = SparkContext.SPARK_JOB_GROUP_ID
+  def getJobGroupIDKey: String = SparkContext.SPARK_JOB_GROUP_ID
 
-    def exceptionString(e: Throwable): String = {
-        Utils.exceptionString(e)
-    }
+  def exceptionString(e: Throwable): String = {
+    Utils.exceptionString(e)
+  }
 
-    def getCurrentUserName(): String = {
-        Utils.getCurrentUserName()
-    }
+  def getCurrentUserName: String = {
+    Utils.getCurrentUserName()
+  }
 
-    def getContextOrSparkClassLoader(): ClassLoader = {
-        Utils.getContextOrSparkClassLoader
-    }
+  def getContextOrSparkClassLoader: ClassLoader = {
+    Utils.getContextOrSparkClassLoader
+  }
 
-    def getLocalDir(conf: SparkConf): String = {
-        Utils.getLocalDir(conf)
-    }
+  def getLocalDir(conf: SparkConf): String = {
+    Utils.getLocalDir(conf)
+  }
 
-    def createTempDir(
-                             root: String = System.getProperty("java.io.tmpdir"),
-                             namePrefix: String = "spark"): File = {
-        Utils.createTempDir(root, namePrefix)
-    }
+  def createTempDir(
+                     root: String = System.getProperty("java.io.tmpdir"),
+                     namePrefix: String = "spark"): File = {
+    Utils.createTempDir(root, namePrefix)
+  }
 
-    def getUserJars(conf: SparkConf): Seq[String] = {
-        Utils.getUserJars(conf)
-    }
+  def getUserJars(conf: SparkConf): Seq[String] = {
+    Utils.getUserJars(conf)
+  }
 
-    def newConfiguration(conf: SparkConf): Configuration = {
-        SparkHadoopUtil.get.newConfiguration(conf)
-    }
+  def newConfiguration(conf: SparkConf): Configuration = {
+    SparkHadoopUtil.get.newConfiguration(conf)
+  }
 
-    /** Executes the given block. Log non-fatal errors if any, and only throw fatal errors */
-    def tryLogNonFatalError(block: => Unit): Unit = {
-        Utils.tryLogNonFatalError(block)
-    }
+  /** Executes the given block. Log non-fatal errors if any, and only throw fatal errors */
+  def tryLogNonFatalError(block: => Unit): Unit = {
+    Utils.tryLogNonFatalError(block)
+  }
 
-    def localHostName(): String = Utils.localHostName()
+  def localHostName(): String = Utils.localHostName()
 
-    // org.apache.spark.util.VersionUtils: Utilities for working with Spark version strings
+  // org.apache.spark.util.VersionUtils: Utilities for working with Spark version strings
 
-    def majorVersion(sparkVersion: String): Int = VersionUtils.majorVersion(sparkVersion)
+  def majorVersion(sparkVersion: String): Int = VersionUtils.majorVersion(sparkVersion)
 
-    def minorVersion(sparkVersion: String): Int = VersionUtils.minorVersion(sparkVersion)
+  def minorVersion(sparkVersion: String): Int = VersionUtils.minorVersion(sparkVersion)
 }

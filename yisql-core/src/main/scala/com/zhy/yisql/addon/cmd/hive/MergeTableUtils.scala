@@ -2,7 +2,7 @@ package com.zhy.yisql.addon.cmd.hive
 
 import com.google.common.primitives.{Ints, Longs}
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{FileStatus, FileSystem, Path}
 import org.apache.parquet.example.data.Group
 import org.apache.parquet.example.data.simple.SimpleGroup
 import org.apache.parquet.hadoop.util.HiddenFileFilter
@@ -13,26 +13,25 @@ import org.apache.spark.sql.Row
 import java.lang.reflect.Field
 import java.sql.Timestamp
 import java.util
-import java.util.List
 import java.util.concurrent.TimeUnit
 import scala.collection.JavaConversions._
-import scala.collection.mutable.Map
+import scala.collection.mutable
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-04-13
-  *  \* Time: 15:37
-  *  \* Description: 
-  *  \*/
-class MergeTableUtils{}
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-04-13
+ *  \* Time: 15:37
+ *  \* Description: 
+ *  \ */
+class MergeTableUtils {}
 
 object MergeTableUtils {
-  def getPathFromDirectory(configuration: Configuration, dir: String): List[Path] ={
+  def getPathFromDirectory(configuration: Configuration, dir: String): util.List[Path] = {
     val dirPath = new Path(dir)
-    val fs = dirPath.getFileSystem(configuration)
-    val status = fs.getFileStatus(dirPath)
-    val inputFiles = fs.listStatus(status.getPath, HiddenFileFilter.INSTANCE)
+    val fs: FileSystem = dirPath.getFileSystem(configuration)
+    val status: FileStatus = fs.getFileStatus(dirPath)
+    val inputFiles: Array[FileStatus] = fs.listStatus(status.getPath, HiddenFileFilter.INSTANCE)
     val list = new util.LinkedList[Path]()
     for (file <- inputFiles) {
       list.add(file.getPath)
@@ -40,8 +39,8 @@ object MergeTableUtils {
     list
   }
 
-  def getValue(typeName:String, group:Group, fieldName:String): Any ={
-    var value:Any = null
+  def getValue(typeName: String, group: Group, fieldName: String): Any = {
+    var value: Any = null
     try {
       if (typeName.equalsIgnoreCase("boolean")) {
         value = group.getBoolean(fieldName, 0)
@@ -58,19 +57,19 @@ object MergeTableUtils {
       } else if (typeName.equalsIgnoreCase("timestamp")) {
         value = resolveTimeStamp(group.getInt96(fieldName, 0))
       } else if (typeName.equalsIgnoreCase("array") ||
-          typeName.equalsIgnoreCase("map") ||
-          typeName.equalsIgnoreCase("struct")) {
+        typeName.equalsIgnoreCase("map") ||
+        typeName.equalsIgnoreCase("struct")) {
 
         value = resolveGroupValue(group.asInstanceOf[SimpleGroup], fieldName, typeName)
       }
     } catch {
-      case _:Exception=>
+      case _: Exception =>
     }
     value
   }
 
-  def getPrivateField(group: SimpleGroup):Tuple2[GroupType, Array[List[Any]]] ={
-    val clazz = classOf[SimpleGroup]
+  def getPrivateField(group: SimpleGroup): (GroupType, Array[util.List[Any]]) = {
+    val clazz: Class[SimpleGroup] = classOf[SimpleGroup]
     var schemaField: Field = null
     var dataField: Field = null
     for (field <- clazz.getDeclaredFields) {
@@ -83,105 +82,111 @@ object MergeTableUtils {
         schemaField = field
       }
     }
-    if (schemaField==null || dataField==null) {
+    if (schemaField == null || dataField == null) {
       return null
     }
-    val schema = schemaField.get(group).asInstanceOf[GroupType]
-    val data = dataField.get(group).asInstanceOf[Array[List[Any]]]
+    val schema: GroupType = schemaField.get(group).asInstanceOf[GroupType]
+    val data: Array[util.List[Any]] = dataField.get(group).asInstanceOf[Array[util.List[Any]]]
     (schema, data)
   }
 
-  def resolveGroupValue(group: SimpleGroup, fieldName:String, typeName:String): Any ={
-    val (schema ,data) = getPrivateField(group)
-    val index = schema.getFieldIndex(fieldName)
-    val value = data(index).get(0)
-    if (value.isInstanceOf[SimpleGroup]) {
-      if (typeName.equalsIgnoreCase("array")) {
-        return resolveValueAsArray(value.asInstanceOf[SimpleGroup])
-      } else if (typeName.equalsIgnoreCase("map")) {
-        return resolveValueAsMap(value.asInstanceOf[SimpleGroup])
-      } else if (typeName.equalsIgnoreCase("struct")) {
-        return resolveValueAsStruct(value.asInstanceOf[SimpleGroup])
-      }
+  def resolveGroupValue(group: SimpleGroup, fieldName: String, typeName: String): Any = {
+    val (schema, data) = getPrivateField(group)
+    val index: Int = schema.getFieldIndex(fieldName)
+    val value: Any = data(index).get(0)
+    value match {
+      case simpleGroup: SimpleGroup =>
+        if (typeName.equalsIgnoreCase("array")) {
+          return resolveValueAsArray(simpleGroup)
+        } else if (typeName.equalsIgnoreCase("map")) {
+          return resolveValueAsMap(simpleGroup)
+        } else if (typeName.equalsIgnoreCase("struct")) {
+          return resolveValueAsStruct(simpleGroup)
+        }
+      case _ =>
     }
     null
   }
 
-  def resolveValue(valueType: PrimitiveType.PrimitiveTypeName, value:Any): Any ={
-    if (valueType==PrimitiveType.PrimitiveTypeName.BOOLEAN) {
+  def resolveValue(valueType: PrimitiveType.PrimitiveTypeName, value: Any): Any = {
+    if (valueType == PrimitiveType.PrimitiveTypeName.BOOLEAN) {
       return value.toString.toBoolean
-    } else if (valueType==PrimitiveType.PrimitiveTypeName.INT32) {
+    } else if (valueType == PrimitiveType.PrimitiveTypeName.INT32) {
       return value.toString.toInt
-    } else if (valueType==PrimitiveType.PrimitiveTypeName.INT64 || valueType==PrimitiveType.PrimitiveTypeName.INT96) {
+    } else if (valueType == PrimitiveType.PrimitiveTypeName.INT64 || valueType == PrimitiveType.PrimitiveTypeName.INT96) {
       return value.toString.toLong
-    } else if (valueType==PrimitiveType.PrimitiveTypeName.FLOAT) {
+    } else if (valueType == PrimitiveType.PrimitiveTypeName.FLOAT) {
       return value.toString.toFloat
-    } else if (valueType==PrimitiveType.PrimitiveTypeName.DOUBLE) {
+    } else if (valueType == PrimitiveType.PrimitiveTypeName.DOUBLE) {
       return value.toString.toDouble
-    } else if (valueType==PrimitiveType.PrimitiveTypeName.BINARY) {
+    } else if (valueType == PrimitiveType.PrimitiveTypeName.BINARY) {
       return value.toString
     }
     value
   }
 
-  def resolveValueAsArray(group: SimpleGroup): Any ={
+  def resolveValueAsArray(group: SimpleGroup): Any = {
     val (schema, data) = getPrivateField(group)
-    val valueList = data(0)
+    val valueList: util.List[Any] = data(0)
     val array = new Array[Any](valueList.size())
     var index = 0
 
-    val fieldType = schema.getType(0).asInstanceOf[GroupType]
-    val valueType = fieldType.getType(0).asInstanceOf[PrimitiveType].getPrimitiveTypeName
+    val fieldType: GroupType = schema.getType(0).asInstanceOf[GroupType]
+    val valueType: PrimitiveType.PrimitiveTypeName = fieldType.getType(0).asInstanceOf[PrimitiveType].getPrimitiveTypeName
     for (value <- valueList) {
-      if (value.isInstanceOf[SimpleGroup]) {
-        val data1 = getPrivateField(value.asInstanceOf[SimpleGroup])._2
-        val rowValue = data1(0).get(0)
-        array(index) = resolveValue(valueType, rowValue)
-        index += 1
+      value match {
+        case simpleGroup: SimpleGroup =>
+          val data1: Array[util.List[Any]] = getPrivateField(simpleGroup)._2
+          val rowValue: Any = data1(0).get(0)
+          array(index) = resolveValue(valueType, rowValue)
+          index += 1
+        case _ =>
       }
     }
     array
   }
 
-  def resolveValueAsMap(group: SimpleGroup): Any ={
+  def resolveValueAsMap(group: SimpleGroup): Any = {
     val (schema, data) = getPrivateField(group)
-    val valueList = data(0)
-    val fieldType = schema.getType(0).asInstanceOf[GroupType]
-    val keyType = fieldType.getType(0).asInstanceOf[PrimitiveType].getPrimitiveTypeName
-    val valueType = fieldType.getType(1).asInstanceOf[PrimitiveType].getPrimitiveTypeName
+    val valueList: util.List[Any] = data(0)
+    val fieldType: GroupType = schema.getType(0).asInstanceOf[GroupType]
+    val keyType: PrimitiveType.PrimitiveTypeName = fieldType.getType(0).asInstanceOf[PrimitiveType].getPrimitiveTypeName
+    val valueType: PrimitiveType.PrimitiveTypeName = fieldType.getType(1).asInstanceOf[PrimitiveType].getPrimitiveTypeName
 
-    val map = Map[Any, Any]()
+    val map: mutable.Map[Any, Any] = mutable.Map[Any, Any]()
     for (value <- valueList) {
-      if (value.isInstanceOf[SimpleGroup]) {
-        val data1 = getPrivateField(value.asInstanceOf[SimpleGroup])._2
-        val mapKey = resolveValue(keyType, data1(0).get(0))
-        val mapValue = resolveValue(valueType, data1(1).get(0))
-        map += (mapKey -> mapValue)
+      value match {
+        case simpleGroup: SimpleGroup =>
+          val data1: Array[util.List[Any]] = getPrivateField(simpleGroup)._2
+          val mapKey: Any = resolveValue(keyType, data1(0).get(0))
+          val mapValue: Any = resolveValue(valueType, data1(1).get(0))
+          map += (mapKey -> mapValue)
+        case _ =>
       }
     }
     map
   }
 
-  def resolveValueAsStruct(group: SimpleGroup): Any ={
+  def resolveValueAsStruct(group: SimpleGroup): Any = {
     val (schema, data) = getPrivateField(group)
     val array = new Array[Any](schema.getFields.size())
-    for (index <- 0 to schema.getFields.size() - 1) {
-      val valueType = schema.getType(index).asInstanceOf[PrimitiveType]
-      val value = data(index).get(0)
+    for (index <- 0 until schema.getFields.size()) {
+      val valueType: PrimitiveType = schema.getType(index).asInstanceOf[PrimitiveType]
+      val value: Any = data(index).get(0)
       array(index) = resolveValue(valueType.getPrimitiveTypeName, value)
     }
     Row.fromSeq(array.toSeq)
   }
 
-  def resolveTimeStamp(value: Binary): Timestamp ={
+  def resolveTimeStamp(value: Binary): Timestamp = {
     if (value.length() != 12) {
       return new Timestamp(0)
     }
-    val bytes = value.getBytes
-    val timeOfDayNanos = Longs.fromBytes(bytes(7), bytes(6), bytes(5), bytes(4), bytes(3), bytes(2), bytes(1), bytes(0))
-    val day = Ints.fromBytes(bytes(11), bytes(10), bytes(9), bytes(8))
+    val bytes: Array[Byte] = value.getBytes
+    val timeOfDayNanos: Long = Longs.fromBytes(bytes(7), bytes(6), bytes(5), bytes(4), bytes(3), bytes(2), bytes(1), bytes(0))
+    val day: Int = Ints.fromBytes(bytes(11), bytes(10), bytes(9), bytes(8))
 
-    new Timestamp((day-2440588) * TimeUnit.DAYS.toMillis(1) + (timeOfDayNanos / TimeUnit.MILLISECONDS.toNanos(1)))
+    new Timestamp((day - 2440588) * TimeUnit.DAYS.toMillis(1) + (timeOfDayNanos / TimeUnit.MILLISECONDS.toNanos(1)))
   }
 }
 

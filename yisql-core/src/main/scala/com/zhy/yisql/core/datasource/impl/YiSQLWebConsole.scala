@@ -5,12 +5,12 @@ import org.apache.spark.sql.streaming.DataStreamReader
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-03-17
-  *  \* Time: 23:09
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-03-17
+ *  \* Time: 23:09
+ *  \* Description: 
+ *  \ */
 class YiSQLWebConsole extends BaseMergeSource {
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
     throw new RuntimeException(s"batch load is not support with ${shortFormat} ")

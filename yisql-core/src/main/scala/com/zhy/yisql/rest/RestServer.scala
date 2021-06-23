@@ -5,15 +5,15 @@ import com.zhy.yisql.netty.rest.controller.ExceptionController
 import com.zhy.yisql.netty.rest.interceptor.CorsInterceptor
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-03-24
-  *  \* Time: 13:27
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-03-24
+ *  \* Time: 13:27
+ *  \* Description: 
+ *  \ */
 object RestServer {
   def main(args: Array[String]): Unit = {
-    val port = args(0).toInt
+    val port: Int = args(0).toInt
     // 全局异常处理
     WebServer.setExceptionHandler(new ExceptionController)
 

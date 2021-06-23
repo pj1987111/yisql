@@ -5,12 +5,12 @@ import org.apache.spark.sql.types._
 import scala.collection.mutable.ArrayBuffer
 
 object SparkSimpleSchemaParser {
-  private def findInputInArrayBracket(input: String) = {
-    val max = input.length - 1
-    val rest = ArrayBuffer[Char]()
+  private def findInputInArrayBracket(input: String): String = {
+    val max: Int = input.length - 1
+    val rest: ArrayBuffer[Char] = ArrayBuffer[Char]()
     var firstS = false
     var fBracketCount = 0
-    (0 until max).foreach { i =>
+    (0 until max).foreach { i: Int =>
       input(i) match {
         case '(' =>
           if (firstS) {
@@ -35,11 +35,11 @@ object SparkSimpleSchemaParser {
     rest.mkString("")
   }
 
-  private def findKeyAndValue(input: String) = {
-    val max = input.length - 1
+  private def findKeyAndValue(input: String): (String, String) = {
+    val max: Int = input.length - 1
     var fBracketCount = 0
     var position = 0
-    (0 until max).foreach { i =>
+    (0 until max).foreach { i: Int =>
       input(i) match {
         case '(' =>
           fBracketCount += 1
@@ -81,7 +81,7 @@ object SparkSimpleSchemaParser {
     }
   }
 
-  def parse(str: String) = {
+  def parse(str: String): DataType = {
     toInnerStructType(str) match {
       case s: WowStructType => toStructType(s)
       case s: DataType =>
@@ -99,7 +99,7 @@ object SparkSimpleSchemaParser {
   }
 
   private def toStructType(wowStructType: WowStructType): StructType = {
-    StructType(wowStructType.list.map { field =>
+    StructType(wowStructType.list.map { field: StructField =>
       field.dataType match {
         case structType: WowStructType =>
           StructField(field.name, toStructType(structType))
@@ -111,7 +111,7 @@ object SparkSimpleSchemaParser {
 
   //st(field(name,string),field(name1,st(field(name2,array(string)))))
   private def toInnerStructType(dt: String, st: WowStructType = WowStructType(ArrayBuffer[StructField]())): DataType = {
-    def startsWith(c: String, token: String) = {
+    def startsWith(c: String, token: String): Boolean = {
       c.startsWith(token) || c.startsWith(s"${token} ") || c.startsWith(s"${token}(")
     }
 
@@ -136,16 +136,16 @@ object SparkSimpleSchemaParser {
         MapType(toInnerStructType(key, st), toInnerStructType(value, st))
 
       case c: String if startsWith(c, "st") =>
-        val value = findInputInArrayBracket(c)
-        val wst = WowStructType(ArrayBuffer[StructField]())
+        val value: String = findInputInArrayBracket(c)
+        val wst: WowStructType = WowStructType(ArrayBuffer[StructField]())
         toInnerStructType(value, wst)
 
 
       case c: String if startsWith(c, "field") =>
-        val filedStrArray = ArrayBuffer[String]()
+        val filedStrArray: ArrayBuffer[String] = ArrayBuffer[String]()
         findFieldArray(c, filedStrArray)
 
-        filedStrArray.foreach { fs =>
+        filedStrArray.foreach { fs: String =>
           val (key, value) = findKeyAndValue(findInputInArrayBracket(fs))
           st.list += StructField(key, toInnerStructType(value, st))
         }
@@ -156,11 +156,11 @@ object SparkSimpleSchemaParser {
   }
 
   private def findFieldArray(input: String, fields: ArrayBuffer[String]): Unit = {
-    val max = input.length
+    val max: Int = input.length
     var fBracketCount = 0
     var position = 0
     var stop = false
-    (0 until max).foreach { i =>
+    (0 until max).foreach { i: Int =>
       if (!stop) {
         input(i) match {
           case '(' =>

@@ -1,14 +1,15 @@
 package com.zhy.yisql.core.job
 
 import com.zhy.yisql.common.utils.log.Logging
-import com.zhy.yisql.core.execute.SQLExecuteContext
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
 import com.zhy.yisql.core.job.listener.JobListener
 import com.zhy.yisql.core.job.listener.JobListener.{JobFinishedEvent, JobStartedEvent}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.session.{SessionIdentifier, SparkSessionCacheManager}
+import org.apache.spark.sql.session.{SQLSession, SessionIdentifier, SparkSessionCacheManager}
 
+import java.util
 import java.util.UUID
-import java.util.concurrent.{ConcurrentHashMap, Executors, TimeUnit}
+import java.util.concurrent.{ConcurrentHashMap, ExecutorService, Executors, ScheduledExecutorService, ScheduledFuture, TimeUnit}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
@@ -23,7 +24,7 @@ import scala.collection.mutable.ArrayBuffer
   *  \*/
 object JobManager extends Logging {
     private[this] var _jobManager: JobManager = _
-    private[this] val _executor = Executors.newFixedThreadPool(100)
+    private[this] val _executor: ExecutorService = Executors.newFixedThreadPool(100)
     private[this] val _jobListeners = ArrayBuffer[JobListener]()
 
     def addJobListener(listener: JobListener) = {
@@ -34,7 +35,7 @@ object JobManager extends Logging {
         _jobListeners -= listener
     }
 
-    def shutdown = {
+    def shutdown(): Unit = {
         logInfo(s"JobManager is shutdown....")
         _executor.shutdownNow()
         _jobManager.shutdown
@@ -56,16 +57,16 @@ object JobManager extends Logging {
 
     def run(session: SparkSession, job: SQLJobInfo, f: () => Unit): Unit = {
 
-        val context = SQLExecuteContext.getContext()
+        val context: ExecuteContext = SQLExecuteContext.getContext()
         //添加任务进度listener
         context.execListener.addJobProgressListener(new DefaultSQLJobProgressListener())
 
         try {
-            _jobListeners.foreach { f => f.onJobStarted(new JobStartedEvent(job.groupId)) }
+            _jobListeners.foreach { f: JobListener => f.onJobStarted(new JobStartedEvent(job.groupId)) }
             if (_jobManager == null) {
                 f()
             } else {
-                session.sparkContext.setJobGroup(job.groupId, job.jobName, true)
+                session.sparkContext.setJobGroup(job.groupId, job.jobName, interruptOnCancel = true)
                 addJobManually(job)
                 f()
             }
@@ -73,13 +74,13 @@ object JobManager extends Logging {
         } finally {
             handleJobDone(job.groupId)
             session.sparkContext.clearJobGroup()
-            _jobListeners.foreach { f => f.onJobFinished(new JobFinishedEvent(job.groupId)) }
+            _jobListeners.foreach { f: JobListener => f.onJobFinished(new JobFinishedEvent(job.groupId)) }
         }
     }
 
     def asyncRun(session: SparkSession, job: SQLJobInfo, f: () => Unit) = {
         // TODO: (fchen) 改成callback
-        val context = SQLExecuteContext.getContext()
+        val context: ExecuteContext = SQLExecuteContext.getContext()
         _executor.execute(new Runnable {
             override def run(): Unit = {
                 SQLExecuteContext.setContext(context)
@@ -91,8 +92,8 @@ object JobManager extends Logging {
                         logInfo("Async Job Exception", e)
                 } finally {
                     //                RequestCleanerManager.call()
-                    context.execListener.env.remove("__MarkAsyncRunFinish__")
-                    SQLExecuteContext.unset
+                    context.execListener.env().remove("__MarkAsyncRunFinish__")
+                    SQLExecuteContext.unset()
                     SparkSession.clearActiveSession()
                 }
 
@@ -105,19 +106,19 @@ object JobManager extends Logging {
                    jobName: String,
                    jobContent: String,
                    timeout: Long): SQLJobInfo = {
-        val startTime = System.currentTimeMillis()
-        val groupId = _jobManager.nextGroupId
+        val startTime: Long = System.currentTimeMillis()
+        val groupId: String = _jobManager.nextGroupId
         SQLJobInfo(owner, jobType, jobName, jobContent, groupId, SQLJobProgress(), startTime, timeout)
     }
 
     def getJobInfo: Map[String, SQLJobInfo] =
         _jobManager.groupIdJobInfo.asScala.toMap
 
-    def addJobManually(job: SQLJobInfo) = {
+    def addJobManually(job: SQLJobInfo): SQLJobInfo = {
         _jobManager.groupIdJobInfo.put(job.groupId, job)
     }
 
-    def removeJobManually(groupId: String) = {
+    def removeJobManually(groupId: String): Unit = {
         handleJobDone(groupId)
     }
 
@@ -133,29 +134,29 @@ object JobManager extends Logging {
 class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Long) extends Logging {
     val groupIdJobInfo = new ConcurrentHashMap[String, SQLJobInfo]()
 
-    def nextGroupId = UUID.randomUUID().toString
+    def nextGroupId: String = UUID.randomUUID().toString
 
-    val executor = Executors.newSingleThreadScheduledExecutor()
+    val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
-    def run = {
+    def run: ScheduledFuture[_] = {
         executor.scheduleWithFixedDelay(new Runnable {
             override def run(): Unit = {
-                groupIdJobInfo.foreach { f =>
+                groupIdJobInfo.foreach { f: (String, SQLJobInfo) =>
                     try {
-                        val elapseTime = System.currentTimeMillis() - f._2.startTime
+                        val elapseTime: Long = System.currentTimeMillis() - f._2.startTime
                         if (f._2.timeout > 0 && elapseTime >= f._2.timeout) {
 
                             // At rest controller, we will clone the session,and this clone session is not
                             // saved in  SparkSessionCacheManager. But this do no harm to this scheduler,
                             // since cancel job depends `groupId` and sparkContext. The exception is stream job (which is connected with spark session),
                             // however, the stream job will not use `clone spark session`
-                            val tempSession = SparkSessionCacheManager.getSessionManagerOption match {
+                            val tempSession: Option[SQLSession] = SparkSessionCacheManager.getSessionManagerOption match {
                                 case Some(sessionManager) =>
                                     sessionManager.getSessionOption(SessionIdentifier(f._2.owner))
                                 case None => None
                             }
-                            val session = tempSession.map(f => f.sparkSession).getOrElse(_spark)
-                            cancelJobGroup(session, f._1, true)
+                            val session: SparkSession = tempSession.map((f: SQLSession) => f.sparkSession).getOrElse(_spark)
+                            cancelJobGroup(session, f._1, ignoreStreamJob = true)
                         }
                     } catch {
                         case e: Exception => logError(s"Kill job ${f._1} fails", e)
@@ -167,9 +168,9 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
 
     def cancelJobGroup(spark: SparkSession, groupId: String, ignoreStreamJob: Boolean = false): Unit = {
         logInfo("JobManager Timer cancel job group " + groupId)
-        val job = groupIdJobInfo.get(groupId)
+        val job: SQLJobInfo = groupIdJobInfo.get(groupId)
 
-        def killStreamJob = {
+        def killStreamJob(): Unit = {
             spark.streams.active.filter(f => f.id.toString == job.groupId).map(f => f.runId.toString).headOption match {
                 case Some(_) =>
                     logInfo(s"Try to kill stream job: ${job.groupId}, name:${job.jobName} ")
@@ -178,13 +179,13 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
             }
         }
 
-        def killBatchJob = {
+        def killBatchJob: SQLJobInfo = {
             spark.sparkContext.cancelJobGroup(groupId)
             groupIdJobInfo.remove(groupId)
         }
 
         if (job != null && !ignoreStreamJob && job.jobType == JobType.STREAM) {
-            killStreamJob
+            killStreamJob()
         }
 
         if (job.jobType != JobType.STREAM) {
@@ -192,7 +193,7 @@ class JobManager(_spark: SparkSession, initialDelay: Long, checkTimeInterval: Lo
         }
     }
 
-    def shutdown = {
+    def shutdown: util.List[Runnable] = {
         executor.shutdownNow()
     }
 }

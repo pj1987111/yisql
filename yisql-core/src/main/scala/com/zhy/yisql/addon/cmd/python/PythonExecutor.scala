@@ -1,8 +1,8 @@
 package com.zhy.yisql.addon.cmd.python
 
 import com.zhy.yisql.common.utils.reflect.ScalaMethodMacros
-import com.zhy.yisql.core.execute.SQLExecuteContext
-import com.zhy.yisql.core.session.SetSession
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
+import com.zhy.yisql.core.session.{SetItem, SetSession}
 import com.zhy.yisql.core.util.SparkSimpleSchemaParser
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
@@ -16,15 +16,15 @@ import java.util
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-05-03
-  *  \* Time: 20:59
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-05-03
+ *  \* Time: 20:59
+ *  \* Description: 
+ *  \ */
 object PythonExecutor {
-  private def getSchemaAndConf(envSession: SetSession) = {
-    def error = {
+  private def getSchemaAndConf(envSession: SetSession): Map[String, String] = {
+    def error: Nothing = {
       throw new RuntimeException(
         """
           |Using `!python conf` to specify the python return value format is required.
@@ -36,9 +36,9 @@ object PythonExecutor {
         """.stripMargin)
     }
 
-    val runnerConf = envSession.fetchPythonRunnerConf match {
+    val runnerConf: Map[String, String] = envSession.fetchPythonRunnerConf match {
       case Some(conf) =>
-        val temp = conf.collect().map(f => (f.k, f.v)).toMap
+        val temp: Map[String, String] = conf.collect().map((f: SetItem) => (f.k, f.v)).toMap
         if (!temp.contains("schema")) {
           error
         }
@@ -62,10 +62,10 @@ object PythonExecutor {
     throw e
   }
 
-  def getBinAndRunConf(session: SparkSession) = {
-    val context = SQLExecuteContext.getContext()
+  def getBinAndRunConf(session: SparkSession): (Map[String, String], Map[String, String]) = {
+    val context: ExecuteContext = SQLExecuteContext.getContext()
     val envSession = new SetSession(session, context.owner)
-    val envs = Map(
+    val envs: Map[String, String] = Map(
       ScalaMethodMacros.str(PythonConf.PY_EXECUTE_USER) -> context.owner,
       ScalaMethodMacros.str(PythonConf.PYTHON_ENV) -> "export ARROW_PRE_0_15_IPC_FORMAT=1"
     ) ++
@@ -79,19 +79,19 @@ object PythonExecutor {
       }.toMap
 
     //    val runnerConf = getSchemaAndConf(envSession) ++ configureLogConf
-    val runnerConf = getSchemaAndConf(envSession)
+    val runnerConf: Map[String, String] = getSchemaAndConf(envSession)
     (envs, runnerConf)
   }
 
   /**
-    * python代码嵌入处理
-    * 离线数据
-    *
-    * @param session
-    * @param code        python 代码
-    * @param sourceTable 离线源表名
-    * @return
-    */
+   * python代码嵌入处理
+   * 离线数据
+   *
+   * @param session
+   * @param code        python 代码
+   * @param sourceTable 离线源表名
+   * @return
+   */
   def batchExecute(session: SparkSession, code: String, sourceTable: String) = {
     val df = session.table(sourceTable)
     val binRunConf = getBinAndRunConf(session)
@@ -100,16 +100,16 @@ object PythonExecutor {
   }
 
   /**
-    * python代码嵌入处理
-    * 实时处理回调
-    *
-    * 由于executor中执行，参数需要外传，因为和外部线程不在同个线程中
-    *
-    * @param session
-    * @param code
-    * @param ds
-    * @return
-    */
+   * python代码嵌入处理
+   * 实时处理回调
+   *
+   * 由于executor中执行，参数需要外传，因为和外部线程不在同个线程中
+   *
+   * @param session
+   * @param code
+   * @param ds
+   * @return
+   */
   def streamExecute(session: SparkSession, code: String, ds: Dataset[Row],
                     envs: Map[String, String], runnerConf: Map[String, String]) = {
     execute(session, code, ds.rdd, ds.schema, envs, runnerConf)

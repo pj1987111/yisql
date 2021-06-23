@@ -16,9 +16,9 @@ class YiSQLKafka extends BaseMergeSource {
 
     //valueSchema="st(field(id,string),field(name,string),field(messgae,string),field(date,string),field(version,integer))"
     override def sLoad(streamReader: DataStreamReader, config: DataSourceConfig): DataFrame = {
-        val option = config.config
-        val format = option.getOrElse("implClass", fullFormat)
-        var loadTable = streamReader.options(rewriteKafkaConfig(option, getSubscribe, getLoadUrl, config.path)).format(format).load()
+        val option: Map[String, String] = config.config
+        val format: String = option.getOrElse("implClass", fullFormat)
+        var loadTable: DataFrame = streamReader.options(rewriteKafkaConfig(option, getSubscribe, getLoadUrl, config.path)).format(format).load()
         if (option.contains("valueSchema")) {
             loadTable = SparkSchemaJsonParser.parseDataFrame(
                 loadTable.selectExpr("CAST(value AS STRING) as value"),
@@ -33,9 +33,9 @@ class YiSQLKafka extends BaseMergeSource {
     }
 
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-        val option = config.config
-        val format = config.config.getOrElse("implClass", fullFormat)
-        var loadTable = reader.options(rewriteKafkaConfig(config.config, getSubscribe, getLoadUrl, config.path)).format(format).load()
+        val option: Map[String, String] = config.config
+        val format: String = config.config.getOrElse("implClass", fullFormat)
+        var loadTable: DataFrame = reader.options(rewriteKafkaConfig(config.config, getSubscribe, getLoadUrl, config.path)).format(format).load()
         if (option.contains("valueSchema")) {
             loadTable = SparkSchemaJsonParser.parseDataFrame(
                 loadTable.selectExpr("CAST(value AS STRING) as value"),
@@ -49,27 +49,27 @@ class YiSQLKafka extends BaseMergeSource {
         writer.options(rewriteKafkaConfig(config.config, getWriteTopic, getSaveUrl, config.path)).format(fullFormat).save()
     }
 
-    def getSubscribe = {
+    def getSubscribe: String = {
         if (shortFormat == "kafka8" || shortFormat == "kafka9") {
             "topics"
         } else "subscribe"
     }
 
-    def getLoadUrl = {
+    def getLoadUrl: String = {
         "kafka.bootstrap.servers"
     }
 
-    def getSaveUrl = {
+    def getSaveUrl: String = {
         if (shortFormat == "kafka8" || shortFormat == "kafka9") {
             "metadata.broker.list"
         } else "kafka.bootstrap.servers"
     }
 
-    def getKafkaBrokers(config: Map[String, String], url: String) = {
+    def getKafkaBrokers(config: Map[String, String], url: String): (String, String) = {
         url -> config.getOrElse("metadata.broker.list", config("kafka.bootstrap.servers"))
     }
 
-    def getWriteTopic = {
+    def getWriteTopic: String = {
         if (shortFormat == "kafka8" || shortFormat == "kafka9") {
             "topics"
         } else "topic"
@@ -77,7 +77,7 @@ class YiSQLKafka extends BaseMergeSource {
 
 
     def rewriteKafkaConfig(config: Map[String, String], topicKey: String, url: String, path: String): Map[String, String] = {
-        var temp = (config - "metadata.broker.list" - "kafka.bootstrap.servers") ++ Map(
+        var temp: Map[String, String] = (config - "metadata.broker.list" - "kafka.bootstrap.servers") ++ Map(
             getKafkaBrokers(config, url)
         )
         if (path != null && path.nonEmpty) {

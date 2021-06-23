@@ -11,7 +11,7 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
   *  \* Description: 
   *  \*/
 trait DataSource {
-    def dbSplitter = {
+    def dbSplitter: String = {
         "."
     }
 

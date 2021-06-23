@@ -1,42 +1,28 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.spark.sql.jdbc
 
 import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcOptionsInWrite, JdbcUtils}
+import org.apache.spark.sql.types.StructField
 import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SaveMode}
+
+import java.lang.reflect.Field
+import java.sql.{Connection, Statement}
 
 object DataFrameWriterExtensions {
 
   implicit class Upsert(w: DataFrameWriter[Row]) {
     def upsert(idCol: Option[String], jdbcOptions: JDBCOptions, df: DataFrame): Unit = {
-      val idColumn = idCol.map(f => df.schema.filter(s => f.split(",").contains(s.name)))
-      val url = jdbcOptions.url
-      val table = jdbcOptions.tableOrQuery
-      val modeF = w.getClass.getDeclaredField("mode")
+      val idColumn: Option[Seq[StructField]] = idCol.map((f: String) => df.schema.filter((s: StructField) => f.split(",").contains(s.name)))
+      val url: String = jdbcOptions.url
+      val table: String = jdbcOptions.tableOrQuery
+      val modeF: Field = w.getClass.getDeclaredField("mode")
       modeF.setAccessible(true)
-      val mode = modeF.get(w).asInstanceOf[SaveMode]
-      val conn = JdbcUtils.createConnectionFactory(jdbcOptions)()
-      val isCaseSensitive = df.sqlContext.conf.caseSensitiveAnalysis
+      val mode: SaveMode = modeF.get(w).asInstanceOf[SaveMode]
+      val conn: Connection = JdbcUtils.createConnectionFactory(jdbcOptions)()
+      val isCaseSensitive: Boolean = df.sqlContext.conf.caseSensitiveAnalysis
       val writeOption = new JdbcOptionsInWrite(url, table, jdbcOptions.parameters)
       try {
 
-        var tableExists = JdbcUtils.tableExists(conn, writeOption)
+        var tableExists: Boolean = JdbcUtils.tableExists(conn, writeOption)
 
         if (mode == SaveMode.Ignore && tableExists) {
           return
@@ -53,14 +39,14 @@ object DataFrameWriterExtensions {
 
         // Create the table if the table didn't exist.
         if (!tableExists) {
-          val schema = JdbcUtils.schemaString(df, url, jdbcOptions.createTableColumnTypes)
-          val dialect = JdbcDialects.get(url)
-          val pk = idColumn.map { f =>
-            val key = f.map(c => s"${dialect.quoteIdentifier(c.name)}").mkString(",")
+          val schema: String = JdbcUtils.schemaString(df, url, jdbcOptions.createTableColumnTypes)
+          val dialect: JdbcDialect = JdbcDialects.get(url)
+          val pk: String = idColumn.map { f: Seq[StructField] =>
+            val key: String = f.map((c: StructField) => s"${dialect.quoteIdentifier(c.name)}").mkString(",")
             s", primary key(${key})"
           }.getOrElse("")
           val sql = s"CREATE TABLE $table ( $schema $pk )"
-          val statement = conn.createStatement
+          val statement: Statement = conn.createStatement
           try {
             statement.executeUpdate(sql)
           } finally {

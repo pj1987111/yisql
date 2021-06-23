@@ -1,7 +1,7 @@
 package com.zhy.yisql.core.session
 
 import com.zhy.yisql.common.utils.hash.HashUtils
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -14,19 +14,19 @@ class SetSession(spark: SparkSession, owner: String) {
 
   import spark.implicits._
 
-  def envTableName = HashUtils.md5Hash(owner)
+  def envTableName: String = HashUtils.md5Hash(owner)
 
-  private def isTheSame(oldItem: SetItem, newItem: SetItem) = {
+  private def isTheSame(oldItem: SetItem, newItem: SetItem): Boolean = {
     (newItem.k, newItem.config(SetSession.__YISQL_CL__)) == (oldItem.k, oldItem.config(SetSession.__YISQL_CL__))
   }
 
-  def set(k: String, v: String, config: Map[String, String]) = {
+  def set(k: String, v: String, config: Map[String, String]): Unit = {
     if (envTableExists()) {
-      val oldItems = spark.table(envTableName).as[SetItem].collect().toList
-      val newItem = SetItem(k, v,
+      val oldItems: Seq[SetItem] = spark.table(envTableName).as[SetItem].collect().toList
+      val newItem: SetItem = SetItem(k, v,
         Map(SetSession.__YISQL_CL__ -> SetSession.SET_STATEMENT_CL) ++ config
       )
-      val newItems = oldItems.filterNot { oldItem =>
+      val newItems: Seq[SetItem] = oldItems.filterNot { oldItem: SetItem =>
         isTheSame(oldItem, newItem)
       } ++ List(newItem)
       spark.createDataset[SetItem](newItems).
@@ -37,40 +37,40 @@ class SetSession(spark: SparkSession, owner: String) {
     }
   }
 
-  private[session] def envTableExists() = {
+  private[session] def envTableExists(): Boolean = {
     spark.catalog.tableExists(envTableName)
   }
 
-  def envTable = {
+  def envTable: Option[DataFrame] = {
     if (envTableExists()) Option(spark.table(envTableName))
     else None
   }
 
-  def filterEnvTable(f: (SetItem) => Boolean) = {
-    if (envTableExists()) Option(spark.table(envTableName).as[SetItem].filter(item => f(item)))
+  def filterEnvTable(f: (SetItem) => Boolean): Option[Dataset[SetItem]] = {
+    if (envTableExists()) Option(spark.table(envTableName).as[SetItem].filter((item: SetItem) => f(item)))
     else None
   }
 
-  def fetchPythonEnv = {
-    filterEnvTable((item) => {
+  def fetchPythonEnv: Option[Dataset[SetItem]] = {
+    filterEnvTable((item: SetItem) => {
       item.config(SetSession.__YISQL_CL__) == SetSession.PYTHON_ENV_CL
     })
   }
 
-  def fetchPythonRunnerConf = {
-    filterEnvTable((item) => {
+  def fetchPythonRunnerConf: Option[Dataset[SetItem]] = {
+    filterEnvTable((item: SetItem) => {
       item.config(SetSession.__YISQL_CL__) == SetSession.PYTHON_RUNNER_CONF_CL
     })
   }
 
-  def fetchSetStatement = {
-    filterEnvTable((item) => {
+  def fetchSetStatement: Option[Dataset[SetItem]] = {
+    filterEnvTable((item: SetItem) => {
       item.config(SetSession.__YISQL_CL__) == SetSession.SET_STATEMENT_CL
     })
   }
 
 
-  def clearAll = {
+  def clearAll(): Unit = {
     envTable match {
       case Some(_) =>
         spark.createDataset[SetItem](Seq()).createOrReplaceTempView(envTableName)

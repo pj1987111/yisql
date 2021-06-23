@@ -1,6 +1,6 @@
 package com.zhy.yisql.core.dsl.adaptor
 
-import com.zhy.yisql.core.datasource.{DataSourceConfig, DataSourceRegistry}
+import com.zhy.yisql.core.datasource.{DataSource, DataSourceConfig, DataSourceRegistry}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
@@ -10,23 +10,23 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader}
 import scala.language.reflectiveCalls
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-01-31
-  *  \* Time: 21:41
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-01-31
+ *  \* Time: 21:41
+ *  \* Description: 
+ *  \ */
 class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
 
   def analyze(ctx: SqlContext): LoadStatement = {
     var format = ""
-    var option = Map[String, String]()
+    var option: Map[String, String] = Map[String, String]()
     var path = ""
     var tableName = ""
-    (0 until ctx.getChildCount).foreach { tokenIndex =>
+    (0 until ctx.getChildCount).foreach { tokenIndex: Int =>
       ctx.getChild(tokenIndex) match {
         case s: FormatContext =>
-          val aliasV = formatAlias(s.getText)
+          val aliasV: (String, Map[String, String]) = formatAlias(s.getText)
           format = aliasV._1
           option = aliasV._2
         case s: ExpressionContext =>
@@ -48,13 +48,14 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
     log.info(option.toString)
 
     var table: DataFrame = null
-    val dsConf = DataSourceConfig(cleanStr(path), option, Option(emptyDataFrame(scriptSQLExecListener.sparkSession)))
+    val dsConf: DataSourceConfig = DataSourceConfig(cleanStr(path), option, Option(emptyDataFrame(scriptSQLExecListener.sparkSession)))
 
     //todo 优化
-    DataSourceRegistry.fetch(format, option).map { datasource =>
+    DataSourceRegistry.fetch(format, option).map { datasource: DataSource =>
       if (isStream) {
         table = datasource.asInstanceOf[ {def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame}].
           sLoad(scriptSQLExecListener.sparkSession.readStream, dsConf)
+        table = withWaterMark(table, option)
       } else {
         table = datasource.asInstanceOf[ {def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame}].
           bLoad(scriptSQLExecListener.sparkSession.read, dsConf)
@@ -65,20 +66,27 @@ class LoadAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
         throw new RuntimeException(s"load is not support with ${format}  in stream mode")
       }
       if (path == "-" || path.isEmpty) {
-          table = scriptSQLExecListener.sparkSession.read.options(option).format(format).load()
+        table = scriptSQLExecListener.sparkSession.read.options(option).format(format).load()
       } else {
-          table = scriptSQLExecListener.sparkSession.read.options(option).format(format)
-            .load(resourceRealPath(scriptSQLExecListener, option.get("owner"), path))
+        table = scriptSQLExecListener.sparkSession.read.options(option).format(format)
+          .load(resourceRealPath(scriptSQLExecListener, option.get("owner"), path))
       }
     }
     table.createOrReplaceTempView(tableName)
     scriptSQLExecListener.setLastSelectTable(tableName)
   }
 
-  def isStream = {
+  def isStream: Boolean = {
     scriptSQLExecListener.env().contains("streamName")
   }
 
+  def withWaterMark(table: DataFrame, option: Map[String, String]): DataFrame = {
+    if (option.contains("eventTimeCol")) {
+      table.withWatermark(option("eventTimeCol"), option("delayThreshold"))
+    } else {
+      table
+    }
+  }
 }
 
 case class LoadStatement(raw: String, format: String, path: String, option: Map[String, String] = Map[String, String](), tableName: String)

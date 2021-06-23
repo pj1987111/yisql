@@ -4,8 +4,10 @@ import com.zhy.yisql.addon.cmd.hive.{HiveUtils, MergeConfig}
 import com.zhy.yisql.common.utils.json.JSONTool
 import com.zhy.yisql.core.cmds.SQLCmd
 import org.apache.commons.lang3.StringUtils
+import org.apache.spark.sql.catalyst.catalog.CatalogTable
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import java.util
 import java.util.LinkedList
 
 /**
@@ -17,7 +19,7 @@ import java.util.LinkedList
  *  \ */
 class HiveCommand extends SQLCmd {
   override def run(spark: SparkSession, path: String, params: Map[String, String]): DataFrame = {
-    val commands = JSONTool.parseJson[List[String]](params("parameters")).toArray
+    val commands: Array[String] = JSONTool.parseJson[List[String]](params("parameters")).toArray
     commands match {
       /**
        * merge table dbTable partition partionSpec
@@ -26,9 +28,9 @@ class HiveCommand extends SQLCmd {
        *
        */
       case Array("merge", "table", dbTable, "partition", partitionSpec) =>
-        val catlogT = HiveUtils.parseDBAndTableFromStr(dbTable, spark)
-        val dsV = partitionSpec.split(",")
-        val dsList = new LinkedList[String]()
+        val catlogT: CatalogTable = HiveUtils.parseDBAndTableFromStr(dbTable, spark)
+        val dsV: Array[String] = partitionSpec.split(",")
+        val dsList = new util.LinkedList[String]()
 
         for (ds <- dsV) {
           var Array(key, value) = ds.split("=")
@@ -38,7 +40,7 @@ class HiveCommand extends SQLCmd {
             value = StringUtils.substringBetween(value, "\"")
           dsList.add(key + "=" + value)
         }
-        val location = catlogT.location.getPath + "/" + StringUtils.join(dsList, "/")
+        val location: String = catlogT.location.getPath + "/" + StringUtils.join(dsList, "/")
         HiveUtils.mergePath(spark, catlogT, location)
         emptyDataFrame(spark)
 
@@ -47,8 +49,8 @@ class HiveCommand extends SQLCmd {
        * dbTable db.table
        */
       case Array("merge", "table", dbTable) =>
-        val catlogT = HiveUtils.parseDBAndTableFromStr(dbTable, spark)
-        val recursive = spark.sparkContext.getConf.get(MergeConfig.sparkMergeRecursive, "true")
+        val catlogT: CatalogTable = HiveUtils.parseDBAndTableFromStr(dbTable, spark)
+        val recursive: String = spark.sparkContext.getConf.get(MergeConfig.sparkMergeRecursive, "true")
         if (recursive.equalsIgnoreCase("true")) {
           logInfo(s"merge table $dbTable recursively")
           HiveUtils.mergeRecursive(spark, catlogT, catlogT.location.getPath)

@@ -1,9 +1,9 @@
 package com.zhy.yisql.core.dsl.adaptor
 
-import com.zhy.yisql.core.datasource.{DataSinkConfig, DataSourceRegistry}
+import com.zhy.yisql.core.datasource.{DataSinkConfig, DataSource, DataSourceRegistry}
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
-import com.zhy.yisql.core.job.{JobManager, JobType, StreamManager}
+import com.zhy.yisql.core.job.{JobManager, JobType, SQLJobInfo, StreamManager}
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 import com.zhy.yisql.dsl.parser.DSLSQLParser._
 import org.apache.spark.sql._
@@ -14,27 +14,27 @@ import scala.collection.mutable.ArrayBuffer
 import scala.language.reflectiveCalls
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-01-31
-  *  \* Time: 21:41
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-01-31
+ *  \* Time: 21:41
+ *  \* Description: 
+ *  \ */
 class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
   val isStream: Boolean = isStream(scriptSQLExecListener.env())
 
   def analyze(ctx: SqlContext): SaveStatement = {
-    var mode = if (isStream) OutputMode.Append else SaveMode.ErrorIfExists
+    var mode: Object = if (isStream) OutputMode.Append else SaveMode.ErrorIfExists
     var format = ""
-    var option = Map[String, String]()
+    var option: Map[String, String] = Map[String, String]()
     var tableName = ""
-    var partitionByCol = ArrayBuffer[String]()
+    val partitionByCol: ArrayBuffer[String] = ArrayBuffer[String]()
     var path = ""
 
-    (0 until ctx.getChildCount).foreach { tokenIndex =>
+    (0 until ctx.getChildCount).foreach { tokenIndex: Int =>
       ctx.getChild(tokenIndex) match {
         case s: FormatContext =>
-          val aliasV = formatAlias(s.getText)
+          val aliasV: (String, Map[String, String]) = formatAlias(s.getText)
           format = aliasV._1
           option = aliasV._2
         case s: PathContext =>
@@ -60,7 +60,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
         case s: ExpressionContext =>
           option += (cleanStr(s.qualifiedName().getText) -> evaluate(getStrOrBlockStr(s), scriptSQLExecListener.env()))
         case s: BooleanExpressionContext =>
-          option += (cleanStr(s.expression().qualifiedName().getText) -> evaluate(getStrOrBlockStr(s.expression()), scriptSQLExecListener.env))
+          option += (cleanStr(s.expression().qualifiedName().getText) -> evaluate(getStrOrBlockStr(s.expression()), scriptSQLExecListener.env()))
         case _ =>
       }
     }
@@ -72,11 +72,11 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
     log.info(option.toString)
 
     val spark: SparkSession = scriptSQLExecListener.sparkSession
-    val context = SQLExecuteContext.getContext()
+    val context: ExecuteContext = SQLExecuteContext.getContext()
     handleStreamJobManagerStart(context)
 
     //添加sql配置，可以过滤，etl等操作
-    var df: DataFrame = option.get("etl.sql").map { sql =>
+    var df: DataFrame = option.get("etl.sql").map { sql: String =>
       spark.sql(sql)
     }.getOrElse {
       spark.table(tableName)
@@ -85,18 +85,18 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       df = df.repartition(option.getOrElse("fileNum", "").toInt)
     }
 
-    val saveRes = DataSourceRegistry.fetch(format, option).map { datasource =>
+    val saveRes = DataSourceRegistry.fetch(format, option).map { datasource: DataSource =>
       if (isStream) {
-        val res = datasource.asInstanceOf[ {def sSave(writer: DataStreamWriter[Row], config: DataSinkConfig): Any}].sSave(
+        val res: Any = datasource.asInstanceOf[ {def sSave(writer: DataStreamWriter[Row], config: DataSinkConfig): Any}].sSave(
           df.writeStream,
           DataSinkConfig(path, option, mode, Option(df), Option(scriptSQLExecListener.env()("streamName")), spark))
         res
       } else {
-        val newOption = if (partitionByCol.nonEmpty) {
+        val newOption: Map[String, String] = if (partitionByCol.nonEmpty) {
           option ++ Map("partitionByCol" -> partitionByCol.mkString(","))
         } else option
 
-        val res = datasource.asInstanceOf[ {def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any}].bSave(
+        val res: Any = datasource.asInstanceOf[ {def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any}].bSave(
           df.write,
           DataSinkConfig(path, newOption, mode, Option(df), None, spark))
         res
@@ -105,7 +105,7 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       if (isStream) {
         throw new RuntimeException(s"save is not support with ${format}  in stream mode")
       }
-      val writer = df.write
+      val writer: DataFrameWriter[Row] = df.write
       if (partitionByCol.nonEmpty) {
         writer.partitionBy(partitionByCol: _*)
       }
@@ -118,20 +118,20 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       }
     }
 
-    val tempTable = UUID.randomUUID().toString.replace("-", "")
-    val outputTable = emptyDataFrame(spark)
+    val tempTable: String = UUID.randomUUID().toString.replace("-", "")
+    val outputTable: DataFrame = emptyDataFrame(spark)
     outputTable.createOrReplaceTempView(tempTable)
     scriptSQLExecListener.setLastSelectTable(tempTable)
   }
 
   /**
-    * 更改job信息，重置jobname,type等
-    * 流job信息使用streamQuery中
-    *
-    * @param context
-    */
+   * 更改job信息，重置jobname,type等
+   * 流job信息使用streamQuery中
+   *
+   * @param context
+   */
   def handleStreamJobManagerStart(context: ExecuteContext): Unit = {
-    var job = JobManager.getJobInfo(context.groupId)
+    var job: SQLJobInfo = JobManager.getJobInfo(context.groupId)
     if (isStream) {
       job = job.copy(jobType = JobType.STREAM, jobName = scriptSQLExecListener.env()("streamName"))
       JobManager.addJobManually(job)
@@ -139,19 +139,19 @@ class SaveAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
   }
 
   /**
-    * 清理无用job，二次确认插入
-    *
-    * @param saveRes
-    * @param context
-    */
+   * 清理无用job，二次确认插入
+   *
+   * @param saveRes
+   * @param context
+   */
   def handleStreamJobManagerEnd(saveRes: Any, context: ExecuteContext): Unit = {
     if (isStream) {
-      val streamQuery = saveRes.asInstanceOf[StreamingQuery]
-      var job = JobManager.getJobInfo(context.groupId)
+      val streamQuery: StreamingQuery = saveRes.asInstanceOf[StreamingQuery]
+      var job: SQLJobInfo = JobManager.getJobInfo(context.groupId)
       if (streamQuery != null) {
         //清理无用的job，批处理才有用
         JobManager.removeJobManually(job.groupId)
-        val realGroupId = streamQuery.id.toString
+        val realGroupId: String = streamQuery.id.toString
         //double check
         if (!JobManager.getJobInfo.contains(realGroupId)) {
           JobManager.addJobManually(job.copy(groupId = realGroupId))

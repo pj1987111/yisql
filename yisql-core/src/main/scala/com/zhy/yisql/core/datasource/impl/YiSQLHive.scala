@@ -14,15 +14,15 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 class YiSQLHive extends BaseMergeSource {
 
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-    val format = config.config.getOrElse("implClass", fullFormat)
+    val format: String = config.config.getOrElse("implClass", fullFormat)
     reader.options(config.config).format(format).table(config.path)
   }
 
   override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
     writer.format(config.config.getOrElse("file_format", "parquet"))
-    val options = config.config - "file_format" - "implClass"
-    config.config.get("partitionByCol").map(partitionColumn => partitionColumn.split(",").filterNot(_.isEmpty)).filterNot(_.length == 0)
-      .map(partitionColumns => writer.partitionBy(partitionColumns: _*))
+    val options: Map[String, String] = config.config - "file_format" - "implClass"
+    config.config.get("partitionByCol").map((partitionColumn: String) => partitionColumn.split(",").filterNot((_: String).isEmpty)).filterNot((_: Array[String]).length == 0)
+      .map((partitionColumns: Array[String]) => writer.partitionBy(partitionColumns: _*))
     writer.options(options).mode(config.mode).saveAsTable(config.path)
   }
 

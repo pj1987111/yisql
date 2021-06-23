@@ -4,6 +4,7 @@ import com.zhy.yisql.common.utils.log.Logging
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.StreamingQueryListener
 
+import java.util.concurrent.ConcurrentHashMap
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
@@ -20,37 +21,38 @@ object StreamManager extends Logging {
     //流管理监听器
     private val listenerStore = new java.util.concurrent.ConcurrentHashMap[String, ArrayBuffer[YiSQLExternalStreamListener]]()
 
-    def addStore(job: SQLJobInfo) = {
+    def addStore(job: SQLJobInfo): SQLJobInfo = {
         store.put(job.groupId, job)
     }
 
-    def removeStore(groupId: String) = {
+    def removeStore(groupId: String): SQLJobInfo = {
         store.remove(groupId)
     }
 
-    def getJob(groupId: String) = {
+    def getJob(groupId: String): Option[SQLJobInfo] = {
         store.asScala.get(groupId)
     }
 
-    def close = {
+    def close(): Unit = {
         store.clear()
     }
 
-    def listeners() = {
+    def listeners(): ConcurrentHashMap[String, ArrayBuffer[YiSQLExternalStreamListener]] = {
         listenerStore
     }
 
-    def runEvent(eventName: StreamEventName.eventName, streamName: String, callback: (YiSQLExternalStreamListener) => Unit) = {
-        listenerStore.asScala.foreach { case (user, items) =>
-            items.filter(p => p.item.eventName == eventName && p.item.streamName == streamName).foreach { p =>
+    def runEvent(eventName: StreamEventName.eventName, streamName: String, callback: (YiSQLExternalStreamListener) => Unit): Unit = {
+        listenerStore.asScala.foreach { case (_, items) =>
+            items.filter((p: YiSQLExternalStreamListener) => p.item.eventName == eventName && p.item.streamName == streamName)
+              .foreach { p: YiSQLExternalStreamListener =>
                 callback(p)
             }
         }
     }
 
-    def addListener(name: String, item: YiSQLExternalStreamListener) = {
+    def addListener(name: String, item: YiSQLExternalStreamListener):ArrayBuffer[YiSQLExternalStreamListener] = {
         synchronized {
-            val buffer = listenerStore.getOrDefault(name, ArrayBuffer())
+            val buffer: ArrayBuffer[YiSQLExternalStreamListener] = listenerStore.getOrDefault(name, ArrayBuffer())
             buffer += item
             listenerStore.put(name, buffer)
         }

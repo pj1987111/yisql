@@ -5,6 +5,7 @@ import com.zhy.yisql.core.execute.{BranchContext, BranchContextHolder, PathPrefi
 import com.zhy.yisql.core.job.JobProgressListener
 import com.zhy.yisql.dsl.parser.DSLSQLParser.SqlContext
 import com.zhy.yisql.dsl.parser.{DSLSQLBaseListener, DSLSQLLexer}
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.spark.sql.SparkSession
 
@@ -26,49 +27,49 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: PathPrefix) extends DSLSQLBaseListener {
 
-  private val _branchContext = BranchContextHolder(new mutable.Stack[BranchContext](), new ArrayBuffer[String]())
+  private val _branchContext: BranchContextHolder = BranchContextHolder(new mutable.Stack[BranchContext](), new ArrayBuffer[String]())
   //全局环境变量
   private val _env = new scala.collection.mutable.HashMap[String, String]
 
-  private[this] val _jobProgressListeners = ArrayBuffer[JobProgressListener]()
+  private[this] val _jobProgressListeners: ArrayBuffer[JobProgressListener] = ArrayBuffer[JobProgressListener]()
 
   private val lastSelectTable = new AtomicReference[String]()
   private val _declaredTables = new ArrayBuffer[String]()
 
   var cmdParserListener: Option[CmdParserListener] = None
 
-  def branchContext = {
+  def branchContext: BranchContextHolder = {
     _branchContext
   }
 
-  def declaredTables = _declaredTables
+  def declaredTables: ArrayBuffer[String] = _declaredTables
 
-  def addJobProgressListener(l: JobProgressListener) = {
+  def addJobProgressListener(l: JobProgressListener): ScriptSQLExecListener = {
     _jobProgressListeners += l
     this
   }
 
-  def setLastSelectTable(table: String) = {
+  def setLastSelectTable(table: String): Unit = {
     if (table != null) {
       _declaredTables += table
     }
     lastSelectTable.set(table)
   }
 
-  def getLastSelectTable() = {
+  def getLastSelectTable(): Option[String] = {
     Option(lastSelectTable.get())
   }
 
-  def addEnv(k: String, v: String) = {
+  def addEnv(k: String, v: String): ScriptSQLExecListener = {
     _env(k) = v
     this
   }
 
-  def env() = _env
+  def env(): mutable.Map[String, String] = _env
 
-  def sparkSession = _sparkSession
+  def sparkSession: SparkSession = _sparkSession
 
-  def pathPrefix = _pathPrefix
+  def pathPrefix: PathPrefix = _pathPrefix
 
   def clone(sparkSession: SparkSession): ScriptSQLExecListener = {
     val ssel = new ScriptSQLExecListener(sparkSession, new PathPrefix(_pathPrefix._defaultPathPrefix, _pathPrefix._allPathPrefix))
@@ -80,20 +81,20 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
   }
 
   override def exitSql(ctx: SqlContext): Unit = {
-    def getText = {
-      val input = ctx.start.getTokenSource().asInstanceOf[DSLSQLLexer]._input
+    def getText: String = {
+      val input: CharStream = ctx.start.getTokenSource.asInstanceOf[DSLSQLLexer]._input
 
-      val start = ctx.start.getStartIndex()
-      val stop = ctx.stop.getStopIndex()
+      val start: Int = ctx.start.getStartIndex
+      val stop: Int = ctx.stop.getStopIndex
       val interval = new Interval(start, stop)
       input.getText(interval)
     }
 
-    def before(clzz: String) = {
+    def before(clzz: String): Unit = {
       _jobProgressListeners.foreach(_.before(clzz, getText))
     }
 
-    def after(clzz: String) = {
+    def after(clzz: String): Unit = {
       _jobProgressListeners.foreach(_.after(clzz, getText))
     }
 
@@ -101,19 +102,19 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
     //            ScriptSQLExec.context().execListener.env().getOrElse("__debug__","false").toBoolean
     //        }
 
-    def str(ctx: SqlContext) = {
+    def str(ctx: SqlContext): String = {
 
-      val input = ctx.start.getTokenSource().asInstanceOf[DSLSQLLexer]._input
+      val input: CharStream = ctx.start.getTokenSource.asInstanceOf[DSLSQLLexer]._input
 
-      val start = ctx.start.getStartIndex()
-      val stop = ctx.stop.getStopIndex()
+      val start: Int = ctx.start.getStartIndex
+      val stop: Int = ctx.stop.getStopIndex
       val interval = new Interval(start, stop)
       input.getText(interval)
     }
 
-    def execute(adaptor: DslAdaptor) = {
-      val bc = branchContext.contexts
-      if (!bc.isEmpty) {
+    def execute(adaptor: DslAdaptor): Unit = {
+      val bc: mutable.Seq[BranchContext] = branchContext.contexts
+      if (bc.nonEmpty) {
         //                bc.pop() match {
         //                    case ifC: IfContext =>
         //                        val isBranchCommand = adaptor match {
@@ -157,7 +158,7 @@ class ScriptSQLExecListener(val _sparkSession: SparkSession, val _pathPrefix: Pa
       }
     }
 
-    val PREFIX = ctx.getChild(0).getText.toLowerCase()
+    val PREFIX: String = ctx.getChild(0).getText.toLowerCase()
 
     before(PREFIX)
     PREFIX match {

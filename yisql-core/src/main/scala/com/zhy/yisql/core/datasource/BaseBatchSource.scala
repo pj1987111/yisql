@@ -30,11 +30,11 @@ trait BaseBatchSource extends BatchSource with BatchSink with Registry with DslT
 //        val newdf = table.toDF(colNames: _*)
 //        newdf
 
-        var dbtable = config.path
+        val dbtable: String = config.path
         // if contains splitter, then we will try to find dbname in dbMapping.
         // otherwize we will do nothing since elasticsearch use something like index/type
         // it will do no harm.
-        val format = config.config.getOrElse("implClass", fullFormat)
+        val format: String = config.config.getOrElse("implClass", fullFormat)
         //load configs should overwrite connect configs
         reader.options(config.config)
         reader.format(format).load(dbtable)
@@ -47,11 +47,11 @@ trait BaseBatchSource extends BatchSource with BatchSink with Registry with DslT
     }
 
     def parseTableAndColumnFromStr(str: String): (String, String) = {
-        val cleanedStr = cleanStr(str)
-        val dbAndTable = cleanedStr.split("\\.")
+        val cleanedStr: String = cleanStr(str)
+        val dbAndTable: Array[String] = cleanedStr.split("\\.")
         if (dbAndTable.length > 1) {
-            val table = dbAndTable(0)
-            val column = dbAndTable.splitAt(1)._2.mkString(".")
+            val table: String = dbAndTable(0)
+            val column: String = dbAndTable.splitAt(1)._2.mkString(".")
             (table, column)
         } else {
             (cleanedStr, cleanedStr)
@@ -59,14 +59,14 @@ trait BaseBatchSource extends BatchSource with BatchSink with Registry with DslT
     }
 
     override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-        var dbtable = config.path
+        val dbtable: String = config.path
         // if contains splitter, then we will try to find dbname in dbMapping.
         // otherwize we will do nothing since elasticsearch use something like index/type
         // it will do no harm.
         writer.mode(config.mode)
         //load configs should overwrite connect configs
         writer.options(config.config)
-        config.config.get("partitionByCol").map { item =>
+        config.config.get("partitionByCol").map { item: String =>
             writer.partitionBy(item.split(","): _*)
         }
         writer.format(config.config.getOrElse("implClass", fullFormat)).save(dbtable)

@@ -23,9 +23,9 @@ import scala.collection.mutable.ArrayBuffer
   * st(field(table,string),field(data,st(field(id,string))))
   *  \*/
 object SparkSchemaJsonParser {
-    private def findInputInArrayBracket(input: String) = {
-        val max = input.length - 1
-        val rest = ArrayBuffer[Char]()
+    private def findInputInArrayBracket(input: String): String = {
+        val max: Int = input.length - 1
+        val rest: ArrayBuffer[Char] = ArrayBuffer[Char]()
         var firstS = false
         var fBracketCount = 0
         (0 until max).foreach { i =>
@@ -53,12 +53,12 @@ object SparkSchemaJsonParser {
         rest.mkString("")
     }
 
-    private def findKeyAndValue(input: String) = {
-        val max = input.length - 1
+    private def findKeyAndValue(input: String): (String, String, String) = {
+        val max: Int = input.length - 1
         var fBracketCount = 0
         val positionArr = new ArrayBuffer[Integer]()
 
-        (0 until max).foreach { i =>
+        (0 until max).foreach { i: Int =>
             input(i) match {
                 case '(' =>
                     fBracketCount += 1
@@ -103,7 +103,7 @@ object SparkSchemaJsonParser {
         }
     }
 
-    private def getAlias(meta: Metadata) = {
+    private def getAlias(meta: Metadata): String = {
         var res = ""
         try {
             res = meta.getString("alias")
@@ -125,13 +125,12 @@ object SparkSchemaJsonParser {
             val curName = s"$parentName.${schema.name}"
             schema.dataType match {
                 case dType: StructType => dfs(columns, curName, dType)
-                case _ => {
-                    val aliasName = getAlias(schema.metadata)
+                case _ =>
+                    val aliasName: String = getAlias(schema.metadata)
                     if (aliasName.isEmpty)
                         columns.append(F.expr(s"$curName"))
                     else
                         columns.append(F.expr(s"$curName as $aliasName"))
-                }
             }
         }
     }
@@ -144,12 +143,12 @@ object SparkSchemaJsonParser {
       *
       *                    注意 如果有两个嵌套同名列 必须用别名区分
       */
-    def parseDataFrame(oldDf: DataFrame, str: String, containsRaw: Boolean = false) = {
+    def parseDataFrame(oldDf: DataFrame, str: String, containsRaw: Boolean = false): DataFrame = {
         //        var newDf = oldDf.select(F.explode(oldDf("value"))).toDF("value")
-        var newDf = oldDf
-        val sourceSchema = parse(str)
+        var newDf: DataFrame = oldDf
+        val sourceSchema: StructType = parse(str)
         //结合explode应对外层数组情况
-        val arraySourceSchema = ArrayType(sourceSchema)
+        val arraySourceSchema: ArrayType = ArrayType(sourceSchema)
         newDf = newDf.select(new Column(JsonToStructs(arraySourceSchema, Map(), F.col("value").expr, None)).as("data"), F.col("value"))
         //解决原始数据为数组情况
         newDf = newDf.select(F.explode(newDf("data")), F.col("value")).toDF("data", "value")
@@ -161,7 +160,7 @@ object SparkSchemaJsonParser {
         newDf
     }
 
-    def parse(str: String) = {
+    def parse(str: String): StructType = {
         toInnerStructType(str) match {
             case s: InnerStructType => toStructType(s)
             //                    case s: DataType =>
@@ -179,7 +178,7 @@ object SparkSchemaJsonParser {
     }
 
     private def toStructType(innerStructType: InnerStructType): StructType = {
-        StructType(innerStructType.list.map { field =>
+        StructType(innerStructType.list.map { field: StructField =>
             field.dataType match {
                 case structType: InnerStructType =>
                     StructField(field.name, toStructType(structType))
@@ -191,7 +190,7 @@ object SparkSchemaJsonParser {
 
     //st(field(name,string),field(name1,st(field(name2,array(string)))))
     private def toInnerStructType(dt: String, st: InnerStructType = InnerStructType(ArrayBuffer[StructField]())): DataType = {
-        def startsWith(c: String, token: String) = {
+        def startsWith(c: String, token: String): Boolean = {
             c.startsWith(token) || c.startsWith(s"${token} ") || c.startsWith(s"${token}(")
         }
 
@@ -216,16 +215,16 @@ object SparkSchemaJsonParser {
                 MapType(toInnerStructType(key, st), toInnerStructType(value, st))
 
             case c: String if startsWith(c, "st") =>
-                val value = findInputInArrayBracket(c)
-                val wst = InnerStructType(ArrayBuffer[StructField]())
+                val value: String = findInputInArrayBracket(c)
+                val wst: InnerStructType = InnerStructType(ArrayBuffer[StructField]())
                 toInnerStructType(value, wst)
 
 
             case c: String if startsWith(c, "field") =>
-                val filedStrArray = ArrayBuffer[String]()
+                val filedStrArray: ArrayBuffer[String] = ArrayBuffer[String]()
                 findFieldArray(c, filedStrArray)
 
-                filedStrArray.foreach { fs =>
+                filedStrArray.foreach { fs: String =>
                     val (key, value, alias) = findKeyAndValue(findInputInArrayBracket(fs))
                     st.list += StructField(key, toInnerStructType(value, st),
                         metadata = new MetadataBuilder().putString("alias", alias).build())
@@ -237,11 +236,11 @@ object SparkSchemaJsonParser {
     }
 
     private def findFieldArray(input: String, fields: ArrayBuffer[String]): Unit = {
-        val max = input.length
+        val max: Int = input.length
         var fBracketCount = 0
         var position = 0
         var stop = false
-        (0 until max).foreach { i =>
+        (0 until max).foreach { i: Int =>
             if (!stop) {
                 input(i) match {
                     case '(' =>
@@ -272,13 +271,11 @@ object SparkSchemaJsonParser {
         val columns = new ArrayBuffer[String]()
         for (schema <- sourceSchema) {
             schema.dataType match {
-                case dType: StructType => {
-                    val innerV = serializeSchema(dType)
+                case dType: StructType =>
+                    val innerV: String = serializeSchema(dType)
                     columns.append(s"field(${schema.name},$innerV)")
-                }
-                case _ => {
+                case _ =>
                     columns.append(s"field(${schema.name},string)")
-                }
             }
         }
         s"st(${columns.mkString(",")})"

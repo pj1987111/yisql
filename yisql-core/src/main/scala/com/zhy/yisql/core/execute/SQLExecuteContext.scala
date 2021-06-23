@@ -41,12 +41,12 @@ object SQLExecuteContext {
         }
     }
 
-    def unset = yisqlExecuteContext.remove()
+    def unset() = yisqlExecuteContext.remove()
 
     def parse(input: String, listener: DSLSQLListener): Unit = {
-        var cmd = input
+        var cmd: String = input
 
-        val sqel = listener.asInstanceOf[ScriptSQLExecListener]
+        val sqel: ScriptSQLExecListener = listener.asInstanceOf[ScriptSQLExecListener]
         //命令注册
         CommandCollection.fill(sqel)
 
@@ -58,12 +58,12 @@ object SQLExecuteContext {
         _parse(cmd, listener)
     }
 
-    def _parse(input: String, listener: DSLSQLListener) = {
+    def _parse(input: String, listener: DSLSQLListener): Unit = {
         val loadLexer = new DSLSQLLexer(new CaseChangingCharStream(input))
         val tokens = new CommonTokenStream(loadLexer)
         val parser = new DSLSQLParser(tokens)
 
-        val stat = parser.statement()
+        val stat: DSLSQLParser.StatementContext = parser.statement()
         ParseTreeWalker.DEFAULT.walk(listener, stat)
     }
 }

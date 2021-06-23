@@ -31,7 +31,7 @@ class SQLSession(username: String,
                  sessionManager: SessionManager,
                  opManager: SQLOperationManager,
                  sessionConf: Map[String, String] = Map()
-                  ) extends Logging {
+                ) extends Logging {
 
 
   @volatile private[this] var lastAccessTime: Long = System.currentTimeMillis()

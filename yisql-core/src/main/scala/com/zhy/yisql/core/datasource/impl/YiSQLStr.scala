@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.{BaseBatchSource, DataSinkConfig, DataSourceConfig}
-import com.zhy.yisql.core.execute.SQLExecuteContext
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
+import org.apache.spark.sql._
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -14,11 +14,11 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row}
 class YiSQLJsonStr extends BaseBatchSource {
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
         val option = config.config
-        val context = SQLExecuteContext.getContext()
-        val items = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
-        val spark = config.df.get.sparkSession
+        val context: ExecuteContext = SQLExecuteContext.getContext()
+        val items: Array[String] = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
+        val spark: SparkSession = config.df.get.sparkSession
         import spark.implicits._
-        val loadTable = reader.options(config.config).json(spark.createDataset[String](items))
+        val loadTable: DataFrame = reader.options(config.config).json(spark.createDataset[String](items))
         //        if (option.getOrElse("withRaw", "false").toBoolean) {
         //            loadTable.select()
         //        }
@@ -37,9 +37,9 @@ class YiSQLJsonStr extends BaseBatchSource {
 class YiSQLCsvStr extends BaseBatchSource {
 
     override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-        val context = SQLExecuteContext.getContext()
-        val items = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
-        val spark = config.df.get.sparkSession
+        val context: ExecuteContext = SQLExecuteContext.getContext()
+        val items: Array[String] = cleanBlockStr(context.execListener.env()(cleanStr(config.path))).split("\n")
+        val spark: SparkSession = config.df.get.sparkSession
         import spark.implicits._
         reader.options(config.config).csv(spark.createDataset[String](items))
     }

@@ -22,7 +22,7 @@ class EngineResource extends SQLCmd {
     val resourceControl = new SparkDynamicControlExecutors(spark)
 
     def isLocalMaster(conf: SparkConf): Boolean = {
-      val master = conf.get("spark.master", "")
+      val master: String = conf.get("spark.master", "")
       master == "local" || master.startsWith("local[")
     }
 
@@ -35,16 +35,16 @@ class EngineResource extends SQLCmd {
       return spark.createDataset[ResourceStatus](Seq(executorInfo.status)).toDF()
     }
 
-    val _action = params.getOrElse(action, "")
-    val _cpus = parseCores(params.getOrElse(cpus, ""))
-    val _timeout = params.getOrElse(timeout, "60 * 1000").toLong
+    val _action: String = params.getOrElse(action, "")
+    val _cpus: Int = parseCores(params.getOrElse(cpus, ""))
+    val _timeout: Long = params.getOrElse(timeout, "60 * 1000").toLong
 
     //需要增减的executor cpu数/每个executor核数
-    val executorsShouldAddOrRemove = Math.floor(_cpus / executorInfo.executorCores).toInt
+    val executorsShouldAddOrRemove: Int = Math.floor(_cpus / executorInfo.executorCores).toInt
     //当前executor数
-    val currentExecutorNum = executorInfo.executorDataMap.size
+    val currentExecutorNum: Int = executorInfo.executorDataMap.size
 
-    def tooMuchWithOneTime(cpusOrExecutorNum: Int) = {
+    def tooMuchWithOneTime(cpusOrExecutorNum: Int): Unit = {
       if (cpusOrExecutorNum > 20) {
         throw new RuntimeException("Too many cpus added at one time. Please add them with multi times.")
       }
@@ -61,7 +61,7 @@ class EngineResource extends SQLCmd {
         resourceControl.killExecutors(executorsShouldAddOrRemove, _timeout)
       case Action.SET =>
 
-        val diff = executorsShouldAddOrRemove - currentExecutorNum
+        val diff: Int = executorsShouldAddOrRemove - currentExecutorNum
         if (diff < 0) {
           tooMuchWithOneTime(-diff)
           logInfo(s"Adding cpus; currentExecutorNum:${currentExecutorNum} targetExecutorNum:${currentExecutorNum + diff}")
@@ -79,7 +79,7 @@ class EngineResource extends SQLCmd {
     spark.createDataset[ResourceStatus](Seq(executorInfo.status)).toDF()
   }
 
-  def parseCores(str: String) = {
+  def parseCores(str: String): Int = {
     if (str.toLowerCase.endsWith("c")) {
       str.toLowerCase.stripSuffix("c").toInt
     } else {
@@ -87,7 +87,7 @@ class EngineResource extends SQLCmd {
     }
   }
 
-  def parseAction(str: String) = {
+  def parseAction(str: String): Action.Value = {
     Action.withName(str)
   }
 

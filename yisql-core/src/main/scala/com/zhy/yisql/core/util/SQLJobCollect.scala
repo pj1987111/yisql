@@ -1,8 +1,9 @@
 package com.zhy.yisql.core.util
 
-import com.zhy.yisql.core.job.JobManager
-import org.apache.spark.SQLResource
+import com.zhy.yisql.core.job.{JobManager, SQLJobInfo}
+import org.apache.spark.{SQLResource, SQLResourceRender, SQLScriptJobGroup}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.streaming.{StreamingQuery, StreamingQueryProgress}
 
 /**
   *  \* Created with IntelliJ IDEA.
@@ -14,31 +15,31 @@ import org.apache.spark.sql.SparkSession
 class SQLJobCollect (spark: SparkSession, owner: String) {
     val resource = new SQLResource(spark, owner, getGroupId)
 
-    def jobs = {
-        val infoMap = JobManager.getJobInfo
-        val data = infoMap.toSeq.map(_._2).filter(_.owner == owner)
+    def jobs: Seq[SQLJobInfo] = {
+        val infoMap: Map[String, SQLJobInfo] = JobManager.getJobInfo
+        val data: Seq[SQLJobInfo] = infoMap.toSeq.map(_._2).filter(_.owner == owner)
         data
     }
 
-    def getJob(jobName: String) = {
-        val infoMap = JobManager.getJobInfo
-        val data = infoMap.toSeq.map(_._2).filter(_.owner == owner).filter(_.groupId == getGroupId(jobName))
+    def getJob(jobName: String): Seq[SQLJobInfo] = {
+        val infoMap: Map[String, SQLJobInfo] = JobManager.getJobInfo
+        val data: Seq[SQLJobInfo] = infoMap.toSeq.map(_._2).filter(_.owner == owner).filter(_.groupId == getGroupId(jobName))
         data
     }
 
-    def getGroupId(jobNameOrGroupId: String) = {
-        JobManager.getJobInfo.find(f => f._2.jobName == jobNameOrGroupId) match {
+    def getGroupId(jobNameOrGroupId: String): String = {
+        JobManager.getJobInfo.find((f: (String, SQLJobInfo)) => f._2.jobName == jobNameOrGroupId) match {
             case Some(item) => item._2.groupId
             case None => jobNameOrGroupId
         }
     }
 
-    def resourceSummary(jobGroupId: String) = {
+    def resourceSummary(jobGroupId: String): SQLResourceRender = {
         resource.resourceSummary(jobGroupId)
     }
 
 
-    def jobDetail(jobGroupId: String, version: Int = 1) = {
+    def jobDetail(jobGroupId: String, version: Int = 1): SQLScriptJobGroup = {
         if (version == 1) {
             resource.jobDetail(jobGroupId)
         }
@@ -48,11 +49,11 @@ class SQLJobCollect (spark: SparkSession, owner: String) {
 
     }
 
-    def jobProgress(jobGroupId: String) = {
-        val finalJobGroupId = getGroupId(jobGroupId)
-        val stream = spark.streams.get(finalJobGroupId)
+    def jobProgress(jobGroupId: String): Array[String] = {
+        val finalJobGroupId: String = getGroupId(jobGroupId)
+        val stream: StreamingQuery = spark.streams.get(finalJobGroupId)
         if (stream != null) {
-            stream.recentProgress.map { f =>
+            stream.recentProgress.map { f: StreamingQueryProgress =>
                 f.json
             }
         } else {

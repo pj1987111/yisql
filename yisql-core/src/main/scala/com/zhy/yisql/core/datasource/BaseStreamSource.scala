@@ -16,16 +16,16 @@ import java.util.concurrent.TimeUnit
 trait BaseStreamSource extends StreamSource with StreamSink with Registry with DslTool {
 
     override def sLoad(streamReader: DataStreamReader, config: DataSourceConfig): DataFrame = {
-        val format = config.config.getOrElse("implClass", fullFormat)
+        val format: String = config.config.getOrElse("implClass", fullFormat)
         streamReader.options(config.config).format(format).load()
     }
 
     override def sSave(streamWriter: DataStreamWriter[Row], config: DataSinkConfig): Any = {
-        var option = config.config
-        val duration = option("duration").toInt
+        var option: Map[String, String] = config.config
+        val duration: Int = option("duration").toInt
         option -= "duration"
 
-        val format = config.config.getOrElse("implClass", fullFormat)
+        val format: String = config.config.getOrElse("implClass", fullFormat)
 
         val writer: DataStreamWriter[Row] = streamWriter.format(format)
 

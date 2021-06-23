@@ -5,12 +5,12 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.streaming.DataStreamReader
 
 /**
-  *  \* Created with IntelliJ IDEA.
-  *  \* User: hongyi.zhou
-  *  \* Date: 2021-02-07
-  *  \* Time: 15:19
-  *  \* Description: 
-  *  \*/
+ *  \* Created with IntelliJ IDEA.
+ *  \* User: hongyi.zhou
+ *  \* Date: 2021-02-07
+ *  \* Time: 15:19
+ *  \* Description: 
+ *  \ */
 class YiSQLElasticSearch extends BaseMergeSource {
 
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {

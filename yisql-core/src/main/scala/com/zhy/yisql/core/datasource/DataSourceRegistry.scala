@@ -17,16 +17,16 @@ object DataSourceRegistry extends Logging {
 
   private val registry = new java.util.concurrent.ConcurrentHashMap[String, DataSource]()
 
-  def register(name: String, obj: DataSource) = {
+  def register(name: String, obj: DataSource): DataSource = {
     registry.put(name, obj)
   }
 
-  def unRegister(name: String) = {
+  def unRegister(name: String): DataSource = {
     registry.remove(name)
   }
 
 
-  def allSourceNames = {
+  def allSourceNames: Seq[String] = {
     registry.asScala.map(f => f._2.shortFormat).toSeq
   }
 
@@ -43,9 +43,9 @@ object DataSourceRegistry extends Logging {
     }
   }
 
-  private def registerFromPackage(name: String) = {
+  private def registerFromPackage(name: String): Unit = {
     ClassPath.from(getClass.getClassLoader).getTopLevelClasses(name).asScala.foreach { clzz =>
-      val dataSource = Class.forName(clzz.getName).newInstance()
+      val dataSource: Any = Class.forName(clzz.getName).newInstance()
       dataSource match {
         case registry: Registry =>
           registry.register()

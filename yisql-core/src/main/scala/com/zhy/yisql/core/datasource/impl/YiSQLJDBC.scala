@@ -21,7 +21,7 @@ class YiSQLJDBC extends BaseMergeSource {
   def forceUseFormat: String = ""
 
   def useFormat(config: Map[String, String]): String = {
-    val format = if(forceUseFormat.nonEmpty) {
+    val format: String = if(forceUseFormat.nonEmpty) {
       forceUseFormat
     } else {
       config.getOrElse("implClass", fullFormat)
@@ -30,20 +30,20 @@ class YiSQLJDBC extends BaseMergeSource {
   }
 
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-    val dbTable = config.path
+    val dbTable: String = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.
-    val format = useFormat(config.config)
-    val url = config.config.get("url")
+    val format: String = useFormat(config.config)
+    val url: Option[String] = config.config.get("url")
     reader.options(config.config)
 
-    val table = if (config.config.contains("query")) {
+    val table: DataFrame = if (config.config.contains("query")) {
       reader.option("query", config.config("query"))
 
       reader.format(format).load()
     } else if (config.config.contains("prePtnArray")) {
-      val prePtn = config.config("prePtnArray")
+      val prePtn: Array[String] = config.config("prePtnArray")
           .split(config.config.getOrElse("prePtnDelimiter", ","))
 
       reader.jdbc(url.get, dbTable, prePtn, new Properties())
@@ -53,32 +53,32 @@ class YiSQLJDBC extends BaseMergeSource {
       reader.format(format).load()
     }
 
-    val columns = table.columns
+    val columns: Array[String] = table.columns
     val colNames = new Array[String](columns.length)
     for (i <- columns.indices) {
       val (_, column) = parseTableAndColumnFromStr(columns(i))
       colNames(i) = column
     }
-    val newDf = table.toDF(colNames: _*)
+    val newDf: DataFrame = table.toDF(colNames: _*)
     newDf
   }
 
   override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-    val dbTable = config.path
+    val dbTable: String = config.path
     // if contains splitter, then we will try to find dbname in dbMapping.
     // otherwize we will do nothing since elasticsearch use something like index/type
     // it will do no harm.
-    val format = useFormat(config.config)
+    val format: String = useFormat(config.config)
     writer.mode(config.mode)
     //load configs should overwrite connect configs
     writer.options(config.config)
-    config.config.get("partitionByCol").map { item =>
+    config.config.get("partitionByCol").map { item: String =>
       writer.partitionBy(item.split(","): _*)
     }
 
-    config.config.get("idCol").map { item =>
+    config.config.get("idCol").map { item: String =>
       import org.apache.spark.sql.jdbc.DataFrameWriterExtensions._
-      val extraOptions = ScalaReflect.fromInstance[DataFrameWriter[Row]](writer)
+      val extraOptions: Map[String, String] = ScalaReflect.fromInstance[DataFrameWriter[Row]](writer)
           .method("extraOptions").invoke()
           .asInstanceOf[ {def toMap[T, U](implicit ev: _ <:< (T, U)): scala.collection.immutable.Map[T, U]}].toMap[String, String]
       val jdbcOptions = new JDBCOptions(extraOptions + ("dbtable" -> dbTable))

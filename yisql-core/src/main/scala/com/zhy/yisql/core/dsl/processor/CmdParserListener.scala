@@ -18,25 +18,25 @@ class CmdParserListener(val scriptSQLExecListener: ScriptSQLExecListener) extend
     private val _statements = new ArrayBuffer[String]()
     private val _singleStatements = new ArrayBuffer[SingleStatement]()
 
-    def toScript = {
+    def toScript: String = {
 //        scriptSQLExecListener.addEnv(MLSQLEnvKey.CONTEXT_STATEMENT_NUM, _statements.length.toString)
         _statements.mkString(";") + ";"
     }
 
-    def statements = {
+    def statements: ArrayBuffer[String] = {
         _statements
     }
 
-    def analyzedStatements = {
+    def analyzedStatements: ArrayBuffer[SingleStatement] = {
         _singleStatements
     }
 
-    def addStatement(v: String) = {
+    def addStatement(v: String): CmdParserListener = {
         _statements += v
         this
     }
 
-    def addSingleStatement(v: SingleStatement) = {
+    def addSingleStatement(v: SingleStatement): CmdParserListener = {
         _singleStatements += v
         this
     }
@@ -46,14 +46,13 @@ class CmdParserListener(val scriptSQLExecListener: ScriptSQLExecListener) extend
         ctx.getChild(0).getText.toLowerCase() match {
             case item if item.startsWith("!") =>
                 new CommandAdaptor(this).parse(ctx)
-                new StatementAdaptor(this, (raw) => {}).parse(ctx)
-            case "set" => {
+                new StatementAdaptor(this, (_: String) => {}).parse(ctx)
+            case "set" =>
                 new SetAdaptor(scriptSQLExecListener).parse(ctx)
-                new StatementAdaptor(this, (raw) => {
+                new StatementAdaptor(this, (raw: String) => {
                     addStatement(raw)
                 }).parse(ctx)
-            }
-            case _ => new StatementAdaptor(this, (raw) => {
+            case _ => new StatementAdaptor(this, (raw: String) => {
                 addStatement(raw)
             }).parse(ctx)
         }

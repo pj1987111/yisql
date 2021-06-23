@@ -1,8 +1,8 @@
 package com.zhy.yisql.core.datasource.impl
 
 import com.zhy.yisql.core.datasource.datalake.DataLake
-import com.zhy.yisql.core.datasource.{BaseBatchSource, BaseMergeSource, BaseStreamSource, DataSinkConfig, DataSourceConfig}
-import com.zhy.yisql.core.execute.SQLExecuteContext
+import com.zhy.yisql.core.datasource.{BaseMergeSource, DataSinkConfig, DataSourceConfig}
+import com.zhy.yisql.core.execute.{ExecuteContext, SQLExecuteContext}
 import org.apache.spark.sql.streaming.{DataStreamReader, DataStreamWriter}
 import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, functions => F}
 
@@ -15,23 +15,23 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, Row, f
   *  \*/
 class YiSQLDelta extends BaseMergeSource {
   override def bLoad(reader: DataFrameReader, config: DataSourceConfig): DataFrame = {
-    val context = SQLExecuteContext.getContext()
-    val format = config.config.getOrElse("implClass", fullFormat)
-    val owner = config.config.getOrElse("owner", context.owner)
+    val context: ExecuteContext = SQLExecuteContext.getContext()
+    val format: String = config.config.getOrElse("implClass", fullFormat)
+    val owner: String = config.config.getOrElse("owner", context.owner)
 
     //timestampAsOf
-    val parameters = config.config
+    val parameters: Map[String, String] = config.config
 
     def paramValidate = {
       throw new RuntimeException("Both startingVersion,endingVersion are  required")
     }
 
-    def buildDF(version: Long) = {
-      val newOpt = if (version > 0) Map("versionAsOf" -> version.toString) else Map()
-      val reader = config.df.get.sparkSession.read
+    def buildDF(version: Long): DataFrame = {
+      val newOpt: Map[_ <: String, String] = if (version > 0) Map("versionAsOf" -> version.toString) else Map()
+      val reader: DataFrameReader = config.df.get.sparkSession.read
 
       val dataLake = new DataLake(config.df.get.sparkSession)
-      val finalPath = if (dataLake.isEnable) {
+      val finalPath: String = if (dataLake.isEnable) {
         dataLake.identifyToPath(config.path)
       } else {
         resourceRealPath(context.execListener, Option(owner), config.path)
@@ -48,22 +48,22 @@ class YiSQLDelta extends BaseMergeSource {
       case (None, Some(_)) => throw paramValidate
       case (Some(_), None) => throw paramValidate
       case (Some(start), Some(end)) =>
-        (start until end).map { version =>
+        (start until end).map { version: Long =>
           buildDF(version).withColumn("__delta_version__", F.lit(version))
-        }.reduce((total, cur) => total.union(cur))
+        }.reduce((total: DataFrame, cur: DataFrame) => total.union(cur))
     }
   }
 
   override def bSave(writer: DataFrameWriter[Row], config: DataSinkConfig): Any = {
-    val context = SQLExecuteContext.getContext()
-    val format = config.config.getOrElse("implClass", fullFormat)
-    val partitionByCol = config.config.getOrElse("partitionByCol", "").split(",").filterNot(_.isEmpty)
+    val context: ExecuteContext = SQLExecuteContext.getContext()
+    val format: String = config.config.getOrElse("implClass", fullFormat)
+    val partitionByCol: Array[String] = config.config.getOrElse("partitionByCol", "").split(",").filterNot(_.isEmpty)
     if (partitionByCol.length > 0) {
       writer.partitionBy(partitionByCol: _*)
     }
 
     val dataLake = new DataLake(config.df.get.sparkSession)
-    val finalPath = if (dataLake.isEnable) {
+    val finalPath: String = if (dataLake.isEnable) {
       dataLake.identifyToPath(config.path)
     } else {
       resourceRealPath(context.execListener, Option(context.owner), config.path)
@@ -72,12 +72,12 @@ class YiSQLDelta extends BaseMergeSource {
   }
 
   override def sLoad(reader: DataStreamReader, config: DataSourceConfig): DataFrame = {
-    val format = config.config.getOrElse("implClass", fullFormat)
-    val context = SQLExecuteContext.getContext()
-    val owner = config.config.getOrElse("owner", context.owner)
+    val format: String = config.config.getOrElse("implClass", fullFormat)
+    val context: ExecuteContext = SQLExecuteContext.getContext()
+    val owner: String = config.config.getOrElse("owner", context.owner)
 
     val dataLake = new DataLake(config.df.get.sparkSession)
-    val finalPath = if (dataLake.isEnable) {
+    val finalPath: String = if (dataLake.isEnable) {
       dataLake.identifyToPath(config.path)
     } else {
       resolvePath(config.path, owner)
@@ -87,21 +87,21 @@ class YiSQLDelta extends BaseMergeSource {
   }
 
   def resolvePath(path: String, owner: String): String = {
-    val context = SQLExecuteContext.getContext()
+    val context: ExecuteContext = SQLExecuteContext.getContext()
     resourceRealPath(context.execListener, Option(owner), path)
   }
 
   override def sSave(streamWriter: DataStreamWriter[Row], config: DataSinkConfig): Any = {
     val dataLake = new DataLake(config.df.get.sparkSession)
-    val context = SQLExecuteContext.getContext()
-    val finalPath = if (dataLake.isEnable) {
+    val context: ExecuteContext = SQLExecuteContext.getContext()
+    val finalPath: String = if (dataLake.isEnable) {
       dataLake.identifyToPath(config.path)
     } else {
       resolvePath(config.path, context.owner)
     }
     //        val newConfig = config.copy(
     //            config = Map("path" -> config.path, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
-    val newConfig = config.copy(
+    val newConfig: DataSinkConfig = config.copy(
       config = Map("path" -> finalPath, "__path__" -> finalPath) ++ config.config ++ Map("dbtable" -> finalPath))
     super.sSave(streamWriter, newConfig)
   }

@@ -1,16 +1,16 @@
 package com.zhy.yisql.core.dsl.adaptor
 
 import com.zhy.yisql.common.utils.json.JSONTool
-import com.zhy.yisql.core.dsl.processor.CmdParserListener
+import com.zhy.yisql.core.dsl.processor.{CmdParserListener, ScriptSQLExecListener}
 import com.zhy.yisql.dsl.parser.DSLSQLParser
 
 import scala.language.reflectiveCalls
 
 class StatementAdaptor(cmdParserListener: CmdParserListener, f: String => Unit) extends DslAdaptor {
   override def parse(ctx: DSLSQLParser.SqlContext): Unit = {
-    val PREFIX = ctx.getChild(0).getText.toLowerCase()
-    val root = cmdParserListener.scriptSQLExecListener
-    val statement = PREFIX match {
+    val PREFIX: String = ctx.getChild(0).getText.toLowerCase()
+    val root: ScriptSQLExecListener = cmdParserListener.scriptSQLExecListener
+    val statement: SingleStatement = PREFIX match {
       case "load" =>
         SingleStatement(loadStatement = new LoadAdaptor(root).analyze(ctx))
 
@@ -87,7 +87,7 @@ case class SingleStatement(loadStatement: LoadStatement = null,
     null
   }
 
-  def toJson = {
+  def toJson: String = {
     JSONTool.toJsonStr(this.unwrap)
   }
 }

@@ -2,7 +2,7 @@ package com.zhy.yisql.core.cmds
 
 import com.zhy.yisql.core.dsl.processor.ScriptSQLExecListener
 import com.zhy.yisql.core.execute.{PathPrefix, SQLExecuteContext}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.JavaConverters._
 
@@ -10,19 +10,19 @@ object CommandCollection {
 
   private val commandMapping = new java.util.concurrent.ConcurrentHashMap[String, String]()
 
-  def refreshCommandMapping(items: Map[String, String]) = {
-    items.foreach { k =>
+  def refreshCommandMapping(items: Map[String, String]): Unit = {
+    items.foreach { k: (String, String) =>
       commandMapping.put(k._1, k._2)
     }
   }
 
-  def remove(name: String) = {
+  def remove(name: String): String = {
     commandMapping.remove(name)
   }
 
   def fill(context: ScriptSQLExecListener): Unit = {
-    commandMapping.asScala.foreach { k =>
-      val value = k._2.toLowerCase
+    commandMapping.asScala.foreach { k: (String, String) =>
+      val value: String = k._2.toLowerCase
       if (value.contains("run") && value.contains("where") && value.contains("as")) {
         context.addEnv(k._1, k._2)
       } else context.addEnv(k._1, s"""run command as ${k._2}.`` where parameters='''{:all}'''""")
@@ -30,10 +30,10 @@ object CommandCollection {
     context.addEnv("desc", """run command as ShowTableExt.`` where parameters='''{:all}''' """)
     //    context.addEnv("kill", """run command as Kill.`` where type="{0}" and value="{1}" """)
     context.addEnv("kill", """run command as Kill.`{}/{}` """)
-//    context.addEnv("kill",
-//      """
-//        |run command as Kill.`` where parameters='''{:all}'''
-//      """.stripMargin)
+    //    context.addEnv("kill",
+    //      """
+    //        |run command as Kill.`` where parameters='''{:all}'''
+    //      """.stripMargin)
 
     //    context.addEnv("jdbc", """ run command as JDBC.`{}` where `driver-statement-0`='''{}''' """)
     context.addEnv("jdbc", """ run command as JDBC.`{}` where parameters='''{:all}''' """)
@@ -49,8 +49,8 @@ object CommandCollection {
     context.addEnv("removePythonEnvFromFile", """ run command as PythonEnvExt.`{}` where condaYamlFilePath="${HOME}/{}" and command="remove" """)
 
     /**
-      * spark资源管控
-      */
+     * spark资源管控
+     */
     context.addEnv("resource", """ run command as EngineResource.`` where action="{0}" and cpus="{1}" """)
 
     context.addEnv("model", """ run command as ModelCommand.`{1}` where action="{0}" """)
@@ -104,7 +104,7 @@ object CommandCollection {
       """.stripMargin)
   }
 
-  def evaluateYiSQL(spark: SparkSession, sql: String) = {
+  def evaluateYiSQL(spark: SparkSession, sql: String): DataFrame = {
     val context = new ScriptSQLExecListener(spark, new PathPrefix(null, null))
     SQLExecuteContext.parse(sql, context)
     spark.table(context.getLastSelectTable().get)
