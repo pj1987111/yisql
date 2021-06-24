@@ -31,3 +31,5 @@ logs/
 hs_err_pid*
 metastore_db/
 alisource/
+spark-warehouse/
+spark-checkpoints/
