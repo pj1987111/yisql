@@ -8,6 +8,8 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.spark.sql.DataFrame
 
+import java.util.UUID
+
 /**
  *  \* Created with IntelliJ IDEA.
  *  \* User: hongyi.zhou
@@ -32,14 +34,22 @@ class SelectAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAda
     text = TemplateMerge.merge(text, scriptSQLExecListener.env().toMap)
 
     val chunks: Array[String] = text.split("\\s+")
-    val tableName: String = chunks.last.replace(";", "")
+    val tableName: String = getTableName(chunks)
     val sql: String = try {
-      text.replaceAll(s"((?i)as)[\\s|\\n]+${tableName}\\s*\\n*$$", "")
+      text.replaceAll(s"((?i)as)[\\s|\\n]+$tableName\\s*\\n*$$", "")
     } catch {
       case _: Exception =>
         text.split("(?i)as").dropRight(1).mkString("as")
     }
     SelectStatement(text, sql, tableName)
+  }
+
+  def getTableName(chunks: Array[String]): String = {
+    if (chunks.length > 2 && chunks(chunks.length - 2).equalsIgnoreCase("as")) {
+      chunks.last.replace(";", "")
+    } else {
+      UUID.randomUUID().toString.replace("-", "")
+    }
   }
 
   override def parse(ctx: SqlContext): Unit = {

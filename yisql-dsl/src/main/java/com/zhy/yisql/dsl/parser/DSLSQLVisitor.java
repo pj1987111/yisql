@@ -1,4 +1,4 @@
-// Generated from /Volumes/workspace/zhy/workspace/yisql/yisql-dsl/src/main/resources/DSLSQL.g4 by ANTLR 4.9.1
+// Generated from /Users/zhouhongyi/Documents/my_workspace/yisql/yisql-dsl/src/main/resources/DSLSQL.g4 by ANTLR 4.9.1
 
 package com.zhy.yisql.dsl.parser;
 

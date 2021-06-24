@@ -15,7 +15,7 @@ statement
 sql
     : LOAD format '.' path where? expression? booleanExpression* as tableName
     | SAVE (overwrite | append | errorIfExists | ignore | complete | update)* tableName as format '.' path where? expression? booleanExpression* (PARTITIONBY col? colGroup*)?
-    | SELECT ~(';')* as tableName
+    | SELECT ~(';')* (as tableName)?
     | INSERT ~(';')*
     | CREATE ~(';')*
     | DROP ~(';')*

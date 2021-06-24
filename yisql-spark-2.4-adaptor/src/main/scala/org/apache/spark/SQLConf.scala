@@ -1,8 +1,7 @@
 package org.apache.spark
 
-import org.apache.spark.internal.config.{ConfigBuilder, ConfigEntry, ConfigProvider, ConfigReader, OptionalConfigEntry}
+import org.apache.spark.internal.config._
 
-import java.util
 import java.util.concurrent.TimeUnit
 import java.util.{HashMap, Map => JMap}
 import scala.collection.JavaConverters._
@@ -15,7 +14,7 @@ import scala.collection.JavaConverters._
  *  \* Description: 
  *  \ */
 object SQLConf {
-  private[this] val sqlConfEntries = new util.HashMap[String, ConfigEntry[_]]()
+  private[this] val sqlConfEntries = new HashMap[String, ConfigEntry[_]]()
 
   def register(entry: ConfigEntry[_]): Unit = {
     require(!sqlConfEntries.containsKey(entry.key),
@@ -23,7 +22,7 @@ object SQLConf {
     sqlConfEntries.put(entry.key, entry)
   }
 
-  def entries: util.HashMap[String, ConfigEntry[_]] = sqlConfEntries
+  def entries: HashMap[String, ConfigEntry[_]] = sqlConfEntries
 
   private[this] object SQLConfigBuilder {
     def apply(key: String): ConfigBuilder = ConfigBuilder(key).onCreate(register)
